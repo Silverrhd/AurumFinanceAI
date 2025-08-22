@@ -57,6 +57,9 @@ DB_PORT=5432
 # CORS for frontend
 CORS_ALLOWED_ORIGINS=http://$AWS_IP,http://127.0.0.1:3000,http://localhost:3000
 
+# Security (disable HTTPS redirect for HTTP deployment)
+SECURE_SSL_REDIRECT=False
+
 # Email (optional)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_HOST_USER=
