@@ -76,9 +76,10 @@ sudo -u aurumapp $APP_DIR/venv/bin/python manage.py collectstatic --noinput --cl
 # Step 6: Create admin user
 echo "👤 Creating admin superuser..."
 sudo -u aurumapp $APP_DIR/venv/bin/python manage.py shell << EOF
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@aurumfinance.com', 'ARDNd1163?')
+    User.objects.create_superuser(username='admin', email='admin@aurumfinance.com', password='ARDNd1163?', client_code='ADMIN')
     print("Admin user created: username=admin, password=ARDNd1163?")
 else:
     print("Admin user already exists")
