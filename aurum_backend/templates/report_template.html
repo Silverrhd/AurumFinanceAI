@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Portfolio Report{% if client_name %} - {{ client_name }}{% endif %}</title>
+    <style>
+        /* Base reset and typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Main container */
+        .report-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 0.5em;
+            color: #333;
+        }
+        
+        h1 { 
+            font-size: 1.8rem; 
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        h2 { 
+            font-size: 1.5rem; 
+            color: #333;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h3 { 
+            font-size: 1.25rem;
+            color: #555;
+        }
+        
+        p { 
+            margin-bottom: 1rem; 
+        }
+        
+        small {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .period-info {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        /* Card Components */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            background-color: #f8f9fa;
+        }
+        
+        .card-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #003366;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        /* Header Section */
+        .report-header {
+            margin-bottom: 2rem;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .logo-container {
+            flex: 0 0 300px;
+        }
+        
+        .company-logo {
+            max-height: 120px;
+            max-width: 100%;
+        }
+        
+        .right-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .export-controls {
+            margin-bottom: 15px;
+        }
+        
+        .title-container {
+            text-align: right;
+        }
+        
+        .report-title {
+            font-size: 1.8rem;
+            text-align: right;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .period-info {
+            text-align: right;
+            color: #6c757d;
+            margin-bottom: 0;
+            font-size: 1.1em;
+        }
+        
+        /* Summary Section */
+        .summary-section {
+            margin-bottom: 2rem;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .summary-item {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .summary-item h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+        
+        .summary-item p {
+            margin: 10px 0 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #212529;
+        }
+        
+        /* Asset Allocation Section */
+        .allocation-section {
+            margin-bottom: 2rem;
+        }
+        
+        .asset-allocation-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 40px;
+            align-items: start;
+        }
+        
+        .allocation-tables {
+            align-self: start;
+            min-width: 300px;
+        }
+        
+        .allocation-tables .data-table {
+            margin-bottom: 0;
+        }
+        
+        .allocation-tables .total-row {
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+        
+        .allocation-chart {
+            justify-self: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .allocation-chart img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Total Assets Card */
+        .total-assets-card {
+            background-color: #e4e6e8;
+            color: #333;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .total-assets-card h2 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .total-assets-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #212529;
+        }
+        
+        .total-assets-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .period-earnings {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .period-earnings-title {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .period-earnings-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #212529 !important; /* Force black color regardless of positive/negative */
+        }
+        
+        .period-earnings-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .period-earnings-percentage {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* Metrics Cards */
+        .metrics-card {
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: white;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-top: 4px solid #e9ecef;
+            transition: transform 0.2s ease;
+        }
+        
+        .metrics-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .metrics-card-title {
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metrics-card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1;
+            color: #212529 !important; /* Force black color for dollar amounts */
+        }
+        
+        .metrics-card-subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .metrics-card-subtitle strong {
+            font-size: 1.2rem;
+        }
+        
+        .performance-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-weight: normal;
+        }
+        
+        /* Tables */
+        .data-table {
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Position table specific styles */
+        .position-table-container {
+            overflow-x: auto;  /* Enable horizontal scroll if needed */
+            margin-bottom: 30px;
+        }
+
+        .position-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+            table-layout: auto;  /* Auto layout for content-aware column sizing */
+            max-width: 100%;
+        }
+
+        .position-table th,
+        .position-table td {
+            padding: 8px 12px;  /* More horizontal padding */
+            white-space: normal;  /* Allow text wrapping */
+            word-wrap: break-word;  /* Break long words */
+            vertical-align: middle;  /* Center content vertically */
+            border: 1px solid #dee2e6;
+            text-align: center;  /* Center all content by default */
+        }
+
+        /* Left-align text columns */
+        .position-table td.col-name,
+        .position-table td.col-ticker,
+        .position-table td.col-asset-type {
+            text-align: left;
+        }
+
+        /* Override for name column only - allow text wrapping */
+        /* Use nth-child selector since the name column is consistently the 2nd column */
+        .position-table td:nth-child(2) {
+            white-space: normal;        /* Allow text wrapping */
+            word-break: break-word;     /* Break long words if needed */
+            max-width: 200px;          /* Control when wrapping occurs */
+            min-width: 150px;          /* Maintain minimum space */
+            text-align: left;          /* Keep left alignment */
+        }
+
+        /* Backup: Also target by class if it gets fixed later */
+        .position-table td.col-name {
+            white-space: normal;        /* Allow text wrapping */
+            word-break: break-word;     /* Break long words if needed */
+            max-width: 200px;          /* Control when wrapping occurs */
+            min-width: 150px;          /* Maintain minimum space */
+            text-align: left;          /* Keep left alignment */
+        }
+
+        /* Right-align numeric columns */
+        .position-table td.numeric {
+            text-align: right;
+            padding-right: 16px;  /* More padding on the right for numbers */
+            white-space: nowrap;  /* Prevent wrapping of numbers */
+            word-wrap: normal;  /* Don't break numbers */
+        }
+
+        /* Auto layout - let browser determine optimal column widths based on content */
+        /* Remove all fixed width specifications to allow content-driven sizing */
+
+        /* Improved header text wrapping */
+        .position-table th {
+            font-size: 12px;  /* Slightly smaller for better fit */
+            line-height: 1.2;
+            padding: 6px 8px;  /* Optimized padding for auto layout */
+            vertical-align: middle;
+            text-transform: capitalize;
+            word-break: normal;
+            white-space: nowrap;  /* Prevent header text wrapping */
+            text-align: center;  /* Center-align all headers for consistency */
+        }
+
+        .position-table td {
+            font-size: 12px;  /* Consistent font size */
+            padding: 6px 8px;  /* Consistent padding */
+            vertical-align: middle;
+            white-space: nowrap;  /* Prevent cell content wrapping */
+        }
+
+        /* Auto layout handles all columns consistently */
+        
+        /* Chart containers */
+        .chart-container {
+            margin-bottom: 40px;
+        }
+        
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Biggest movers section */
+        .biggest-movers-section {
+            margin-bottom: 2rem;
+        }
+        
+        .biggest-movers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .biggest-movers-table th,
+        .biggest-movers-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .biggest-movers-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        /* Weekly Comparison Summary styles */
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .summary-flex {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        
+        .summary-card {
+            flex: 1;
+            min-width: 300px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .metrics-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .metrics-table td:last-child {
+            text-align: right;
+        }
+        
+        /* Metrics Comparison styles */
+        .metrics-comparison-section {
+            margin: 40px 0;
+        }
+        
+        .metrics-comparison-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .metrics-comparison-chart {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        /* Bond maturity section */
+        .bond-maturity-section {
+            margin-bottom: 2rem;
+        }
+        
+        .bond-maturity-section th {
+            text-align: right;
+        }
+        
+        /* Interactive Bond Maturity Timeline Styles */
+        .bond-maturity-table .maturity-row {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .bond-maturity-table .maturity-row:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .bond-maturity-table .maturity-row.expanded {
+            background-color: #e9ecef;
+        }
+        
+        .bond-maturity-table .expand-arrow {
+            transition: transform 0.2s ease;
+            font-weight: bold;
+            color: #007bff;
+            margin-left: 8px;
+            display: inline-block;
+        }
+        
+        .bond-maturity-table .expanded .expand-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .bond-maturity-table .bond-details-row {
+            display: none;
+            background-color: #f8f9fa;
+        }
+        
+        .bond-maturity-table .bond-details-container {
+            padding: 15px;
+            border-left: 3px solid #007bff;
+            margin: 5px 0;
+        }
+        
+        .bond-maturity-table .top-bonds-header {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .bond-maturity-table .bond-details-table {
+            width: 100%;
+            margin: 0;
+            font-size: 0.9em;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .bond-maturity-table .bond-details-table th {
+            background-color: #e9ecef;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.85em;
+        }
+        
+        .bond-maturity-table .bond-details-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+        
+        .bond-maturity-table .bond-details-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .bond-maturity-table .bond-details-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Top bond ranking indicators */
+        .bond-maturity-table .bond-details-table .top-1-bond {
+            border-left: 3px solid #28a745;
+        }
+        
+        .bond-maturity-table .bond-details-table .top-2-bond {
+            border-left: 3px solid #ffc107;
+        }
+        
+        .bond-maturity-table .bond-details-table .top-3-bond {
+            border-left: 3px solid #fd7e14;
+        }
+        
+        /* Utility classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-bold { font-weight: bold; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .p-0 { padding: 0; }
+        
+        .positive { color: #28a745; }
+        .negative { color: #dc3545; }
+        
+        /* PDF export button */
+        .export-controls {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .export-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .export-button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .report-container {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .asset-allocation-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .allocation-chart {
+                justify-self: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .grid-3, 
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-flex {
+                flex-direction: column;
+            }
+            
+            .summary-card {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .report-container {
+                padding: 15px;
+                margin: 10px;
+            }
+        }
+        
+        /* Print/PDF specific styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 10px;
+                background-color: white;
+            }
+            
+            .report-container {
+                max-width: none;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            /* Hide the PDF export button when printing */
+            .export-controls {
+                display: none;
+            }
+            
+            /* Ensure table headers repeat on each page */
+            thead {
+                display: table-header-group;
+            }
+            
+            /* Better page breaks */
+            tbody {
+                page-break-inside: auto;
+            }
+            
+            table {
+                page-break-inside: auto;
+            }
+            
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            
+            h1, h2, h3, h4 {
+                page-break-after: avoid;
+            }
+            
+            /* Remove hover effects - they don't make sense in PDF */
+            .data-table tr:hover {
+                background-color: transparent;
+            }
+            
+            /* Make sure images render properly */
+            img {
+                max-width: 100% !important;
+            }
+            
+            /* Ensure good page breaks between sections */
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            /* Maintain grid layouts in print */
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            /* Ensure proper card display */
+            .card {
+                break-inside: avoid;
+            }
+        }
+
+        /* Chart with info box styles */
+        .chart-with-info {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .chart-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .current-value-box {
+            background: linear-gradient(135deg, #5f76a1, #4a5d7a);
+            color: white;
+            border-radius: 8px;
+            padding: 16px;
+            min-width: 150px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(95, 118, 161, 0.3);
+            align-self: flex-start;
+            margin-top: 20px;
+        }
+
+        .current-value-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .current-value-number {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .current-value-date {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .chart-with-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .current-value-box {
+                align-self: stretch;
+                margin-top: 0;
+            }
+        }
+
+        /* Right-align numeric columns */
+        .position-table td.numeric {
+            text-align: right;
+            padding-right: 16px;  /* More padding on the right for numbers */
+            white-space: nowrap;  /* Prevent wrapping of numbers */
+            word-wrap: normal;  /* Don't break numbers */
+        }
+        
+        /* Numeric columns get right-aligned content but center-aligned headers */
+        .position-table td.numeric {
+            text-align: right;
+            padding-right: 8px;  /* Reduced padding for better fit */
+        }
+
+        /* Priority hints for auto layout - suggest relative importance */
+        .position-table .col-name {
+            min-width: 150px;  /* Ensure asset names have adequate space */
+        }
+
+        .position-table .col-market-value,
+        .position-table .col-cost-basis {
+            min-width: 100px;  /* Ensure key financial columns have adequate space */
+        }
+
+        .position-table .col-unrealized-gain-pct {
+            min-width: 80px;   /* Ensure percentage column fits header and values */
+        }
+
+        .position-table .col-coupon-rate {
+            min-width: 60px;   /* Ensure coupon rate fits "0.00%" values */
+        }
+        
+        /* Subtotal row styling - specific to subtotal rows only */
+        .subtotal-row td {
+            font-weight: bold;
+            background-color: #f8f9fa;
+            border-top: 2px solid #dee2e6;
+            border-bottom: 2px solid #dee2e6;
+        }
+    </style>
+    
+    <!-- ApexCharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header Section -->
+        <header class="report-header">
+            <div class="header-container">
+                <!-- Logo on the left -->
+                <div class="logo-container">
+                    <img src="data:image/png;base64,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" alt="DND Logo" class="company-logo">
+                </div>
+                
+                <!-- Right side content -->
+                <div class="right-content">
+                    <!-- Export button on top -->
+                    <div class="export-controls">
+                        <a href="javascript:window.print();" class="export-button">Export to PDF</a>
+                    </div>
+                    
+                    <!-- Title and period below -->
+                    <div class="title-container">
+                        <h1 class="report-title">
+                            {% if client_name %}{{ client_name }}{% endif %} Portfolio Report
+                        </h1>
+                        <div class="period-info">
+                            {% if date2 %}
+                                Period of {{ date1 }} - {{ date2 }}
+                            {% else %}
+                                As of {{ date1 }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Total Assets Card -->
+        <div class="card total-assets-card">
+            <h2>Your Assets as of {{ date2 }}</h2>
+            <div class="total-assets-value">{{ week2_data.total_value | format_currency }}</div>
+            <div class="total-assets-subtitle">Total Assets</div>
+            
+            <div class="period-earnings">
+                <div class="period-earnings-title">Total Earnings for the period</div>
+                <div class="period-earnings-value {{ 'positive' if week2_summary.weekly_dollar_performance >= 0 else 'negative' }}">
+                    {{ week2_summary.weekly_dollar_performance | format_currency }}
+                </div>
+                <div class="period-earnings-label">
+                    <span class="period-earnings-percentage {{ 'positive' if week2_summary.total_return_pct >= 0 else 'negative' }}">
+                        {{ week2_summary.total_return_pct | format_percentage }}
+                    </span>
+                    <span class="performance-label">Weekly Return</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gain/Loss Metrics Cards -->
+        <section class="metrics-section">
+            <h2>Gain/Loss</h2>
+            <div class="grid grid-3">
+                <!-- This Period Card -->
+                <div class="metrics-card">
+                    <div class="metrics-card-title">This Period</div>
+                    <div class="metrics-card-value {{ 'positive' if week2_summary.weekly_dollar_performance >= 0 else 'negative' }}">
+                        <strong>{{ week2_summary.weekly_dollar_performance | format_currency }}</strong>
+                    </div>
+                    <div class="metrics-card-subtitle">
+                        <span class="{{ 'positive' if week2_summary.total_return_pct >= 0 else 'negative' }}">
+                            <strong>{{ week2_summary.total_return_pct | format_percentage }}</strong>
+                        </span>
+                        <span class="performance-label">Weekly Return</span>
+                    </div>
+                </div>
+                
+                <!-- Inception Card -->
+                <div class="metrics-card">
+                    <div class="metrics-card-title">Since Inception</div>
+                    <div class="metrics-card-value {{ 'positive' if week2_summary.inception_dollar_performance >= 0 else 'negative' }}">
+                        <strong>{{ week2_summary.inception_dollar_performance | format_currency }}</strong>
+                    </div>
+                    <div class="metrics-card-subtitle">
+                        <span class="{{ 'positive' if week2_summary.inception_return_pct >= 0 else 'negative' }}">
+                            <strong>{{ week2_summary.inception_return_pct | format_percentage }}</strong>
+                        </span>
+                        <span class="performance-label">Total Return</span>
+                    </div>
+                </div>
+                
+                <!-- YTD Card (Placeholder) -->
+                <div class="metrics-card">
+                    <div class="metrics-card-title">Year-to-Date</div>
+                    <div class="metrics-card-value {{ 'positive' if week2_summary.weekly_dollar_performance >= 0 else 'negative' }}">
+                        <strong>{{ week2_summary.weekly_dollar_performance | format_currency }}</strong>
+                    </div>
+                    <div class="metrics-card-subtitle">
+                        <span class="{{ 'positive' if week2_summary.total_return_pct >= 0 else 'negative' }}">
+                            <strong>{{ week2_summary.total_return_pct | format_percentage }}</strong>
+                        </span>
+                        <span class="performance-label">YTD Return</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Est. Annual Income Card -->
+        <section class="annual-income-section">
+            <h2>Est. Annual Income</h2>
+            <div class="metrics-card">
+                <div class="metrics-card-title">Estimated Annual Income</div>
+                <div class="metrics-card-value">
+                    <strong>{{ week2_data.total_annual_income | format_currency }}</strong>
+                </div>
+                <div class="metrics-card-subtitle">
+                    <span class="{{ 'positive' if week2_data.total_annual_income > 0 else 'negative' }}">
+                        <strong>{{ week2_summary.total_annual_yield | format_percentage }}</strong>
+                    </span>
+                    <span class="performance-label">Annual Income</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Cumulative Return Chart -->
+        <section class="chart-section">
+            <h2>Cumulative Return Over Time</h2>
+            <div class="chart-container">
+                {% if cumulative_return_chart.hasData %}
+                    <div class="chart-with-info">
+                        <div id="cumulative-return-chart" class="chart-main" style="height: 400px; flex: 1;"></div>
+                        <div class="current-value-box">
+                            <div class="current-value-label">Current Value</div>
+                            <div class="current-value-number">{{ cumulative_return_chart.currentValue }}</div>
+                            <div class="current-value-date">{{ cumulative_return_chart.currentDate }}</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="no-data-message" style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                        {{ cumulative_return_chart.message }}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        
+        <!-- Portfolio History Chart -->
+        <section class="chart-section">
+            <h2>Portfolio Value Evolution</h2>
+            <div class="chart-container">
+                {% if portfolio_history_chart.hasData %}
+                    <div class="chart-with-info">
+                        <div id="portfolio-history-chart" class="chart-main" style="height: 400px; flex: 1;"></div>
+                        <div class="current-value-box">
+                            <div class="current-value-label">Current Value</div>
+                            <div class="current-value-number">{{ portfolio_history_chart.currentValue }}</div>
+                            <div class="current-value-date">{{ portfolio_history_chart.currentDate }}</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="no-data-message" style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                        {{ portfolio_history_chart.message }}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        
+        <!-- Asset Allocation Section -->
+        <section class="allocation-section">
+            <h2>Asset Allocation</h2>
+            <div class="asset-allocation-section">
+                <div class="allocation-tables">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Asset Class</th>
+                                <th class="text-right">Market Value</th>
+                                <th class="text-right">Allocation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asset_type, data in asset_allocation.items() %}
+                            <tr>
+                                <td>{{ asset_type }}</td>
+                                <td class="text-right">{{ data.market_value | format_currency }}</td>
+                                <td class="text-right">{{ data.percentage | format_percentage }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="total-row">
+                                <td>Total</td>
+                                <td class="text-right">{{ week2_data.total_value | format_currency }}</td>
+                                <td class="text-right">100.00%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="allocation-chart">
+                    {% if asset_allocation_chart.hasData %}
+                        <div id="asset-allocation-chart" style="height: 380px;"></div>
+                    {% else %}
+                        <div class="no-data-message" style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                            {{ asset_allocation_chart.message }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        
+        <!-- Custody Allocation Section -->
+        <section class="allocation-section">
+            <h2>Custody Allocation</h2>
+            <div class="asset-allocation-section">
+                <div class="allocation-tables">
+                    <table class="data-table custody-table">
+                        <thead>
+                            <tr>
+                                <th>Custody</th>
+                                <th class="text-right">Market Value</th>
+                                <th class="text-right">Weight %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for custody, data in custody_allocation.items() %}
+                            <tr>
+                                <td>{{ custody }}</td>
+                                <td class="text-right">{{ data.market_value | format_currency }}</td>
+                                <td class="text-right">{{ data.percentage | format_percentage }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="total-row">
+                                <td>Total</td>
+                                <td class="text-right">{{ week2_data.total_value | format_currency }}</td>
+                                <td class="text-right">100.00%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="allocation-chart">
+                    {% if custody_allocation_chart.hasData %}
+                        <div id="custody-allocation-chart" style="height: 380px;"></div>
+                    {% else %}
+                        <div class="no-data-message" style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                            {{ custody_allocation_chart.message }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        
+        <!-- Biggest Movers Section -->
+        <section class="biggest-movers-section">
+            <h2>Biggest movers of the period</h2>
+            {% if biggest_movers %}
+            <table class="biggest-movers-table">
+                <thead>
+                    <tr>
+                        <th>Asset</th>
+                        <th class="text-right">Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mover in biggest_movers %}
+                    <tr>
+                        <td>{{ mover['asset_type'] }} - {{ mover['name'] }}</td>
+                        <td class="text-right {{ 'positive' if mover['pct_change'] >= 0 else 'negative' }}">
+                            {{ mover['dollar_change'] | format_currency }} ({{ mover['pct_change'] | format_percentage }})
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No significant movers for this period.</p>
+            {% endif %}
+        </section>
+        
+        <!-- Interactive Bond Maturity Timeline -->
+        <section class="bond-maturity-section">
+            <h2>Bond Maturity Timeline</h2>
+            <div class="position-table-container">
+                <table class="data-table bond-maturity-table">
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Number of Bonds</th>
+                            <th>Total Face Value</th>
+                            <th>Total Market Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for year in ['2025', '2026', '2027', '2028', '2029', '2030+'] %}
+                        <!-- Clickable maturity row -->
+                        <tr class="maturity-row" onclick="toggleBondDetails('{{ year }}')" data-year="{{ year }}" title="Click to view top bonds">
+                            <td>{{ year }} <span class="expand-arrow" id="arrow-{{ year }}">▼</span></td>
+                            <td class="text-right">{{ bond_maturity_timeline[year]['num_bonds'] }}</td>
+                            <td class="text-right">${{ '{:,.2f}'.format(bond_maturity_timeline[year]['face_value']) }}</td>
+                            <td class="text-right">${{ '{:,.2f}'.format(bond_maturity_timeline[year]['market_value']) }}</td>
+                        </tr>
+                        
+                        <!-- Hidden detail row with top 5 bonds -->
+                        <tr class="bond-details-row" id="bonds-{{ year }}">
+                            <td colspan="4">
+                                <div class="bond-details-container">
+                                    <div class="top-bonds-header">
+                                        {% if bond_maturity_timeline[year]['num_bonds'] > 5 %}
+                                        Top 5 Bonds by Market Value (showing 5 of {{ bond_maturity_timeline[year]['num_bonds'] }} bonds)
+                                        {% elif bond_maturity_timeline[year]['num_bonds'] > 0 %}
+                                        All {{ bond_maturity_timeline[year]['num_bonds'] }} Bond{{ 's' if bond_maturity_timeline[year]['num_bonds'] != 1 else '' }} by Market Value
+                                        {% else %}
+                                        No bonds maturing in {{ year }}
+                                        {% endif %}
+                                    </div>
+                                    {% if bond_maturity_timeline[year]['num_bonds'] > 0 %}
+                                    <table class="bond-details-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Bank/Account</th>
+                                                <th>Bond Name</th>
+                                                <th>Market Value</th>
+                                                <th>Maturity Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bonds-{{ year }}-body">
+                                            <!-- Dynamic content populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Weekly Comparison Summary Section -->
+        {% if not is_first_report and comparison %}
+        <section class="comparison-section">
+            <h2>Weekly Comparison Summary</h2>
+            <div class="summary-flex">
+                <div class="summary-card">
+                    <h3>Previous Week ({{ comparison.date1 }})</h3>
+                    <table class="metrics-table">
+                        <tr><td>Total Portfolio Value:</td><td>{{ comparison.week1_summary.total_portfolio_value | format_currency }}</td></tr>
+                        <tr><td>Cash Flow:</td><td>{{ comparison.week1_summary.cash_flow | format_currency }}</td></tr>
+                        <tr><td>Annual Income:</td><td>{{ comparison.week1_summary.total_annual_income | format_currency }} ({{ comparison.week1_summary.total_annual_yield | format_percentage }})</td></tr>
+                        <tr><td>Number of Assets:</td><td>{{ comparison.week1_summary.count_of_assets }}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>Current Week ({{ comparison.date2 }})</h3>
+                    <table class="metrics-table">
+                        <tr><td>Total Portfolio Value:</td><td>{{ comparison.week2_summary.total_portfolio_value | format_currency }}</td></tr>
+                        <tr><td>Cash Flow:</td><td>{{ comparison.week2_summary.cash_flow | format_currency }}</td></tr>
+                        <tr><td>Annual Income:</td><td>{{ comparison.week2_summary.total_annual_income | format_currency }} ({{ comparison.week2_summary.total_annual_yield | format_percentage }})</td></tr>
+                        <tr><td>Number of Assets:</td><td>{{ comparison.week2_summary.count_of_assets }}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>Week-over-Week Change</h3>
+                    <table class="metrics-table">
+                        <tr>
+                            <td>Portfolio Value Change:</td>
+                            <td class="{{ 'positive' if comparison.portfolio_value_change >= 0 else 'negative' }}">
+                                {{ comparison.portfolio_value_change | format_currency }} ({{ comparison.portfolio_value_pct | format_percentage }})
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Net Cash Flow:</td>
+                            <td class="{{ 'positive' if comparison.combined_cash_flow >= 0 else 'negative' }}">
+                                {{ comparison.combined_cash_flow | format_currency }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Income Change:</td>
+                            <td class="{{ 'positive' if comparison.income_change >= 0 else 'negative' }}">
+                                {{ comparison.income_change | format_currency }} ({{ comparison.income_pct | format_percentage }})
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+        
+        {% if portfolio_comparison_chart %}
+        <!-- Portfolio Comparison Chart -->
+        <section class="metrics-comparison-section">
+            <h2>Portfolio Metrics Comparison</h2>
+            <div class="metrics-comparison-container">
+                {% if portfolio_comparison_chart.hasData %}
+                    <div id="portfolio-comparison-chart" style="height: 350px;"></div>
+                {% else %}
+                    <div class="no-data-message" style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                        No comparison data available
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- Current Positions Section -->
+        <section class="positions-section">
+            <h2>Current Positions</h2>
+            <div class="position-table-container">
+                {{ positions_table | safe }}
+            </div>
+        </section>
+        
+        <!-- Recent Transactions Section -->
+        {% if transactions_table %}
+        <section class="transactions-section">
+            <h2>Recent Transactions</h2>
+            {{ transactions_table | safe }}
+        </section>
+        {% endif %}
+        
+        <!-- Rollover Alert Section -->
+        {% if rollover_info and rollover_info.has_rollover %}
+        <section class="rollover-alert-section" style="
+            background-color: #fff3cd; 
+            border: 1px solid #ffeaa7; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 30px 0;
+            border-left: 5px solid #f39c12;
+        ">
+            <h3 style="color: #856404; margin-top: 0; display: flex; align-items: center;">
+                ⚠️ Data Rollover Notice
+            </h3>
+            <p style="margin: 15px 0; font-size: 14px; line-height: 1.5; color: #856404;">
+                {{ rollover_info.message }}
+            </p>
+            <p style="margin: 10px 0 0 0; font-size: 12px; color: #6c757d;">
+                <strong>Rolled-over accounts:</strong> {{ rollover_info.accounts | join(", ") }}
+            </p>
+        </section>
+        {% endif %}
+        
+        <!-- Account Rollover Alert Section -->
+        {% if week2_summary and week2_summary.rollover_accounts %}
+        <section class="rollover-alert-section">
+            <div class="rollover-alert" style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; border-left: 4px solid #f39c12;">
+                <h4 style="color: #856404; margin: 0 0 8px 0; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">⚠️</span>
+                    Data Quality Notice
+                </h4>
+                <p style="color: #856404; margin: 0; font-size: 14px;">
+                    The following accounts used data from the previous period: <strong>{{ week2_summary.rollover_accounts|join(', ') }}</strong>
+                </p>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+    
+    <!-- Chart JavaScript -->
+    <script>
+        // Cumulative Return Chart
+        {% if cumulative_return_chart.hasData %}
+        var cumulativeReturnOptions = {
+            series: {{ cumulative_return_chart.series | tojson }},
+            chart: {
+                height: 400,
+                type: 'area',
+                toolbar: { 
+                    show: false 
+                },
+                animations: { 
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                background: 'transparent',
+                fontFamily: 'Arial, sans-serif'
+            },
+            colors: ['{{ cumulative_return_chart.colors[0] }}'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'light',
+                    type: 'vertical',
+                    shadeIntensity: 0.5,
+                    gradientToColors: ['{{ cumulative_return_chart.gradient.to }}'],
+                    opacityFrom: 0.7,
+                    opacityTo: 0.1,
+                    stops: [0, 100]
+                }
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            dataLabels: { 
+                enabled: false 
+            },
+            grid: {
+                borderColor: '#e0e0e0',
+                strokeDashArray: 3,
+                xaxis: { lines: { show: false } },
+                yaxis: { lines: { show: true } },
+                padding: { left: 20, right: 20 }
+            },
+            xaxis: {
+                type: 'datetime',
+                labels: { 
+                    format: 'MMM dd',
+                    style: { 
+                        colors: '#666',
+                        fontSize: '12px'
+                    },
+                    rotate: -45
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                title: { 
+                    text: 'Cumulative Return (Base: 1000)',
+                    style: { 
+                        color: '#666',
+                        fontSize: '14px',
+                        fontWeight: 500
+                    }
+                },
+                labels: {
+                    formatter: function(val) { 
+                        return val.toFixed(2); 
+                    },
+                    style: { 
+                        colors: '#666',
+                        fontSize: '12px'
+                    }
+                },
+                min: {{ cumulative_return_chart.yAxisMin }},
+                max: {{ cumulative_return_chart.yAxisMax }}
+            },
+            tooltip: {
+                theme: 'light',
+                x: { 
+                    format: 'MMM dd, yyyy' 
+                },
+                y: { 
+                    formatter: function(val) { 
+                        return val.toFixed(2); 
+                    } 
+                },
+                marker: { show: true },
+                style: { fontSize: '12px' }
+            },
+            markers: {
+                size: 0,
+                hover: { 
+                    size: 6,
+                    sizeOffset: 3 
+                }
+            },
+            // Current value annotation will be added via JavaScript
+            responsive: [{
+                breakpoint: 768,
+                options: {
+                    chart: {
+                        height: 300
+                    },
+                    xaxis: {
+                        labels: {
+                            rotate: 0
+                        }
+                    },
+                    annotations: {
+                        xaxis: [{
+                            label: {
+                                offsetX: 30,
+                                style: {
+                                    fontSize: '11px',
+                                    padding: '4px 8px'
+                                }
+                            }
+                        }]
+                    }
+                }
+            }]
+        };
+
+        var cumulativeReturnChart = new ApexCharts(
+            document.querySelector("#cumulative-return-chart"), 
+            cumulativeReturnOptions
+        );
+        cumulativeReturnChart.render();
+        {% endif %}
+
+        // Portfolio History Chart
+        {% if portfolio_history_chart.hasData %}
+        var portfolioHistoryOptions = {
+            series: {{ portfolio_history_chart.series | tojson }},
+            chart: {
+                height: 400,
+                type: 'area',
+                toolbar: { 
+                    show: false 
+                },
+                animations: { 
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                background: 'transparent',
+                fontFamily: 'Arial, sans-serif'
+            },
+            colors: ['{{ portfolio_history_chart.colors[0] }}'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'light',
+                    type: 'vertical',
+                    shadeIntensity: 0.5,
+                    gradientToColors: ['{{ portfolio_history_chart.gradient.to }}'],
+                    opacityFrom: 0.7,
+                    opacityTo: 0.1,
+                    stops: [0, 100]
+                }
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            dataLabels: { 
+                enabled: false 
+            },
+            grid: {
+                borderColor: '#e0e0e0',
+                strokeDashArray: 3,
+                xaxis: { lines: { show: false } },
+                yaxis: { lines: { show: true } },
+                padding: { left: 20, right: 20 }
+            },
+            xaxis: {
+                type: 'datetime',
+                labels: { 
+                    format: 'MMM dd',
+                    style: { 
+                        colors: '#666',
+                        fontSize: '12px'
+                    },
+                    rotate: -45
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                title: { 
+                    text: 'Portfolio Value ($)',
+                    style: { 
+                        color: '#666',
+                        fontSize: '14px',
+                        fontWeight: 500
+                    }
+                },
+                labels: {
+                    formatter: function(val) { 
+                        return '$' + val.toLocaleString(); 
+                    },
+                    style: { 
+                        colors: '#666',
+                        fontSize: '12px'
+                    }
+                },
+                min: {{ portfolio_history_chart.yAxisMin }},
+                max: {{ portfolio_history_chart.yAxisMax }}
+            },
+            tooltip: {
+                theme: 'light',
+                x: { 
+                    format: 'MMM dd, yyyy' 
+                },
+                y: { 
+                    formatter: function(val) { 
+                        return '$' + val.toLocaleString(); 
+                    } 
+                },
+                marker: { show: true },
+                style: { fontSize: '12px' }
+            },
+            markers: {
+                size: 0,
+                hover: { 
+                    size: 6,
+                    sizeOffset: 3 
+                }
+            },
+            responsive: [{
+                breakpoint: 768,
+                options: {
+                    chart: {
+                        height: 300
+                    },
+                    xaxis: {
+                        labels: {
+                            rotate: 0
+                        }
+                    }
+                }
+            }]
+        };
+
+        var portfolioHistoryChart = new ApexCharts(
+            document.querySelector("#portfolio-history-chart"), 
+            portfolioHistoryOptions
+        );
+        portfolioHistoryChart.render();
+        {% endif %}
+
+        // Asset Allocation Polar Chart
+        {% if asset_allocation_chart.hasData %}
+        var assetAllocationPolarOptions = {
+            series: {{ asset_allocation_chart.series | tojson }},
+            chart: {
+                type: 'polarArea',
+                toolbar: { 
+                    show: false 
+                },
+                animations: { 
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                background: 'transparent',
+                fontFamily: 'Arial, sans-serif'
+            },
+            labels: {{ asset_allocation_chart.labels | tojson }},
+            colors: ['#5f76a1', '#072061', '#b7babe', '#dae1f3'],
+            stroke: {
+                colors: ['#fff']
+            },
+            fill: {
+                opacity: 0.8
+            },
+            legend: {
+                position: 'bottom',
+                fontSize: '13px',
+                fontWeight: '500',
+                labels: {
+                    colors: '#333'
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function(value, opts) {
+                        const monetaryValues = {{ asset_allocation_chart.monetaryValues | tojson }};
+                        const monetaryValue = monetaryValues[opts.seriesIndex];
+                        return value.toFixed(1) + '% ($' + monetaryValue.toLocaleString() + ')';
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+
+        var assetAllocationPolarChart = new ApexCharts(
+            document.querySelector("#asset-allocation-chart"), 
+            assetAllocationPolarOptions
+        );
+        assetAllocationPolarChart.render();
+        {% endif %}
+
+        // Custody Allocation Polar Chart
+        {% if custody_allocation_chart.hasData %}
+        var custodyAllocationPolarOptions = {
+            series: {{ custody_allocation_chart.series | tojson }},
+            chart: {
+                type: 'polarArea',
+                toolbar: { 
+                    show: false 
+                },
+                animations: { 
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                background: 'transparent',
+                fontFamily: 'Arial, sans-serif'
+            },
+            labels: {{ custody_allocation_chart.labels | tojson }},
+            colors: ['#5f76a1', '#072061', '#b7babe', '#dae1f3'],
+            stroke: {
+                colors: ['#fff']
+            },
+            fill: {
+                opacity: 0.8
+            },
+            legend: {
+                position: 'bottom',
+                fontSize: '13px',
+                fontWeight: '500',
+                labels: {
+                    colors: '#333'
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function(value, opts) {
+                        const monetaryValues = {{ custody_allocation_chart.monetaryValues | tojson }};
+                        const monetaryValue = monetaryValues[opts.seriesIndex];
+                        return value.toFixed(1) + '% ($' + monetaryValue.toLocaleString() + ')';
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+
+        var custodyAllocationPolarChart = new ApexCharts(
+            document.querySelector("#custody-allocation-chart"), 
+            custodyAllocationPolarOptions
+        );
+        custodyAllocationPolarChart.render();
+        {% endif %}
+
+        // Portfolio Comparison Column Chart
+        {% if portfolio_comparison_chart.hasData %}
+        var portfolioComparisonOptions = {
+            series: {{ portfolio_comparison_chart.series | tojson }},
+            chart: {
+                type: 'bar',
+                height: 350,
+                toolbar: { 
+                    show: false 
+                },
+                background: 'transparent',
+                fontFamily: 'Arial, sans-serif'
+            },
+            plotOptions: {
+                bar: {
+                    colors: {
+                        ranges: [{
+                            from: -999999999,
+                            to: -0.01,
+                            color: '#b7babe'
+                        }, {
+                            from: 0,
+                            to: 999999999,
+                            color: '#5f76a1'
+                        }]
+                    },
+                    columnWidth: '80%'
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            xaxis: {
+                categories: {{ portfolio_comparison_chart.categories | tojson }},
+                labels: {
+                    rotate: -45,
+                    style: {
+                        colors: '#666',
+                        fontSize: '12px'
+                    }
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                title: {
+                    text: 'Change ($)',
+                    style: {
+                        color: '#666',
+                        fontSize: '14px',
+                        fontWeight: 500
+                    }
+                },
+                labels: {
+                    formatter: function(val) {
+                        return '$' + val.toLocaleString();
+                    },
+                    style: {
+                        colors: '#666',
+                        fontSize: '12px'
+                    }
+                },
+                min: {{ portfolio_comparison_chart.yAxisMin }},
+                max: {{ portfolio_comparison_chart.yAxisMax }}
+            },
+            grid: {
+                borderColor: '#e0e0e0',
+                strokeDashArray: 3,
+                xaxis: { lines: { show: false } },
+                yaxis: { lines: { show: true } },
+                padding: { left: 20, right: 20 }
+            },
+            tooltip: {
+                theme: 'light',
+                y: {
+                    formatter: function(val) {
+                        return '$' + val.toLocaleString();
+                    }
+                },
+                style: { fontSize: '12px' }
+            },
+            annotations: {
+                yaxis: [{
+                    y: 0,
+                    borderColor: '#333',
+                    borderWidth: 1,
+                    strokeDashArray: 0
+                }]
+            },
+            responsive: [{
+                breakpoint: 768,
+                options: {
+                    chart: {
+                        height: 300
+                    },
+                    xaxis: {
+                        labels: {
+                            rotate: -90
+                        }
+                    }
+                }
+            }]
+        };
+
+        var portfolioComparisonChart = new ApexCharts(
+            document.querySelector("#portfolio-comparison-chart"), 
+            portfolioComparisonOptions
+        );
+        portfolioComparisonChart.render();
+        {% endif %}
+
+        // Interactive Bond Maturity Timeline Functionality
+        // Bond maturity data for JavaScript access
+        const bondMaturityData = {{ bond_maturity_timeline | tojson }};
+
+        function toggleBondDetails(year) {
+            const detailsRow = document.getElementById(`bonds-${year}`);
+            const arrow = document.getElementById(`arrow-${year}`);
+            const maturityRow = document.querySelector(`[data-year="${year}"]`);
+            
+            const isVisible = detailsRow.style.display === 'table-row';
+            
+            if (isVisible) {
+                // Collapse
+                detailsRow.style.display = 'none';
+                arrow.textContent = '▼';
+                maturityRow.classList.remove('expanded');
+            } else {
+                // Expand and show top 5 bonds
+                populateTop5BondDetails(year);
+                detailsRow.style.display = 'table-row';
+                arrow.textContent = '▲';
+                maturityRow.classList.add('expanded');
+            }
+        }
+
+        function populateTop5BondDetails(year) {
+            const tbody = document.getElementById(`bonds-${year}-body`);
+            const topBonds = bondMaturityData[year]?.top_bonds || [];
+            
+            tbody.innerHTML = '';
+            
+            // Display top 5 bonds (or fewer if less than 5 exist)
+            topBonds.forEach((bond, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${bond.bank_account}</td>
+                    <td>${bond.name}</td>
+                    <td class="text-right">$${bond.market_value.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td class="text-right">${bond.maturity_date}</td>
+                `;
+                
+                // Add visual ranking indicator for top bonds
+                if (index === 0) {
+                    row.classList.add('top-1-bond');
+                } else if (index === 1) {
+                    row.classList.add('top-2-bond');
+                } else if (index === 2) {
+                    row.classList.add('top-3-bond');
+                }
+                
+                tbody.appendChild(row);
+            });
+            
+            // Show message if no bonds available
+            if (topBonds.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="4" class="text-center" style="color: #666; font-style: italic;">No bonds maturing in this year</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        // Add keyboard accessibility
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                const target = event.target;
+                if (target.classList.contains('maturity-row')) {
+                    event.preventDefault();
+                    const year = target.getAttribute('data-year');
+                    if (year) {
+                        toggleBondDetails(year);
+                    }
+                }
+            }
+        });
+
+        // Add ARIA attributes for accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const maturityRows = document.querySelectorAll('.maturity-row');
+            maturityRows.forEach(row => {
+                row.setAttribute('role', 'button');
+                row.setAttribute('tabindex', '0');
+                row.setAttribute('aria-expanded', 'false');
+                const year = row.getAttribute('data-year');
+                row.setAttribute('aria-controls', `bonds-${year}`);
+            });
+        });
+    </script>
+</body>
+</html> 

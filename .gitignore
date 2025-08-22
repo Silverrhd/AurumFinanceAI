@@ -1,0 +1,17 @@
+# Security files - do not commit
+CREDENTIALS_README.md
+secure_credentials/
+temp_credentials.txt
+*credentials*.txt
+# Excel data files (large and sensitive)
+aurum_backend/data/excel/input_files/
+data/excel/input_files/
+
+# Large database and backup files
+*.sqlite3
+db_backup_*.sqlite3
+data_export.json
+
+# Log files (can be large)
+logs/*.log
+logs/*.log.*

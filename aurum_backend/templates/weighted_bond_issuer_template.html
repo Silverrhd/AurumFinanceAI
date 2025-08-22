@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Issuer Weight Report - {{ client_name or 'All Clients' }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .logo-left {
+            height: 60px;
+            width: auto;
+        }
+        
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .report-date {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .print-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .print-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .report-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+        }
+        
+        .client-name {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 500;
+            color: #34495e;
+            margin: 0 0 30px 0;
+        }
+        
+        .bond-issuer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .bond-issuer-table th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #34495e;
+        }
+        
+        .bond-issuer-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+        
+        .bond-issuer-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .bond-issuer-table tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .bond-issuer-table th:first-child,
+        .bond-issuer-table td:first-child {
+            padding-left: 15px;
+        }
+        
+        .bond-issuer-table th:last-child,
+        .bond-issuer-table td:last-child {
+            padding-right: 15px;
+        }
+        
+        .bond-issuer-table th:nth-child(3),
+        .bond-issuer-table td:nth-child(3),
+        .bond-issuer-table th:nth-child(4),
+        .bond-issuer-table td:nth-child(4),
+        .bond-issuer-table th:nth-child(5),
+        .bond-issuer-table td:nth-child(5) {
+            text-align: right;
+        }
+        
+        .bond-issuer-table th:nth-child(1),
+        .bond-issuer-table td:nth-child(1),
+        .bond-issuer-table th:nth-child(6),
+        .bond-issuer-table td:nth-child(6) {
+            text-align: center;
+        }
+        
+        /* Interactive Bond Issuer Details Styles */
+        .bond-issuer-table .issuer-row {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .bond-issuer-table .issuer-row:hover {
+            background-color: #f0f8ff !important;
+        }
+        
+        .bond-issuer-table .issuer-row.expanded {
+            background-color: #e3f2fd !important;
+        }
+        
+        .issuer-arrow {
+            margin-left: 8px;
+            font-size: 12px;
+            color: #666;
+            transition: transform 0.2s ease;
+        }
+        
+        .bond-details-row {
+            background-color: #f8f9fa;
+        }
+        
+        .bond-details-container {
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            margin: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .bond-details-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .bond-details-table {
+            width: 100%;
+            margin: 0;
+            font-size: 0.9em;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .bond-details-table th {
+            background-color: #e9ecef;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.85em;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .bond-details-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: top;
+        }
+        
+        .bond-details-table tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+        
+        .bond-details-table tr:hover {
+            background-color: #e8f4fd;
+        }
+        
+        .bond-details-table .text-right {
+            text-align: right;
+        }
+        
+        .bond-details-table .text-center {
+            text-align: center;
+        }
+        
+        .risk-analysis-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fff3cd;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .risk-analysis-section h3 {
+            margin: 0 0 15px 0;
+            color: #856404;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .risk-analysis-section p {
+            margin: 0 0 10px 0;
+            color: #856404;
+        }
+        
+        .risk-analysis-section ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .risk-analysis-section li {
+            color: #856404;
+            margin-bottom: 5px;
+        }
+        
+        .summary-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .summary-section h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .summary-table {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .summary-table td {
+            padding: 5px 10px;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .summary-table td:first-child {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .summary-table td:last-child {
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        .no-bonds-message {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 16px;
+            font-style: italic;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .print-btn {
+                display: none;
+            }
+            
+            .bond-issuer-table {
+                box-shadow: none;
+            }
+            
+            .bond-issuer-table tr:hover {
+                background-color: transparent;
+            }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .header-right {
+                align-items: center;
+            }
+            
+            .bond-issuer-table {
+                font-size: 12px;
+            }
+            
+            .bond-issuer-table th,
+            .bond-issuer-table td {
+                padding: 8px 4px;
+            }
+            
+            .report-title {
+                font-size: 24px;
+            }
+            
+            .client-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            {% if logo_base64 %}
+            <img src="data:image/png;base64,{{ logo_base64 }}" alt="Company Logo" class="logo-left">
+            {% else %}
+            <div class="logo-left" style="width: 60px; height: 60px; background-color: #e9ecef; border-radius: 4px;"></div>
+            {% endif %}
+            
+            <div class="header-right">
+                <div class="report-date">{{ report_date }}</div>
+                <button onclick="window.print()" class="print-btn">Print PDF</button>
+            </div>
+        </div>
+        
+        <!-- Title Section -->
+        <h1 class="report-title">Bond Issuer Weight Report</h1>
+        {% if client_name %}
+        <h2 class="client-name">{{ client_name }}</h2>
+        {% endif %}
+        
+        <!-- Bond Issuer Table -->
+        {% if issuers and issuers|length > 0 %}
+        <table class="bond-issuer-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Issuer</th>
+                    <th>Quantity (Face Value)</th>
+                    <th>Market Value</th>
+                    <th>Weight %</th>
+                    <th># of Bonds</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issuer in issuers %}
+                <!-- Main issuer row (clickable) -->
+                <tr class="issuer-row" data-issuer="{{ issuer.issuer|replace(' ', '-') }}" onclick="toggleIssuerDetails('{{ issuer.issuer|replace(' ', '-') }}')">
+                    <td>{{ issuer.rank }}</td>
+                    <td>{{ issuer.issuer or 'Unknown Issuer' }}<span class="issuer-arrow" id="arrow-{{ issuer.issuer|replace(' ', '-') }}">▼</span></td>
+                    <td>${{ "{:,.2f}".format(issuer.face_value or 0) }}</td>
+                    <td>${{ "{:,.2f}".format(issuer.market_value or 0) }}</td>
+                    <td>{{ "{:.1f}".format(issuer.weight_pct or 0) }}%</td>
+                    <td>{{ issuer.num_bonds or 0 }}</td>
+                </tr>
+                
+                <!-- Hidden bond details row -->
+                <tr id="bonds-{{ issuer.issuer|replace(' ', '-') }}" class="bond-details-row" style="display: none;">
+                    <td colspan="6">
+                        <div class="bond-details-container">
+                            <div class="bond-details-header">{{ issuer.issuer }} Bond Details</div>
+                            <table class="bond-details-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bond Name</th>
+                                        <th class="text-right">Market Value</th>
+                                        <th class="text-right">Face Value</th>
+                                        <th class="text-center">Coupon Rate</th>
+                                        <th class="text-center">Maturity Date</th>
+                                        <th class="text-right">Est. Annual Income</th>
+                                        <th class="text-center">Custody</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bonds-{{ issuer.issuer|replace(' ', '-') }}-body">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-bonds-message">
+            <h3>No Fixed Income Positions Found</h3>
+            <p>{% if client_name %}{{ client_name }}{% else %}This portfolio{% endif %} does not have any Fixed Income positions in the current portfolio.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Risk Analysis Section -->
+        {% if risk_analysis and risk_analysis.high_concentration_count > 0 %}
+        <div class="risk-analysis-section">
+            <h3>⚠️ Concentration Risk Analysis</h3>
+            <p>The following issuers represent more than {{ risk_analysis.concentration_threshold }}% 
+               of {{ client_name }}'s bond portfolio:</p>
+            <ul>
+                {% for issuer in risk_analysis.high_concentration_issuers %}
+                <li><strong>{{ issuer.issuer }}</strong>: {{ "{:.1f}".format(issuer.weight_pct) }}% 
+                    ({{ "{:,.0f}".format(issuer.num_bonds) }} bond{{ "s" if issuer.num_bonds != 1 else "" }})</li>
+                {% endfor %}
+            </ul>
+            <p><strong>Risk Assessment:</strong> 
+            {% if risk_analysis.high_concentration_count == 1 %}
+                Single issuer concentration detected.
+            {% else %}
+                Multiple issuer concentrations detected ({{ risk_analysis.high_concentration_count }} issuers).
+            {% endif %}
+            Consider diversification to reduce concentration risk.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Summary Section -->
+        {% if total_bond_value and issuers %}
+        <div class="summary-section">
+            <h3>Portfolio Summary</h3>
+            <table class="summary-table">
+                <tr><td>Total Issuers:</td><td>{{ issuers|length or 0 }}</td></tr>
+                <tr><td>Total Bond Portfolio Value:</td><td>${{ "{:,.2f}".format(total_bond_value or 0) }}</td></tr>
+                <tr><td>Total Bonds:</td><td>{{ issuers|sum(attribute='num_bonds') or 0 }}</td></tr>
+                {% if risk_analysis %}
+                <tr><td>Issuers Above {{ risk_analysis.concentration_threshold }}%:</td><td>{{ risk_analysis.high_concentration_count or 0 }}</td></tr>
+                {% endif %}
+                {% if risk_analysis and risk_analysis.max_concentration %}
+                <tr><td>Largest Concentration:</td><td>{{ "{:.1f}".format(risk_analysis.max_concentration.weight_pct) }}% ({{ risk_analysis.max_concentration.issuer }})</td></tr>
+                {% endif %}
+            </table>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Bond issuer data for JavaScript access
+        const bondIssuerData = {
+            {% for issuer in issuers %}
+            "{{ issuer.issuer|replace(' ', '-') }}": {
+                "issuer": "{{ issuer.issuer|e }}",
+                "bonds": {{ issuer.bonds|tojson }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        };
+        
+        function toggleIssuerDetails(issuerId) {
+            const detailsRow = document.getElementById(`bonds-${issuerId}`);
+            const arrow = document.getElementById(`arrow-${issuerId}`);
+            const issuerRow = document.querySelector(`[data-issuer="${issuerId}"]`);
+            
+            const isVisible = detailsRow.style.display === 'table-row';
+            
+            if (isVisible) {
+                // Collapse
+                detailsRow.style.display = 'none';
+                arrow.textContent = '▼';
+                issuerRow.classList.remove('expanded');
+            } else {
+                // Expand and populate bond details
+                populateIssuerBondDetails(issuerId);
+                detailsRow.style.display = 'table-row';
+                arrow.textContent = '▲';
+                issuerRow.classList.add('expanded');
+            }
+        }
+        
+        function populateIssuerBondDetails(issuerId) {
+            const tbody = document.getElementById(`bonds-${issuerId}-body`);
+            const issuerData = bondIssuerData[issuerId];
+            
+            if (!issuerData || !issuerData.bonds) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bond details available</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            // Display all bonds for this issuer
+            issuerData.bonds.forEach((bond, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${bond.name}</td>
+                    <td class="text-right">$${bond.market_value.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td class="text-right">$${bond.face_value.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td class="text-center">${bond.coupon_rate}</td>
+                    <td class="text-center">${bond.maturity_date}</td>
+                    <td class="text-right">$${bond.estimated_annual_income.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td class="text-center">${bond.custody}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Show message if no bonds available
+            if (issuerData.bonds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bonds found for this issuer</td></tr>';
+            }
+        }
+        
+        // Add keyboard accessibility
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                const target = event.target;
+                if (target.classList.contains('issuer-row')) {
+                    event.preventDefault();
+                    const issuerId = target.getAttribute('data-issuer');
+                    if (issuerId) {
+                        toggleIssuerDetails(issuerId);
+                    }
+                }
+            }
+        });
+        
+        // Add ARIA attributes for accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const issuerRows = document.querySelectorAll('.issuer-row');
+            issuerRows.forEach(row => {
+                row.setAttribute('role', 'button');
+                row.setAttribute('tabindex', '0');
+                row.setAttribute('aria-expanded', 'false');
+                const issuerId = row.getAttribute('data-issuer');
+                row.setAttribute('aria-controls', `bonds-${issuerId}`);
+            });
+        });
+    </script>
+</body>
+</html> 

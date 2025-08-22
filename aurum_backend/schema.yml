@@ -1,0 +1,1359 @@
+openapi: 3.0.3
+info:
+  title: Aurum Finance Portfolio Management API
+  version: 1.0.0
+  description: "\n    Complete API for portfolio management, bank file processing,\
+    \ and report generation.\n    \n    ## Key Features:\n    - Multi-tenant client\
+    \ isolation\n    - Role-based access control (Admin/Client)\n    - Bank file processing\
+    \ (JPM, MS, CS, Valley, Pershing, HSBC, JB, CSC)\n    - Automated report generation\n\
+    \    - Real-time dashboard data\n    \n    ## Authentication:\n    Use JWT tokens\
+    \ obtained from the login endpoint. Include in requests as:\n    `Authorization:\
+    \ Bearer <your_access_token>`\n    \n    ## User Roles:\n    - **Admin**: Can\
+    \ access all client data and management functions\n    - **Client**: Can only\
+    \ access their own portfolio data\n    "
+paths:
+  /api/admin/bank-status/:
+    get:
+      operationId: get_bank_status
+      description: "\n    Get processing status for all supported banks.\n    Shows\
+        \ file counts and processing states for each bank.\n    "
+      summary: Get Bank Processing Status
+      tags:
+      - File Processing
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BankStatus'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/admin/bond-issuer-progress/:
+    get:
+      operationId: bond_issuer_progress
+      description: "\n    Track progress of bond issuer report generation.\n    Uses\
+        \ your existing weighted_bond_issuer_report.py script.\n    "
+      summary: Bond Issuer Report Progress
+      tags:
+      - Report Generation
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportGenerationProgress'
+          description: ''
+  /api/admin/bond-maturity-progress/:
+    get:
+      operationId: bond_maturity_progress
+      description: "\n    **This tracks your \"Bond Maturity Report\" button progress!**\n\
+        \    \n    Monitors the progress of bond maturity report generation.\n   \
+        \ Uses your existing maturity_report.py script.\n    \n    **Features:**\n\
+        \    - Bonds sorted by maturity date (closest to furthest)\n    - Maturity\
+        \ analysis and timeline\n    - Client-specific or all-clients reporting\n\
+        \    "
+      summary: Bond Maturity Report Progress
+      tags:
+      - Report Generation
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportGenerationProgress'
+          description: ''
+  /api/admin/dashboard/:
+    get:
+      operationId: admin_dashboard_retrieve
+      description: |-
+        Get dashboard data for admin users (all clients).
+
+        GET /api/admin/dashboard/
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/admin/dashboard/all-charts/:
+    get:
+      operationId: admin_all_charts
+      description: "\n    Get all chart data in a single request for admin dashboard.\n\
+        \    Includes asset allocation, portfolio history, comparison, and cumulative\
+        \ return.\n    "
+      summary: All Dashboard Charts Data
+      tags:
+      - Dashboard - Admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllChartsResponse'
+          description: ''
+  /api/admin/dashboard/asset-allocation/:
+    get:
+      operationId: admin_asset_allocation
+      description: "\n    Get asset allocation data for donut chart.\n    Shows portfolio\
+        \ allocation across different asset types.\n    "
+      summary: Asset Allocation Chart Data
+      tags:
+      - Dashboard - Admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetAllocationChart'
+          description: ''
+  /api/admin/dashboard/metrics/:
+    get:
+      operationId: admin_dashboard_metrics
+      description: "\n    Get comprehensive dashboard metrics for admin users.\n \
+        \   Includes portfolio summary, client statistics, and performance data.\n\
+        \    "
+      summary: Admin Dashboard Metrics
+      tags:
+      - Dashboard - Admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDashboardMetrics'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/admin/equity-breakdown-progress/:
+    get:
+      operationId: equity_breakdown_progress
+      description: "\n    **This tracks your \"Equity Breakdown Report\" button progress!**\n\
+        \    \n    Monitors the progress of equity breakdown report generation.\n\
+        \    Uses your existing equity_breakdown_report.py script.\n    "
+      summary: Equity Breakdown Report Progress
+      tags:
+      - Report Generation
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportGenerationProgress'
+          description: ''
+  /api/admin/generate-missing-reports/:
+    post:
+      operationId: generate_missing_reports
+      description: "\n    **This is your main \"Generate Reports\" button functionality!**\n\
+        \    \n    Generates missing weekly portfolio reports for the specified date.\n\
+        \    \n    **Process:**\n    1. Analyzes which clients need reports for the\
+        \ date\n    2. Runs background generation using your existing generate_weekly_report.py\n\
+        \    3. Provides real-time progress tracking\n    4. Handles errors gracefully\n\
+        \    \n    **Background Processing:**\n    - Uses your existing Python scripts\n\
+        \    - Maintains all current calculation logic\n    - Preserves Modified Dietz\
+        \ calculations\n    - Generates identical HTML reports\n    "
+      summary: Generate Missing Reports
+      tags:
+      - Report Generation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateReportsRequestRequest'
+            examples:
+              GenerateReportsForDate:
+                value:
+                  date: '15_07_2025'
+                summary: Generate Reports for Date
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GenerateReportsRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GenerateReportsRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportGenerationProgress'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/admin/generation-progress/:
+    get:
+      operationId: generation_progress
+      description: "\n    Get real-time progress of report generation.\n    Tracks\
+        \ the background report generation process.\n    "
+      summary: Report Generation Progress
+      tags:
+      - Report Generation
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportGenerationProgress'
+          description: ''
+  /api/admin/report-analysis/{date}/:
+    get:
+      operationId: report_analysis
+      description: "\n    Comprehensive report status analysis for a specific date.\n\
+        \    Shows which clients have reports and which are missing.\n    "
+      summary: Report Status Analysis
+      parameters:
+      - in: path
+        name: date
+        schema:
+          type: string
+        description: Date in DD_MM_YYYY format
+        required: true
+      tags:
+      - Report Generation
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportAnalysis'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/admin/run-preprocessing/:
+    post:
+      operationId: run_preprocessing
+      description: "\n    Run the bank file preprocessing pipeline.\n    Transforms\
+        \ uploaded files into standardized format.\n    "
+      summary: Run Preprocessing Pipeline
+      tags:
+      - File Processing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreprocessingRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PreprocessingRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PreprocessingRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreprocessingResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/admin/system/health/:
+    get:
+      operationId: system_health
+      description: "\n    Comprehensive system health check including database, file\
+        \ system, and memory status.\n    "
+      summary: System Health Check
+      tags:
+      - System Monitoring
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemHealth'
+          description: ''
+  /api/admin/upload-files/:
+    post:
+      operationId: upload_bank_files
+      description: "\n    Upload bank statement files with automatic bank detection.\n\
+        \    \n    **Supported Banks:**\n    - JPMorgan (JPM)\n    - Morgan Stanley\
+        \ (MS) \n    - Credit Suisse (CS)\n    - Valley Bank\n    - Pershing\n   \
+        \ - HSBC\n    - JB Private Bank\n    - Credit Suisse Canada (CSC)\n    \n\
+        \    **File Requirements:**\n    - Excel files only (.xlsx, .xls)\n    - Maximum\
+        \ 50MB per file\n    - Multiple files supported\n    "
+      summary: Upload Bank Files
+      tags:
+      - File Processing
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '413':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/auth/login/:
+    post:
+      operationId: user_login
+      description: "\n    Authenticate user and return JWT tokens.\n    \n    **Supports\
+        \ both admin and client users:**\n    - Admin users: Can access all client\
+        \ data and management functions\n    - Client users: Can only access their\
+        \ own portfolio data\n    \n    **Returns:**\n    - Access token (1 hour expiry)\n\
+        \    - Refresh token (7 days expiry)  \n    - User profile information\n \
+        \   "
+      summary: User Login
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestRequest'
+            examples:
+              AdminLogin:
+                value:
+                  username: admin@aurumfinance.com
+                  password: secure_password
+                summary: Admin Login
+              ClientLogin:
+                value:
+                  username: client@company.com
+                  password: client_password
+                summary: Client Login
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: |-
+        Logout endpoint that blacklists the refresh token.
+
+        POST /api/auth/logout/
+        {
+            "refresh": "refresh_token_here"
+        }
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/profile/:
+    get:
+      operationId: auth_profile_retrieve
+      description: |-
+        Get current user profile information.
+
+        GET /api/auth/profile/
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/token/:
+    post:
+      operationId: auth_token_create
+      description: Custom JWT token view with enhanced error handling and logging.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/client/dashboard/:
+    get:
+      operationId: client_dashboard_retrieve
+      description: |-
+        Get dashboard data for client users (own data only).
+
+        GET /api/client/dashboard/
+      tags:
+      - client
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/client/dashboard/metrics/:
+    get:
+      operationId: client_dashboard_metrics
+      description: "\n    Get dashboard metrics for client users (own data only).\n\
+        \    Includes portfolio summary and performance data for the specific client.\n\
+        \    "
+      summary: Client Dashboard Metrics
+      tags:
+      - Dashboard - Client
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDashboardMetrics'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/client/info/:
+    get:
+      operationId: get_client_info
+      description: "\n    Get detailed information for the current client.\n    Client\
+        \ users can only see their own information.\n    "
+      summary: Get Client Information
+      tags:
+      - Dashboard - Client
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientInfo'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/client/token-info/:
+    get:
+      operationId: token_info
+      description: "\n    Get information about the current JWT token.\n    Validates\
+        \ token and returns user information.\n    "
+      summary: Token Information
+      tags:
+      - Authentication
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenInfo'
+          description: ''
+  /api/clients/:
+    get:
+      operationId: get_all_clients
+      description: "\n    Get list of all clients with basic information.\n    Admin-only\
+        \ endpoint for client management.\n    "
+      summary: Get All Clients
+      tags:
+      - Dashboard - Admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientList'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: ''
+  /api/health/:
+    get:
+      operationId: health_retrieve
+      description: |-
+        Health check endpoint for monitoring.
+
+        GET /api/health/
+      tags:
+      - health
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    AdminDashboardMetrics:
+      type: object
+      description: Admin dashboard metrics - matches /api/admin/dashboard/metrics
+      properties:
+        total_clients:
+          type: integer
+        total_assets:
+          type: integer
+        total_positions:
+          type: integer
+        total_market_value:
+          type: number
+          format: double
+        monthly_change:
+          type: number
+          format: double
+        ytd_return:
+          type: number
+          format: double
+        last_updated:
+          type: string
+          format: date-time
+        active_clients:
+          type: integer
+      required:
+      - active_clients
+      - last_updated
+      - monthly_change
+      - total_assets
+      - total_clients
+      - total_market_value
+      - total_positions
+      - ytd_return
+    AllChartsResponse:
+      type: object
+      description: All charts data response - matches /api/admin/dashboard/all-charts
+      properties:
+        asset_allocation:
+          $ref: '#/components/schemas/AssetAllocationChart'
+        portfolio_history:
+          $ref: '#/components/schemas/PortfolioHistoryChart'
+        portfolio_comparison:
+          $ref: '#/components/schemas/ChartData'
+        cumulative_return:
+          $ref: '#/components/schemas/ChartData'
+        last_updated:
+          type: string
+          format: date-time
+      required:
+      - asset_allocation
+      - cumulative_return
+      - last_updated
+      - portfolio_comparison
+      - portfolio_history
+    AssetAllocationChart:
+      type: object
+      description: Asset allocation donut chart data
+      properties:
+        chart_type:
+          type: string
+          default: donut
+        series:
+          type: array
+          items:
+            type: number
+            format: double
+        labels:
+          type: array
+          items:
+            type: string
+        colors:
+          type: array
+          items:
+            type: string
+        total_value:
+          type: number
+          format: double
+      required:
+      - colors
+      - labels
+      - series
+      - total_value
+    BankStatus:
+      type: object
+      description: Bank processing status - matches /api/admin/bank-status
+      properties:
+        bank_code:
+          type: string
+        bank_name:
+          type: string
+        files_count:
+          type: integer
+        last_processed:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          $ref: '#/components/schemas/BankStatusStatusEnum'
+        next_action:
+          type: string
+          nullable: true
+        file_types:
+          type: array
+          items:
+            type: string
+      required:
+      - bank_code
+      - bank_name
+      - file_types
+      - files_count
+      - last_processed
+      - next_action
+      - status
+    BankStatusStatusEnum:
+      enum:
+      - ready
+      - processing
+      - completed
+      - error
+      - no_files
+      type: string
+      description: |-
+        * `ready` - ready
+        * `processing` - processing
+        * `completed` - completed
+        * `error` - error
+        * `no_files` - no_files
+    ChartData:
+      type: object
+      description: Chart data structure for ApexCharts - matches your current format
+      properties:
+        series:
+          type: array
+          items: {}
+          description: Chart data series
+        labels:
+          type: array
+          items: {}
+          description: Chart labels
+        colors:
+          type: array
+          items: {}
+          description: Chart colors
+        categories:
+          type: array
+          items: {}
+          description: X-axis categories
+        title:
+          type: string
+      required:
+      - series
+    ClientDashboardMetrics:
+      type: object
+      description: Client dashboard metrics - matches /api/client/dashboard/metrics
+      properties:
+        client_code:
+          type: string
+        total_assets:
+          type: integer
+        total_market_value:
+          type: number
+          format: double
+        monthly_change:
+          type: number
+          format: double
+        ytd_return:
+          type: number
+          format: double
+        last_updated:
+          type: string
+          format: date-time
+        portfolio_allocation:
+          type: object
+          additionalProperties: {}
+      required:
+      - client_code
+      - last_updated
+      - monthly_change
+      - portfolio_allocation
+      - total_assets
+      - total_market_value
+      - ytd_return
+    ClientInfo:
+      type: object
+      description: Client information - matches /api/client/info
+      properties:
+        client_code:
+          type: string
+        client_name:
+          type: string
+        total_assets:
+          type: integer
+        total_market_value:
+          type: number
+          format: double
+        last_report_date:
+          type: string
+          format: date
+          nullable: true
+        account_status:
+          type: string
+      required:
+      - account_status
+      - client_code
+      - client_name
+      - last_report_date
+      - total_assets
+      - total_market_value
+    ClientList:
+      type: object
+      description: List of all clients - matches /api/clients
+      properties:
+        client_code:
+          type: string
+        client_name:
+          type: string
+        asset_count:
+          type: integer
+        market_value:
+          type: number
+          format: double
+        last_updated:
+          type: string
+          format: date-time
+        status:
+          type: string
+      required:
+      - asset_count
+      - client_code
+      - client_name
+      - last_updated
+      - market_value
+      - status
+    CustomTokenObtainPairRequest:
+      type: object
+      description: Custom JWT token serializer that includes user role and client
+        information.
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
+    ErrorResponse:
+      type: object
+      description: Standard error response format
+      properties:
+        error:
+          type: string
+          description: Error type or code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          additionalProperties: {}
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+        request_id:
+          type: string
+          description: Request ID for tracking
+      required:
+      - error
+      - message
+      - timestamp
+    FileUploadResponse:
+      type: object
+      description: Response for file upload endpoint - matches /api/admin/upload-files
+      properties:
+        success:
+          type: boolean
+        files_processed:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileUploadResult'
+        total_size:
+          type: integer
+          description: Total size in bytes
+        processing_time:
+          type: number
+          format: double
+          description: Processing time in seconds
+        errors:
+          type: array
+          items:
+            type: string
+          description: List of error messages
+      required:
+      - files_processed
+      - processing_time
+      - results
+      - success
+      - total_size
+    FileUploadResult:
+      type: object
+      description: Individual file upload result
+      properties:
+        filename:
+          type: string
+        bank_detected:
+          type: string
+          nullable: true
+        file_size:
+          type: integer
+        status:
+          $ref: '#/components/schemas/FileUploadResultStatusEnum'
+        message:
+          type: string
+        file_path:
+          type: string
+      required:
+      - bank_detected
+      - file_size
+      - filename
+      - message
+      - status
+    FileUploadResultStatusEnum:
+      enum:
+      - success
+      - error
+      - warning
+      type: string
+      description: |-
+        * `success` - success
+        * `error` - error
+        * `warning` - warning
+    GenerateReportsRequestRequest:
+      type: object
+      description: Request for generate-missing-reports endpoint - your main button!
+      properties:
+        date:
+          type: string
+          minLength: 1
+          description: Date in DD_MM_YYYY format (e.g., '15_07_2025')
+      required:
+      - date
+    LoginRequestRequest:
+      type: object
+      description: Login request schema matching your current FastAPI endpoint
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Username or email address
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+          description: User password
+          maxLength: 128
+      required:
+      - password
+      - username
+    LoginResponse:
+      type: object
+      description: Login response with JWT tokens and user info
+      properties:
+        access:
+          type: string
+          description: JWT access token (1 hour expiry)
+        refresh:
+          type: string
+          description: JWT refresh token (7 days expiry)
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          description: User profile information
+      required:
+      - access
+      - refresh
+      - user
+    PortfolioHistoryChart:
+      type: object
+      description: Portfolio history line chart data
+      properties:
+        chart_type:
+          type: string
+          default: line
+        series:
+          type: array
+          items: {}
+        categories:
+          type: array
+          items:
+            type: string
+        colors:
+          type: array
+          items:
+            type: string
+      required:
+      - categories
+      - colors
+      - series
+    PreprocessingRequestRequest:
+      type: object
+      description: Request for run-preprocessing endpoint
+      properties:
+        date:
+          type: string
+          minLength: 1
+          description: Date in DD_MM_YYYY format (e.g., '15_07_2025')
+        force_reprocess:
+          type: boolean
+          default: false
+          description: Force reprocessing even if files already exist
+      required:
+      - date
+    PreprocessingResponse:
+      type: object
+      description: Response for preprocessing pipeline
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        processing_time:
+          type: number
+          format: double
+        files_generated:
+          type: array
+          items:
+            type: string
+        banks_processed:
+          type: array
+          items:
+            type: string
+        errors:
+          type: array
+          items:
+            type: string
+      required:
+      - banks_processed
+      - files_generated
+      - message
+      - processing_time
+      - success
+    ReportAnalysis:
+      type: object
+      description: Report analysis response - matches /api/admin/report-analysis/{date}
+      properties:
+        date:
+          type: string
+        formatted_date:
+          type: string
+        total_clients:
+          type: integer
+        clients_with_reports:
+          type: integer
+        missing_clients:
+          type: array
+          items:
+            type: string
+        existing_reports:
+          type: array
+          items:
+            type: string
+        securities_file:
+          type: string
+          nullable: true
+        transactions_file:
+          type: string
+          nullable: true
+        files_exist:
+          type: boolean
+      required:
+      - clients_with_reports
+      - date
+      - existing_reports
+      - files_exist
+      - formatted_date
+      - missing_clients
+      - securities_file
+      - total_clients
+      - transactions_file
+    ReportGenerationProgress:
+      type: object
+      description: Progress tracking for report generation - matches your current
+        system
+      properties:
+        status:
+          $ref: '#/components/schemas/ReportGenerationProgressStatusEnum'
+        current_client:
+          type: string
+          nullable: true
+          description: Currently processing client code
+        completed_count:
+          type: integer
+        total_count:
+          type: integer
+        percentage:
+          type: number
+          format: double
+        message:
+          type: string
+        failed_clients:
+          type: array
+          items:
+            type: string
+        last_error:
+          type: string
+          nullable: true
+        generated_reports:
+          type: array
+          items:
+            type: string
+      required:
+      - completed_count
+      - current_client
+      - failed_clients
+      - last_error
+      - message
+      - percentage
+      - status
+      - total_count
+    ReportGenerationProgressStatusEnum:
+      enum:
+      - idle
+      - started
+      - processing
+      - completed
+      - error
+      type: string
+      description: |-
+        * `idle` - idle
+        * `started` - started
+        * `processing` - processing
+        * `completed` - completed
+        * `error` - error
+    RoleEnum:
+      enum:
+      - admin
+      - client
+      type: string
+      description: |-
+        * `admin` - Admin
+        * `client` - Client
+    SystemHealth:
+      type: object
+      description: System health check response
+      properties:
+        status:
+          $ref: '#/components/schemas/SystemHealthStatusEnum'
+        timestamp:
+          type: string
+          format: date-time
+        database_status:
+          type: string
+        file_system_status:
+          type: string
+        memory_usage:
+          type: number
+          format: double
+        disk_usage:
+          type: number
+          format: double
+        active_processes:
+          type: integer
+      required:
+      - active_processes
+      - database_status
+      - disk_usage
+      - file_system_status
+      - memory_usage
+      - status
+      - timestamp
+    SystemHealthStatusEnum:
+      enum:
+      - healthy
+      - warning
+      - error
+      type: string
+      description: |-
+        * `healthy` - healthy
+        * `warning` - warning
+        * `error` - error
+    TokenInfo:
+      type: object
+      description: Token validation response - matches /api/client/token-info
+      properties:
+        valid:
+          type: boolean
+        user_id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+        client_code:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+      required:
+      - client_code
+      - expires_at
+      - role
+      - user_id
+      - username
+      - valid
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    User:
+      type: object
+      description: User serializer for API responses
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: |-
+            User role: admin can see all clients, client can only see their own data
+
+            * `admin` - Admin
+            * `client` - Client
+        client_code:
+          type: string
+          nullable: true
+          description: Client code for client users (required for client role)
+          maxLength: 10
+        is_admin:
+          type: string
+          readOnly: true
+        is_client:
+          type: string
+          readOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - date_joined
+      - id
+      - is_admin
+      - is_client
+      - last_login
+      - username
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+- name: Authentication
+  description: User login, logout, and token management
+- name: File Processing
+  description: Bank file upload and preprocessing (12 banks supported)
+- name: Report Generation
+  description: Weekly, bond issuer, bond maturity, and equity breakdown reports
+- name: Dashboard - Admin
+  description: Admin dashboard data and charts
+- name: Dashboard - Client
+  description: Client-specific dashboard data
+- name: System Monitoring
+  description: Health checks and system status
