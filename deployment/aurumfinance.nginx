@@ -24,8 +24,17 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Django admin
-    location /admin/ {
+    # Django admin (specific path only)
+    location = /admin/ {
+        proxy_pass http://unix:/opt/aurumfinance/aurum_backend.sock;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # Django admin static/login pages
+    location ~ ^/admin/(login|logout|password_change|password_reset|jsi18n)/ {
         proxy_pass http://unix:/opt/aurumfinance/aurum_backend.sock;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
