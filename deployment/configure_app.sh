@@ -63,10 +63,17 @@ source ../venv/bin/activate
 python manage.py migrate
 python manage.py collectstatic --noinput --clear
 
-# Create superuser (interactive)
+# Create superuser (non-interactive)
 echo "👤 Creating Django superuser..."
-echo "Please create your admin user:"
-python manage.py createsuperuser
+python manage.py shell << EOF
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(username='Admin').exists():
+    User.objects.create_superuser(username='Admin', email='', password='ARDNd1163?', client_code='ADMIN')
+    print("Admin user created: username=Admin, password=ARDNd1163?")
+else:
+    print("Admin user already exists")
+EOF
 
 # Setup Next.js frontend
 echo "🎨 Setting up Next.js frontend..."
