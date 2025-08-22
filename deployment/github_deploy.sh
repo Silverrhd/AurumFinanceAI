@@ -90,7 +90,7 @@ echo "🎨 Setting up Next.js frontend..."
 cd $APP_DIR/source/aurum_frontend
 
 sudo -u aurumapp cat > .env.local << EOF
-NEXT_PUBLIC_API_URL=http://$AWS_IP/api
+NEXT_PUBLIC_API_URL=http://$AWS_IP
 NODE_ENV=production
 EOF
 
