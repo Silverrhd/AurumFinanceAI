@@ -43,7 +43,7 @@ echo "📝 Creating production environment file..."
 sudo -u aurumapp cat > $APP_DIR/source/aurum_backend/.env << EOF
 DJANGO_ENVIRONMENT=production
 DEBUG=False
-SECRET_KEY=$(python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
+SECRET_KEY=$($APP_DIR/venv/bin/python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
 ALLOWED_HOSTS=$AWS_IP,127.0.0.1,localhost
 
 # Database
