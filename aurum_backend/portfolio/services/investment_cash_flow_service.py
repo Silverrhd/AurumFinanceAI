@@ -136,6 +136,14 @@ class InvestmentCashFlowService:
             'SERVICE_FEES': ['MISCELLANEOS FEES', 'BALANCE FEES', 'MISCELLANEOUS FEES'],
             'EXTERNAL_FLOWS': ['WIRE OUT', 'WIRE IN', 'WIRE OUT INTL', 'ACH DEBIT', 'ELECTRONIFIED CHECK'],
             'OTHER_EXCLUDED': ['SECURITIES DEBIT']
+        },
+         'ALT': {
+            'OTHER_INCOME': ['SECURITIES CREDIT'],
+            'SERVICE_FEES': ['MISCELLANEOS FEES', 'BALANCE FEES', 'MISCELLANEOUS FEES'],
+            'TRADING_BUY': ['purchase', 'Purchase'],
+            'TRADING_SELL': ['sale', 'sold', 'Sale'],
+            'EXTERNAL_FLOWS': ['WIRE OUT', 'WIRE IN', 'WIRE OUT INTL', 'ACH DEBIT', 'ELECTRONIFIED CHECK'],
+            'OTHER_EXCLUDED': ['SECURITIES DEBIT']
         }
     }
     

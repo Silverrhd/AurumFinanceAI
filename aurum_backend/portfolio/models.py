@@ -105,7 +105,7 @@ class Asset(models.Model):
     account = models.CharField(max_length=50, default="", help_text="Custody account (empty string instead of UNKNOWN)")
     client = models.CharField(max_length=20, db_index=True, help_text="Client code for asset isolation")
     isin = models.CharField(max_length=12, null=True, blank=True, db_index=True)
-    cusip = models.CharField(max_length=9, null=True, blank=True, db_index=True)
+    cusip = models.CharField(max_length=50, null=True, blank=True, db_index=True)
     coupon_rate = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
     maturity_date = models.DateField(null=True, blank=True)
     dividend_yield = models.DecimalField(
@@ -260,13 +260,13 @@ class Transaction(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='transactions')
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='transactions')
     date = models.DateField(db_index=True)
-    transaction_type = models.CharField(max_length=50)
+    transaction_type = models.CharField(max_length=150)
     quantity = models.DecimalField(max_digits=15, decimal_places=4, null=True, blank=True)
     price = models.DecimalField(max_digits=15, decimal_places=4, null=True, blank=True)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     bank = models.CharField(max_length=20, default="", help_text="Bank name (empty string instead of UNKNOWN)")
-    account = models.CharField(max_length=50, default="", help_text="Account identifier (empty string instead of UNKNOWN)")
-    transaction_id = models.CharField(max_length=100, default="", help_text="Transaction identifier (empty string instead of UNKNOWN)")
+    account = models.CharField(max_length=100, default="", help_text="Account identifier (empty string instead of UNKNOWN)")
+    transaction_id = models.CharField(max_length=150, default="", help_text="Transaction identifier (empty string instead of UNKNOWN)")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

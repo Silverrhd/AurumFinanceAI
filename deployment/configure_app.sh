@@ -53,7 +53,7 @@ EMAIL_HOST_PASSWORD=
 DEFAULT_FROM_EMAIL=noreply@aurumfinance.com
 
 # API Keys (add your keys here)
-OPENFIGI_API_KEY=your_openfigi_key_here
+OPENFIGI_API_KEY=bf21060a-0568-489e-8622-efcaf02e52cf
 EOF
 
 # Run Django setup

@@ -22,6 +22,7 @@ apt install -y \
     nginx \
     postgresql \
     postgresql-contrib \
+    redis-server \
     supervisor \
     git \
     curl \
