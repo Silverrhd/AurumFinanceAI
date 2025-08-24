@@ -63,16 +63,51 @@ source ../venv/bin/activate
 python manage.py migrate
 python manage.py collectstatic --noinput --clear
 
-# Create superuser (non-interactive)
-echo "👤 Creating Django superuser..."
+# Create users (admin + all clients)
+echo "👤 Creating Django users (admin + all clients)..."
 python manage.py shell << EOF
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+# Create admin user (fixed role and client_code)
 if not User.objects.filter(username='Admin').exists():
-    User.objects.create_superuser(username='Admin', email='', password='ARDNd1163?', client_code='ADMIN')
-    print("Admin user created: username=Admin, password=ARDNd1163?")
+    admin_user = User.objects.create_superuser(username='Admin', email='admin@aurumfinance.com', password='ARDNd1163?')
+    admin_user.role = 'admin'
+    admin_user.client_code = None
+    admin_user.save()
+    print("✅ Admin user created: username=Admin, password=ARDNd1163?")
 else:
-    print("Admin user already exists")
+    print("✅ Admin user already exists")
+
+# Create client users from temp_credentials.txt (all 42 clients)
+client_credentials = [
+    ('AA', '@1tQw4Z3'), ('AC', 'w$YB0f^F'), ('AG', 'm6vC$atg'), ('AU', 'i9wb*G4Y'), ('BK', 'z*wpH7f6'),
+    ('CH', 'dUoo!0Fe'), ('CI', '^dMLVw9&'), ('CR', 'Tx*g7$1j'), ('DA', '2!Qws7I9'), ('DG', '%nyUt$m8'),
+    ('EG', 'z7#FY*AS'), ('ELP', '%B5U7qI#'), ('EV', 'IJo0x*lW'), ('FG', 'Qr&tTF6F'), ('FU', 'x^JMtb3q'),
+    ('GG', '0^0QlBgL'), ('GW', 'vFSYa8%0'), ('GZ', 'NFQi*J12'), ('HH', 'T0^kH*iq'), ('HS', 'E^q7YHwj'),
+    ('HZ', 'HPR&ec7^'), ('IA', 'RkS!fm7C'), ('ID', 'w6Kw#rTc'), ('IZ', 'zwy!0N!K'), ('JAI', 'FCsOB3!d'),
+    ('JAV', 'yNHJ5t$1'), ('JC', '%%oO4Gz8'), ('JG', 'P#eKI$Z5'), ('JN', 'nt&7I&f*'), ('JPU', '@#OZU9o5'),
+    ('KP', 'YrGd5!H!'), ('LP', 'lEcH57F^'), ('LV', '%0cT8wNw'), ('MAC', '6etU3%S@'), ('MB', 'D%Mo99Fn'),
+    ('MZ', '1u%&^*Ir'), ('NAC', '&8#ZJM3r'), ('PS', '&!Cf8*rz'), ('RB', 'oUR#l9Te'), ('RM', 'vlXl8@4W'),
+    ('RP', 'Ya#X5*fS'), ('RS', '8Nj9$Kr7'), ('VH', 'QXg&L5#Z'), ('VLP', '7oBY4!za'), ('VP', '*2uN@4zZ')
+]
+
+created_count = 0
+for client_code, password in client_credentials:
+    username = f"{client_code}_user"
+    if not User.objects.filter(username=username).exists():
+        client_user = User.objects.create_user(
+            username=username, 
+            email=f"{client_code.lower()}@aurumfinance.com",
+            password=password
+        )
+        client_user.role = 'client'
+        client_user.client_code = client_code
+        client_user.save()
+        created_count += 1
+
+print(f"✅ Created {created_count} new client users (42 total)")
+print("🔐 All client users use same passwords as temp_credentials.txt")
 EOF
 
 # Setup Next.js frontend

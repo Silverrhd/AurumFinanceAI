@@ -33,6 +33,15 @@ echo "🟢 Installing Node.js 18..."
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 apt-get install -y nodejs
 
+# Create 1GB swap file for frontend builds
+echo "💾 Setting up swap file for frontend builds..."
+fallocate -l 1G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+echo "✅ Swap file created and configured"
+
 # Verify installations
 echo "✅ Verifying installations..."
 python3 --version
