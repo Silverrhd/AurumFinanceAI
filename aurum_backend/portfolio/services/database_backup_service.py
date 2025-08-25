@@ -630,7 +630,7 @@ class DatabaseBackupService:
             restore_result = subprocess.run(restore_cmd, env=env, capture_output=True, text=True)
             if restore_result.returncode != 0:
                 # Check if it's a warning or actual error
-                if 'ERROR' in restore_result.stderr and 'already exists' not in restore_result.stderr:
+                if 'FATAL' in restore_result.stderr:
                     return {
                         'success': False,
                         'error': f'Database restore failed: {restore_result.stderr}'
