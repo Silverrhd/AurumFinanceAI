@@ -1,0 +1,1 @@
+# Core Django app for AurumFinance system utilities

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',  # OpenAPI 3.0 schema generation
     'corsheaders',
+    'core',  # Core system utilities (maintenance mode, etc.)
     'portfolio',  # Aurum Finance portfolio models
 ]
 
@@ -63,6 +64,7 @@ if DEBUG and not IS_PRODUCTION:
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'core.middleware.MaintenanceModeMiddleware',  # Enterprise maintenance mode
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
