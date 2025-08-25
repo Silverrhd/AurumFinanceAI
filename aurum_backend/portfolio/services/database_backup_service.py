@@ -579,14 +579,21 @@ class DatabaseBackupService:
             if self.db_password:
                 env['PGPASSWORD'] = self.db_password
             
-            # Step 1: Terminate all connections to the database
-            self.logger.info("🔪 Terminating all connections to database...")
-            terminate_result = self._terminate_database_connections()
+            # Step 1: Enhanced connection management and termination
+            self.logger.info("🔪 Enhanced connection termination process...")
+            revoke_result = self._revoke_database_connections()
             
-            if not terminate_result['success']:
-                self.logger.warning(f"⚠️ Connection termination had issues: {terminate_result['error']}")
+            if not revoke_result['success']:
+                self.logger.warning(f"⚠️ Enhanced connection termination had issues: {revoke_result['error']}")
+                # Continue anyway - we'll try basic termination as fallback
+                self.logger.info("🔄 Falling back to basic connection termination...")
+                basic_terminate_result = self._terminate_database_connections()
+                if not basic_terminate_result['success']:
+                    self.logger.warning(f"⚠️ Basic termination also failed: {basic_terminate_result['error']}")
+            else:
+                self.logger.info("✅ Enhanced connection termination successful")
             
-            # Step 2: Drop database with force
+            # Step 2: Drop database (should work now with connections cleared)
             self.logger.info("🗑️ Dropping existing database...")
             drop_cmd = [
                 'dropdb',
@@ -594,7 +601,6 @@ class DatabaseBackupService:
                 '--port', str(self.db_port),
                 '--username', self.db_user,
                 '--if-exists',
-                '--force',  # Force drop even with active connections
                 self.db_name
             ]
             
@@ -647,14 +653,32 @@ class DatabaseBackupService:
                     # Just warnings about existing objects, continue
                     self.logger.info(f"✅ Restore completed with warnings: {restore_result.stderr[:200]}")
             
+            # Step 5: Restore database connect privileges
+            self.logger.info("🔓 Restoring database permissions...")
+            permission_result = self._restore_database_permissions()
+            
+            if not permission_result['success']:
+                self.logger.warning(f"⚠️ Permission restoration warning: {permission_result['error']}")
+            else:
+                self.logger.info("✅ Database permissions restored")
+            
             self.logger.info("✅ PostgreSQL restore completed successfully")
             return {
                 'success': True,
-                'message': 'PostgreSQL restore completed successfully'
+                'message': 'PostgreSQL restore completed successfully',
+                'permissions_restored': permission_result['success']
             }
             
         except Exception as e:
             self.logger.error(f"❌ PostgreSQL restore error: {str(e)}")
+            
+            # Attempt to restore permissions even on failure
+            try:
+                self.logger.info("🔧 Attempting to restore database permissions after error...")
+                self._restore_database_permissions()
+            except Exception as cleanup_error:
+                self.logger.error(f"❌ Failed to restore permissions during cleanup: {cleanup_error}")
+            
             return {
                 'success': False,
                 'error': f'PostgreSQL restore error: {str(e)}'
@@ -712,4 +736,226 @@ class DatabaseBackupService:
             return {
                 'success': False,
                 'error': f'Error terminating connections: {str(e)}'
+            }
+    
+    def _revoke_database_connections(self) -> Dict[str, any]:
+        """
+        Enhanced connection management: Revoke connect privileges and terminate all connections.
+        
+        Multi-stage approach:
+        1. Revoke CONNECT privilege (prevents new connections)
+        2. Terminate all connections (all states: active, idle, etc.)
+        3. Wait and verify connections are gone
+        4. Force-kill any stubborn connections
+        
+        Returns:
+            Dict with revocation result
+        """
+        try:
+            env = os.environ.copy()
+            if self.db_password:
+                env['PGPASSWORD'] = self.db_password
+            
+            self.logger.info("🚫 Revoking database connect privileges...")
+            
+            # Step 1: Revoke CONNECT privileges to prevent new connections
+            revoke_sql = f"""
+            REVOKE CONNECT ON DATABASE {self.db_name} FROM public;
+            REVOKE CONNECT ON DATABASE {self.db_name} FROM {self.db_user};
+            """
+            
+            revoke_cmd = [
+                'psql',
+                '--host', self.db_host,
+                '--port', str(self.db_port),
+                '--username', self.db_user,
+                '--dbname', 'postgres',
+                '--no-password',
+                '--command', revoke_sql
+            ]
+            
+            revoke_result = subprocess.run(revoke_cmd, env=env, capture_output=True, text=True)
+            if revoke_result.returncode != 0:
+                self.logger.warning(f"⚠️ Connect privilege revocation warning: {revoke_result.stderr}")
+            else:
+                self.logger.info("✅ Database connect privileges revoked")
+            
+            # Step 2: Enhanced connection termination
+            self.logger.info("🔪 Terminating ALL database connections...")
+            
+            # Terminate all connection types (active, idle, idle in transaction, etc.)
+            terminate_sql = f"""
+            SELECT pg_terminate_backend(pid) 
+            FROM pg_stat_activity 
+            WHERE datname = '{self.db_name}' 
+              AND pid <> pg_backend_pid()
+              AND state IN ('active', 'idle', 'idle in transaction', 'idle in transaction (aborted)', 'fastpath function call', 'disabled');
+            """
+            
+            terminate_cmd = [
+                'psql',
+                '--host', self.db_host,
+                '--port', str(self.db_port),
+                '--username', self.db_user,
+                '--dbname', 'postgres',
+                '--no-password',
+                '--command', terminate_sql
+            ]
+            
+            terminate_result = subprocess.run(terminate_cmd, env=env, capture_output=True, text=True)
+            if terminate_result.returncode != 0:
+                self.logger.warning(f"⚠️ Connection termination warning: {terminate_result.stderr}")
+            
+            # Step 3: Wait and verify connections are gone
+            self.logger.info("⏳ Waiting for connections to terminate...")
+            connections_cleared = False
+            
+            for attempt in range(30):  # Wait up to 30 seconds
+                remaining_count = self._count_remaining_connections()
+                
+                if remaining_count == 0:
+                    connections_cleared = True
+                    self.logger.info(f"✅ All connections terminated (attempt {attempt + 1})")
+                    break
+                
+                if attempt == 0:
+                    self.logger.info(f"⏳ {remaining_count} connections remaining, waiting...")
+                
+                time.sleep(1)
+            
+            # Step 4: Force-kill any remaining stubborn connections
+            if not connections_cleared:
+                self.logger.warning("⚡ Using nuclear option for stubborn connections...")
+                
+                force_kill_sql = f"""
+                SELECT pg_cancel_backend(pid), pg_terminate_backend(pid)
+                FROM pg_stat_activity 
+                WHERE datname = '{self.db_name}' AND pid <> pg_backend_pid();
+                """
+                
+                force_cmd = [
+                    'psql',
+                    '--host', self.db_host,
+                    '--port', str(self.db_port),
+                    '--username', self.db_user,
+                    '--dbname', 'postgres',
+                    '--no-password',
+                    '--command', force_kill_sql
+                ]
+                
+                subprocess.run(force_cmd, env=env, capture_output=True, text=True)
+                
+                # Final check
+                final_count = self._count_remaining_connections()
+                if final_count == 0:
+                    self.logger.info("✅ All connections forcefully terminated")
+                    connections_cleared = True
+                else:
+                    self.logger.error(f"❌ {final_count} stubborn connections still remain")
+            
+            return {
+                'success': connections_cleared,
+                'message': 'Database connections revoked and terminated' if connections_cleared else 'Some connections may remain',
+                'connections_cleared': connections_cleared
+            }
+            
+        except Exception as e:
+            self.logger.error(f"❌ Error in connection revocation: {str(e)}")
+            return {
+                'success': False,
+                'error': f'Connection revocation error: {str(e)}'
+            }
+    
+    def _count_remaining_connections(self) -> int:
+        """
+        Count remaining connections to the target database.
+        
+        Returns:
+            Number of remaining active connections
+        """
+        try:
+            env = os.environ.copy()
+            if self.db_password:
+                env['PGPASSWORD'] = self.db_password
+            
+            count_sql = f"""
+            SELECT COUNT(*) 
+            FROM pg_stat_activity 
+            WHERE datname = '{self.db_name}' 
+              AND pid <> pg_backend_pid();
+            """
+            
+            count_cmd = [
+                'psql',
+                '--host', self.db_host,
+                '--port', str(self.db_port),
+                '--username', self.db_user,
+                '--dbname', 'postgres',
+                '--no-password',
+                '--tuples-only',
+                '--command', count_sql
+            ]
+            
+            result = subprocess.run(count_cmd, env=env, capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                count = int(result.stdout.strip())
+                return count
+            else:
+                self.logger.warning(f"⚠️ Error counting connections: {result.stderr}")
+                return -1
+                
+        except Exception as e:
+            self.logger.error(f"❌ Error counting connections: {str(e)}")
+            return -1
+    
+    def _restore_database_permissions(self) -> Dict[str, any]:
+        """
+        Restore database connect privileges after successful restore.
+        
+        Returns:
+            Dict with permission restoration result
+        """
+        try:
+            env = os.environ.copy()
+            if self.db_password:
+                env['PGPASSWORD'] = self.db_password
+            
+            self.logger.info("🔓 Restoring database connect privileges...")
+            
+            restore_sql = f"""
+            GRANT CONNECT ON DATABASE {self.db_name} TO public;
+            GRANT CONNECT ON DATABASE {self.db_name} TO {self.db_user};
+            """
+            
+            restore_cmd = [
+                'psql',
+                '--host', self.db_host,
+                '--port', str(self.db_port),
+                '--username', self.db_user,
+                '--dbname', 'postgres',
+                '--no-password',
+                '--command', restore_sql
+            ]
+            
+            restore_result = subprocess.run(restore_cmd, env=env, capture_output=True, text=True)
+            
+            if restore_result.returncode == 0:
+                self.logger.info("✅ Database connect privileges restored")
+                return {
+                    'success': True,
+                    'message': 'Database connect privileges restored'
+                }
+            else:
+                self.logger.warning(f"⚠️ Permission restoration warning: {restore_result.stderr}")
+                return {
+                    'success': False,
+                    'error': f'Permission restoration failed: {restore_result.stderr}'
+                }
+                
+        except Exception as e:
+            self.logger.error(f"❌ Error restoring permissions: {str(e)}")
+            return {
+                'success': False,
+                'error': f'Permission restoration error: {str(e)}'
             }
