@@ -993,6 +993,7 @@ class DatabaseBackupService:
             restore_sql = f"""
             GRANT CONNECT ON DATABASE {self.db_name} TO public;
             GRANT CONNECT ON DATABASE {self.db_name} TO {self.db_user};
+            ALTER DATABASE {self.db_name} OWNER TO {self.db_user};
             """
             
             restore_cmd = [
