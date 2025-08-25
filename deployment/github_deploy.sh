@@ -23,6 +23,13 @@ sudo rm -rf $APP_DIR
 sudo mkdir -p $APP_DIR
 sudo chown aurumapp:aurumapp $APP_DIR
 
+# Create persistent data directory (survives deployments)
+echo "📁 Setting up persistent data directory..."
+sudo mkdir -p /var/lib/aurumfinance/backups
+sudo chown -R aurumapp:aurumapp /var/lib/aurumfinance
+sudo chmod 755 /var/lib/aurumfinance
+sudo chmod 755 /var/lib/aurumfinance/backups
+
 # Step 2: Clone repository
 echo "📥 Cloning AurumFinanceAI from GitHub..."
 cd /tmp

@@ -48,8 +48,8 @@ class DatabaseBackupService:
             self.backup_dir = self.db_path.parent
             self.backup_extension = '.sqlite3'
         else:  # PostgreSQL
-            # Use persistent backup location outside deployment directory
-            self.backup_dir = Path('/opt/aurumfinance/backups') if os.path.exists('/opt/aurumfinance') else Path.cwd() / 'backups'
+            # Use persistent backup location that survives deployments
+            self.backup_dir = Path('/var/lib/aurumfinance/backups')
             self.backup_dir.mkdir(parents=True, exist_ok=True)
             self.backup_extension = '.sql'
             
