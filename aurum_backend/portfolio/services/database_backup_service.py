@@ -642,6 +642,19 @@ class DatabaseBackupService:
             # Step 4: Swap databases (drop old, rename temp)
             self.logger.info("🔄 Swapping databases...")
             
+            # Transfer ownership before dropping database
+            self.logger.info("👑 Transferring database ownership...")
+            ownership_cmd = [
+                'psql',
+                '--host', self.db_host,
+                '--port', str(self.db_port),
+                '--username', self.db_user,
+                '--dbname', 'postgres',
+                '--no-password',
+                '--command', f'ALTER DATABASE {self.db_name} OWNER TO {self.db_user};'
+            ]
+            subprocess.run(ownership_cmd, env=env, capture_output=True, text=True)
+            
             # Drop the old production database
             self.logger.info("🗑️ Dropping old production database...")
             drop_cmd = [
