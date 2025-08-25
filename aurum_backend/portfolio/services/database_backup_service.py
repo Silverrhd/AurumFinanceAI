@@ -593,47 +593,33 @@ class DatabaseBackupService:
             else:
                 self.logger.info("✅ Enhanced connection termination successful")
             
-            # Step 2: Drop database (should work now with connections cleared)
-            self.logger.info("🗑️ Dropping existing database...")
-            drop_cmd = [
-                'dropdb',
-                '--host', self.db_host,
-                '--port', str(self.db_port),
-                '--username', self.db_user,
-                '--if-exists',
-                self.db_name
-            ]
+            # Step 2: Create temporary database (avoids "already exists" error)
+            temp_db_name = f"{self.db_name}_temp"
+            self.logger.info(f"🏗️ Creating temporary database: {temp_db_name}")
             
-            drop_result = subprocess.run(drop_cmd, env=env, capture_output=True, text=True)
-            if drop_result.returncode != 0:
-                self.logger.warning(f"⚠️ Drop database warning: {drop_result.stderr}")
-                # Continue anyway - the database might not exist
-            
-            # Step 3: Create new database
-            self.logger.info("🏗️ Creating new database...")
             create_cmd = [
                 'createdb',
                 '--host', self.db_host,
                 '--port', str(self.db_port),
                 '--username', self.db_user,
-                self.db_name
+                temp_db_name
             ]
             
             create_result = subprocess.run(create_cmd, env=env, capture_output=True, text=True)
             if create_result.returncode != 0:
                 return {
                     'success': False,
-                    'error': f'Database creation failed: {create_result.stderr}'
+                    'error': f'Temporary database creation failed: {create_result.stderr}'
                 }
             
-            # Step 4: Restore from backup
-            self.logger.info("📥 Restoring data from backup...")
+            # Step 3: Restore to temporary database
+            self.logger.info("📥 Restoring data to temporary database...")
             restore_cmd = [
                 'pg_restore',
                 '--host', self.db_host,
                 '--port', str(self.db_port),
                 '--username', self.db_user,
-                '--dbname', self.db_name,
+                '--dbname', temp_db_name,  # Restore to temp database
                 '--verbose',
                 '--no-password',
                 '--clean',  # Clean before restore
@@ -651,7 +637,63 @@ class DatabaseBackupService:
                     }
                 else:
                     # Just warnings about existing objects, continue
-                    self.logger.info(f"✅ Restore completed with warnings: {restore_result.stderr[:200]}")
+                    self.logger.info(f"✅ Restore to temp database completed with warnings")
+            
+            # Step 4: Swap databases (drop old, rename temp)
+            self.logger.info("🔄 Swapping databases...")
+            
+            # Drop the old production database
+            self.logger.info("🗑️ Dropping old production database...")
+            drop_cmd = [
+                'dropdb',
+                '--host', self.db_host,
+                '--port', str(self.db_port),
+                '--username', self.db_user,
+                '--if-exists',
+                self.db_name
+            ]
+            
+            drop_result = subprocess.run(drop_cmd, env=env, capture_output=True, text=True)
+            if drop_result.returncode != 0:
+                self.logger.warning(f"⚠️ Old database drop warning: {drop_result.stderr}")
+                # If drop fails, we still continue - the rename might work
+            else:
+                self.logger.info("✅ Old production database dropped")
+            
+            # Rename temp database to production name
+            self.logger.info("🔄 Renaming temp database to production...")
+            rename_cmd = [
+                'psql',
+                '--host', self.db_host,
+                '--port', str(self.db_port),
+                '--username', self.db_user,
+                '--dbname', 'postgres',
+                '--no-password',
+                '--command', f'ALTER DATABASE {temp_db_name} RENAME TO {self.db_name};'
+            ]
+            
+            rename_result = subprocess.run(rename_cmd, env=env, capture_output=True, text=True)
+            if rename_result.returncode != 0:
+                # This is critical - if rename fails, we need to cleanup
+                self.logger.error(f"❌ Database rename failed: {rename_result.stderr}")
+                
+                # Try to cleanup temp database
+                cleanup_cmd = [
+                    'dropdb',
+                    '--host', self.db_host,
+                    '--port', str(self.db_port),
+                    '--username', self.db_user,
+                    '--if-exists',
+                    temp_db_name
+                ]
+                subprocess.run(cleanup_cmd, env=env, capture_output=True, text=True)
+                
+                return {
+                    'success': False,
+                    'error': f'Database rename failed: {rename_result.stderr}'
+                }
+            
+            self.logger.info("✅ Database swap completed successfully")
             
             # Step 5: Restore database connect privileges
             self.logger.info("🔓 Restoring database permissions...")
@@ -666,11 +708,36 @@ class DatabaseBackupService:
             return {
                 'success': True,
                 'message': 'PostgreSQL restore completed successfully',
-                'permissions_restored': permission_result['success']
+                'permissions_restored': permission_result['success'],
+                'method': 'temporary_database_swap'
             }
             
         except Exception as e:
             self.logger.error(f"❌ PostgreSQL restore error: {str(e)}")
+            
+            # Cleanup: attempt to remove temp database if it exists
+            try:
+                temp_db_name = f"{self.db_name}_temp"
+                self.logger.info("🧹 Cleaning up temporary database...")
+                
+                cleanup_cmd = [
+                    'dropdb',
+                    '--host', self.db_host,
+                    '--port', str(self.db_port),
+                    '--username', self.db_user,
+                    '--if-exists',
+                    temp_db_name
+                ]
+                
+                env = os.environ.copy()
+                if self.db_password:
+                    env['PGPASSWORD'] = self.db_password
+                
+                subprocess.run(cleanup_cmd, env=env, capture_output=True, text=True)
+                self.logger.info("✅ Temporary database cleaned up")
+                
+            except Exception as cleanup_error:
+                self.logger.error(f"❌ Failed to cleanup temp database: {cleanup_error}")
             
             # Attempt to restore permissions even on failure
             try:
