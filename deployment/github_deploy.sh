@@ -111,7 +111,7 @@ autostart=true
 autorestart=true
 redirect_stderr=true
 stdout_logfile=/var/log/supervisor/aurum-backend.log
-environment=PATH="$APP_DIR/venv/bin"
+environment=PATH="$APP_DIR/venv/bin:/usr/local/bin:/usr/bin:/bin"
 EOF
 
 sudo cat > /etc/supervisor/conf.d/aurum-frontend.conf << EOF
