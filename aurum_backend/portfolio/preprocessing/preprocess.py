@@ -74,7 +74,7 @@ class UnifiedPreprocessor:
     def __init__(self):
         """Initialize the unified preprocessor."""
         self.project_root = Path(__file__).parent.parent.parent
-        self.supported_banks = ['JPM', 'MS', 'CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT']
+        self.supported_banks = ['JPM', 'MS', 'CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT', 'Citi']
         self.transformer_registry = {
             'JPM': 'preprocessing.transformers.jpm_transformer.JPMorganTransformer',
             'MS': 'preprocessing.transformers.ms_transformer.MorganStanleyTransformer',
@@ -87,7 +87,8 @@ class UnifiedPreprocessor:
             'Safra': 'preprocessing.transformers.safra_transformer.SafraTransformer',
             'LO': 'preprocessing.transformers.lombard_transformer.LombardTransformer',
             'IDB': 'preprocessing.transformers.idb_transformer.IDBTransformer',
-            'Banchile': 'preprocessing.transformers.banchile_transformer.BanchileTransformer'  # Added Banchile
+            'Banchile': 'preprocessing.transformers.banchile_transformer.BanchileTransformer',
+            'Citi': 'preprocessing.transformers.citi_transformer.CitiTransformer'
         }
         self.loaded_transformers = {}
         self.progress_tracker = ProgressTracker()
@@ -624,8 +625,8 @@ class UnifiedPreprocessor:
         transactions_df = pd.DataFrame()
         
         # Banks that need mappings file vs those that already have bank/client/account columns
-        banks_needing_mappings = ['JPM', 'MS', 'Safra']
-        banks_with_embedded_data = ['CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'LO', 'IDB', 'Banchile']  # Added Banchile
+        banks_needing_mappings = ['JPM', 'MS', 'Safra', 'Citi']
+        banks_with_embedded_data = ['CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'LO', 'IDB', 'Banchile']
         
         mappings_file = None
         if bank_code in banks_needing_mappings:
@@ -1166,6 +1167,7 @@ class UnifiedPreprocessor:
             logger.info("   - Safra_securities_DD_MM_YYYY.xlsx")
             logger.info("   - LO_securities_DD_MM_YYYY.xlsx")  # Added Lombard
             logger.info("   - IDB_securities_DD_MM_YYYY.xlsx")  # Added IDB
+            logger.info("   - Citi_securities_DD_MM_YYYY.xlsx")
             logger.info("   - JPM_transactions_DD_MM_YYYY.xlsx")
             logger.info("   - MS_transactions_DD_MM_YYYY.xlsx")
             logger.info("   - CSC_transactions_DD_MM_YYYY.xlsx")
@@ -1176,6 +1178,7 @@ class UnifiedPreprocessor:
             logger.info("   - Valley_transactions_DD_MM_YYYY.xlsx")
             logger.info("   - Safra_transactions_DD_MM_YYYY.xlsx")
             logger.info("   - LO_transactions_DD_MM_YYYY.xlsx")  # Added Lombard
+            logger.info("   - Citi_transactions_DD_MM_YYYY.xlsx")
             logger.info("   - Mappings.xlsx")
             return False
         

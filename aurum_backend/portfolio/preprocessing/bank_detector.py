@@ -22,7 +22,8 @@ class BankDetector:
         'Safra': r'^Safra_',
         'IDB': r'^IDB_',
         'Banchile': r'^Banchile_',
-        'ALT': r'^alt_'
+        'ALT': r'^alt_',
+        'Citi': r'^Citi_'
     }
     
     # Banks that use individual files per client/account

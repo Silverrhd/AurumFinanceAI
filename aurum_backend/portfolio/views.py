@@ -2759,7 +2759,7 @@ def determine_bank_status(bank_info, bank_code, processing_type):
 def get_bank_status(request):
     """Enhanced bank status with real file scanning."""
     try:
-        # The 13 ProjectAurum Banks with their processing types
+        # The 14 ProjectAurum Banks with their processing types
         PROJECTAURUM_BANKS = [
             {'code': 'JPM', 'name': 'JPMorgan', 'type': 'simple'},
             {'code': 'MS', 'name': 'Morgan Stanley', 'type': 'simple'},
@@ -2773,7 +2773,8 @@ def get_bank_status(request):
             {'code': 'Banchile', 'name': 'Banchile', 'type': 'combination'},
             {'code': 'Pershing', 'name': 'Pershing', 'type': 'enrichment_combination'},
             {'code': 'LO', 'name': 'Lombard', 'type': 'enrichment_combination'},
-            {'code': 'ALT', 'name': 'Alternative Assets', 'type': 'combination'}
+            {'code': 'ALT', 'name': 'Alternative Assets', 'type': 'combination'},
+            {'code': 'Citi', 'name': 'Citigroup', 'type': 'simple'}
         ]
         
         def get_next_steps(processing_type):
