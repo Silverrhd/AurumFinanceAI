@@ -144,6 +144,31 @@ class InvestmentCashFlowService:
             'TRADING_SELL': ['sale', 'sold', 'Sale'],
             'EXTERNAL_FLOWS': ['WIRE OUT', 'WIRE IN', 'WIRE OUT INTL', 'ACH DEBIT', 'ELECTRONIFIED CHECK'],
             'OTHER_EXCLUDED': ['SECURITIES DEBIT']
+        },
+        'Citi': {
+            'DIVIDEND_INCOME': ['Dividend', 'Dividends', 'Foreign Dividend'],
+            'INTEREST_INCOME': [
+                'Interest', 'Interest ', 'Interest Income', 'Corporate Interest', 
+                'U.S. Government Interest', 'Foreign Interest'
+            ],
+            'OTHER_INCOME': ['Distribution', 'Adjustment - Distribution'],
+            'TAX_FEES': ['Taxes', 'Tax Withholding', 'FATCA Tax Withheld'],
+            'SERVICE_FEES': [
+                'Account Fee', 'Fees paid - Asset account', 
+                'Adjustment Fee (outside commitment)'
+            ],
+            'TRADING_BUY': ['Asset Purchased', 'Purchase', 'Bought'],
+            'TRADING_SELL': ['Asset Sold', 'Sale', 'Sold', 'Redemption'],
+            'EXTERNAL_FLOWS': [
+                'Cash Withdrawal', 'Cash Deposit', 'Funds Received', 
+                'Funds Transferred', 'Online Transfer', 'Auto Bank Product Deposit',
+                'Bank Product Withdrawal', 'Adjustment - outside Commitment ', 
+                'Adjustment - outside Commitment'
+            ],
+            'OTHER_EXCLUDED': [
+                'Cost Adjustment', 'Dividend Reinvestment', 'Accrued Int Pd', 
+                'Accrued Int Rcv', 'OUTGOING'
+            ]
         }
     }
     

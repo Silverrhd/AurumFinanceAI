@@ -239,6 +239,30 @@ class CashFlowService:
                 'Distribution'   # Distributions from private equity, etc.
             ],
             'PROBLEMATIC_EXCLUDED': []
+        },
+        'Citi': {
+            'EXTERNAL_INFLOWS': [
+                'Cash Deposit',                  # Client deposits
+                'Funds Received',                # Wire transfers in
+                'Auto Bank Product Deposit',     # Automatic deposits
+                'Online Transfer'                # When positive amount
+            ],
+            'EXTERNAL_OUTFLOWS': [
+                'Cash Withdrawal',               # ATM/branch withdrawals  
+                'Funds Transferred',             # Wire transfers out
+                'Bank Product Withdrawal',       # Account withdrawals
+                'Adjustment - outside Commitment ', # Negative adjustments (with space)
+                'Adjustment - outside Commitment'  # Negative adjustments (without space)
+            ],
+            'TRADING_EXCLUDED': [
+                'Asset Purchased', 'Purchase', 'Bought',    # Buy transactions
+                'Asset Sold', 'Sale', 'Sold', 'Redemption' # Sell transactions
+            ],
+            'PROBLEMATIC_EXCLUDED': [
+                'Cost Adjustment',               # Accounting adjustments
+                'Dividend Reinvestment',         # Automatic reinvestment
+                'Accrued Int Pd', 'Accrued Int Rcv' # Accrual accounting
+            ]
         }
     }
     

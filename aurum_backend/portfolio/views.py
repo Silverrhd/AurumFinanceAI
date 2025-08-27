@@ -2211,6 +2211,7 @@ def organize_uploaded_file(uploaded_file, bank_code, extracted_date):
             'MS': 'Ready for immediate transformation', 
             'IDB': 'Ready for immediate transformation',
             'Safra': 'Ready for immediate transformation',
+            'Citi': 'Ready for immediate transformation',
             'HSBC': 'Ready for enrichment processing',
             'Pershing': 'Ready for enrichment + combination processing',
             'LO': 'Ready for enrichment + combination processing'
@@ -2644,7 +2645,8 @@ def scan_bank_files(bank_code, base_processing_dir, target_date=None):
         # Simple processing banks (already in final location)
         'JPM': [base_processing_dir],  # Root directory only
         'MS': [base_processing_dir],   # Root directory only
-        'Safra': [base_processing_dir] # Root directory only
+        'Safra': [base_processing_dir], # Root directory only
+        'Citi': [base_processing_dir]  # Root directory only
     }
     
     # Get scan locations for this bank
@@ -2717,6 +2719,7 @@ def determine_bank_status(bank_info, bank_code, processing_type):
         'MS': ['securities', 'transactions'],
         'IDB': ['securities', 'transactions'],
         'Safra': ['securities', 'transactions'],
+        'Citi': ['securities', 'transactions'],
         
         # Enrichment processing banks
         'HSBC': ['securities', 'transactions', 'unitcost'],
