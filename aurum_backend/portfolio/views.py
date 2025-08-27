@@ -2164,7 +2164,8 @@ def organize_uploaded_file(uploaded_file, bank_code, extracted_date):
             # Simple processing banks (ready for transform)
             'JPM': base_processing_dir,  # Root directory
             'MS': base_processing_dir,   # Root directory
-            'Safra': base_processing_dir # Root directory
+            'Safra': base_processing_dir, # Root directory
+            'Citi': base_processing_dir  # Root directory
         }
         
         # Get destination directory for this bank
@@ -2774,7 +2775,7 @@ def get_bank_status(request):
             {'code': 'Pershing', 'name': 'Pershing', 'type': 'enrichment_combination'},
             {'code': 'LO', 'name': 'Lombard', 'type': 'enrichment_combination'},
             {'code': 'ALT', 'name': 'Alternative Assets', 'type': 'combination'},
-            {'code': 'Citi', 'name': 'Citigroup', 'type': 'simple'}
+            {'code': 'Citi', 'name': 'Citi Bank', 'type': 'simple'}
         ]
         
         def get_next_steps(processing_type):
