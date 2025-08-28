@@ -147,7 +147,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
 
   const handleGenerateReport = async () => {
     // Check if report type is implemented
-    const implementedTypes = ['weekly_investment', 'bond_issuer_weight'];
+    const implementedTypes = ['weekly_investment', 'bond_issuer_weight', 'cash_position'];
     if (!implementedTypes.includes(reportType)) {
       toast.error(`${title} generation is not yet implemented. Coming soon!`);
       return;
@@ -362,7 +362,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
               </div>
             )}
             {/* Date selection - only show for reports that need it */}
-            {reportType !== 'bond_issuer_weight' && (
+            {reportType !== 'bond_issuer_weight' && reportType !== 'cash_position' && (
               <div>
                 <Label className="block text-xs font-medium text-gray-700 mb-1">Select Date:</Label>
                 <Select value={selectedDate} onValueChange={setSelectedDate}>
@@ -433,7 +433,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
               disabled={
                 isGenerating || 
                 !selectedClient || 
-                (reportType !== 'bond_issuer_weight' && !selectedDate)
+                (reportType !== 'bond_issuer_weight' && reportType !== 'cash_position' && !selectedDate)
               }
               className="w-full px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
             >
