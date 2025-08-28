@@ -14,6 +14,7 @@ import {
   Building,
   Calendar,
   PieChart,
+  DollarSign,
   LogOut
 } from 'lucide-react';
 import { DashboardAssetAllocationChart } from '@/components/charts/DashboardAssetAllocationChart';
