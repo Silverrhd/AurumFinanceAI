@@ -76,7 +76,7 @@ class InvestmentCashFlowService:
             'DIVIDEND_INCOME': ['Cash Dividend Received', 'Foreign Bond Interest'],
             'INTEREST_INCOME': ['Bond Interest Received'],
             'TAX_FEES': ['Non-resident Alien Tax'],
-            'TRADING_BUY': ['Buy', 'Purchase', 'Sell'],
+            'TRADING_BUY': ['Buy', 'Sell', 'Purchase'],
             'OTHER_EXCLUDED': ['Activity Within Your Acct']
         },
         'VALLEY': {
@@ -125,7 +125,7 @@ class InvestmentCashFlowService:
             'DIVIDEND_INCOME': ['Cash Dividend Received', 'Foreign Bond Interest'],
             'INTEREST_INCOME': ['Bond Interest Received'],
             'TAX_FEES': ['Non-resident Alien Tax'],
-            'TRADING_BUY': ['Buy', 'Purchase'],
+            'TRADING_BUY': ['Buy', 'Purchase', 'Sell'],
             'OTHER_EXCLUDED': ['Activity Within Your Acct', 'Security Redeemed']
         },
         'Safra': {

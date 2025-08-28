@@ -211,7 +211,7 @@ class CashFlowService:
                 'Buy', 'Purchase', 'Sell', 'Security Redeemed'
             ],
             'PROBLEMATIC_EXCLUDED': [
-                'Activity Within Your Acct', 'Foreign Bond Interest', 'Bond Interest Received'
+                'Activity Within Your Acct'
             ]
         },
         'Pershing': {
@@ -221,7 +221,7 @@ class CashFlowService:
                 'Buy', 'Purchase', 'Sell', 'Security Redeemed'
             ],
             'PROBLEMATIC_EXCLUDED': [
-                'Activity Within Your Acct', 'Foreign Bond Interest', 'Bond Interest Received'
+                'Activity Within Your Acct'
             ]
         },
         'BANCHILE': {
