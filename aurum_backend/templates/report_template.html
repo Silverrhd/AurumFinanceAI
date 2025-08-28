@@ -1314,7 +1314,13 @@
             <p class="section-description">Portfolio performance compared to market benchmarks since inception (May 29, 2025)</p>
             
             <div class="chart-container">
-                <div id="benchmarkComparisonChart" class="chart-area"></div>
+                {% if benchmark_comparison_chart.hasData %}
+                    <div id="benchmarkComparisonChart" class="chart-area"></div>
+                {% else %}
+                    <div class="no-data-message" style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                        {{ benchmark_comparison_chart.message }}
+                    </div>
+                {% endif %}
             </div>
             
             <div class="benchmark-legend" style="margin-top: 15px; text-align: center; font-size: 12px; color: #666;">
@@ -1326,9 +1332,9 @@
             
             <script>
                 // Benchmark Comparison Chart
-                if (typeof charts_data !== 'undefined' && charts_data.benchmark_comparison && charts_data.benchmark_comparison.hasData) {
-                    var benchmarkOptions = {
-                        series: charts_data.benchmark_comparison.series,
+                {% if benchmark_comparison_chart.hasData %}
+                var benchmarkOptions = {
+                    series: {{ benchmark_comparison_chart.series | tojson }},
                         chart: {
                             type: 'line',
                             height: 400,
@@ -1362,8 +1368,8 @@
                             }
                         },
                         yaxis: {
-                            min: charts_data.benchmark_comparison.yAxisMin,
-                            max: charts_data.benchmark_comparison.yAxisMax,
+                            min: {{ benchmark_comparison_chart.yAxisMin }},
+                            max: {{ benchmark_comparison_chart.yAxisMax }},
                             labels: {
                                 formatter: function (value) {
                                     return value.toFixed(0);
@@ -1379,7 +1385,7 @@
                                 }
                             }
                         },
-                        colors: charts_data.benchmark_comparison.colors,
+                        colors: {{ benchmark_comparison_chart.colors | tojson }},
                         legend: {
                             show: true,
                             position: 'top',
@@ -1402,14 +1408,11 @@
                         dataLabels: {
                             enabled: false
                         }
-                    };
-                    
-                    var benchmarkChart = new ApexCharts(document.querySelector("#benchmarkComparisonChart"), benchmarkOptions);
-                    benchmarkChart.render();
-                } else {
-                    document.getElementById('benchmarkComparisonChart').innerHTML = 
-                        '<div style="text-align: center; padding: 40px; color: #666;"><p>Benchmark data not available or insufficient historical data</p></div>';
-                }
+                };
+                
+                var benchmarkChart = new ApexCharts(document.querySelector("#benchmarkComparisonChart"), benchmarkOptions);
+                benchmarkChart.render();
+                {% endif %}
             </script>
         </section>
         

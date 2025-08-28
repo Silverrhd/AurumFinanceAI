@@ -1240,6 +1240,7 @@ class EnhancedReportService:
             'asset_allocation_chart': charts_data.get('asset_allocation', {'hasData': False, 'message': 'No data available'}),
             'custody_allocation_chart': charts_data.get('custody_allocation', {'hasData': False, 'message': 'No data available'}),
             'portfolio_comparison_chart': charts_data.get('portfolio_comparison', {'hasData': False, 'message': 'No data available'}),
+            'benchmark_comparison_chart': charts_data.get('benchmark_comparison', {'hasData': False, 'message': 'No data available'}),
             
             # Enhanced flags
             'has_bonds': 'bonds' in position_tables,
@@ -1281,6 +1282,7 @@ class EnhancedReportService:
             'portfolio_history_chart': charts_data.get('portfolio_history', {'hasData': False}),
             'cumulative_return_chart': charts_data.get('cumulative_return', {'hasData': False}),
             'portfolio_comparison_chart': charts_data.get('portfolio_comparison', {'hasData': False}),
+            'benchmark_comparison_chart': charts_data.get('benchmark_comparison', {'hasData': False}),
             
             # FIXED: Add missing template variables for conditional rendering
             'is_first_report': comparison_date == current_date,

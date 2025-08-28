@@ -3270,3 +3270,11 @@ INFO 2025-08-28 15:19:00,950 portfolio.services.benchmark_service benchmark_serv
 INFO 2025-08-28 15:19:00,952 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
 INFO 2025-08-28 15:19:00,952 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
 INFO 2025-08-28 15:19:00,952 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
+INFO 2025-08-28 16:25:05,556 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for VOO
+INFO 2025-08-28 16:25:05,558 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
+INFO 2025-08-28 16:25:06,907 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for AGG
+INFO 2025-08-28 16:25:06,909 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
+INFO 2025-08-28 18:37:09,043 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for VOO
+INFO 2025-08-28 18:37:09,045 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
+INFO 2025-08-28 18:37:10,383 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for AGG
+INFO 2025-08-28 18:37:10,385 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
