@@ -28,6 +28,10 @@ class EnhancedReportService:
         # Initialize Investment Cash Flow service for weekly comparison
         from .investment_cash_flow_service import InvestmentCashFlowService
         self.investment_cash_flow_service = InvestmentCashFlowService()
+        
+        # Initialize Benchmark service for benchmark comparison
+        from .benchmark_service import BenchmarkService
+        self.benchmark_service = BenchmarkService()
     
     def _setup_jinja2(self):
         """Setup Jinja2 environment with custom filters."""
@@ -660,7 +664,10 @@ class EnhancedReportService:
         # 4. Cumulative Return Chart - FIXED to calculate Modified Dietz returns
         cumulative_return_chart = self._generate_cumulative_return_chart(client, current_date)
         
-        # 5. Portfolio Comparison Chart - FIXED with actual 4-metric data
+        # 5. Benchmark Comparison Chart - NEW: Portfolio vs VOO vs AGG
+        benchmark_comparison_chart = self._generate_benchmark_comparison_chart(client, current_date)
+        
+        # 6. Portfolio Comparison Chart - FIXED with actual 4-metric data
         if comparison_snapshot != current_snapshot:
             # Calculate the 4 required metrics
             current_metrics = self._calculate_enhanced_metrics(current_snapshot)
@@ -718,6 +725,7 @@ class EnhancedReportService:
             'custody_allocation': custody_allocation_chart, 
             'portfolio_history': portfolio_history_chart,
             'cumulative_return': cumulative_return_chart,
+            'benchmark_comparison': benchmark_comparison_chart,
             'portfolio_comparison': portfolio_comparison_chart
         }
     
@@ -1019,6 +1027,105 @@ class EnhancedReportService:
             'yAxisMax': max(cumulative_values) + 50 if cumulative_values else 1050,
             'colors': ['#5f76a1'],
             'gradient': {'to': '#dae1f3'}
+        }
+    
+    def _generate_benchmark_comparison_chart(self, client: Client, current_date: str) -> dict:
+        """Generate benchmark comparison chart with portfolio vs VOO vs AGG (all base 1000)."""
+        
+        # Get snapshots up to current_date (inclusive)  
+        snapshots = PortfolioSnapshot.objects.filter(
+            client=client,
+            snapshot_date__lte=current_date
+        ).order_by('snapshot_date')
+        
+        if snapshots.count() < 2:
+            return {
+                'hasData': False,
+                'message': 'Not enough historical data to display benchmark comparison',
+                'series': [],
+                'yAxisMin': 950,
+                'yAxisMax': 1050,
+                'colors': ['#5f76a1', '#28a745', '#ffc107']
+            }
+        
+        # Get portfolio data
+        first_snapshot = snapshots.first()
+        start_date = first_snapshot.snapshot_date.strftime('%Y-%m-%d')
+        end_date = current_date
+        
+        # Portfolio cumulative values (reuse existing logic)
+        portfolio_chart = self._generate_cumulative_return_chart(client, current_date)
+        
+        if not portfolio_chart.get('hasData'):
+            return portfolio_chart
+        
+        # Get benchmark data (VOO and AGG)
+        benchmark_data = self.benchmark_service.get_benchmark_data(start_date, end_date)
+        
+        # Start with portfolio series
+        series = [{
+            'name': f'{client.name} Portfolio',
+            'data': portfolio_chart['series'][0]['data'],
+            'color': '#5f76a1'
+        }]
+        
+        all_values = [point['y'] for point in portfolio_chart['series'][0]['data']]
+        
+        # Add VOO (S&P 500) series
+        if 'VOO' in benchmark_data and benchmark_data['VOO']:
+            voo_chart_data = []
+            for point in benchmark_data['VOO']:
+                try:
+                    from datetime import datetime
+                    date_obj = datetime.strptime(point['date'], '%Y-%m-%d')
+                    timestamp = int(date_obj.timestamp() * 1000)
+                    voo_chart_data.append({'x': timestamp, 'y': point['cumulative_value']})
+                    all_values.append(point['cumulative_value'])
+                except ValueError:
+                    continue
+            
+            if voo_chart_data:
+                series.append({
+                    'name': 'S&P 500 (VOO)',
+                    'data': voo_chart_data,
+                    'color': '#28a745'
+                })
+        
+        # Add AGG (Fixed Income) series
+        if 'AGG' in benchmark_data and benchmark_data['AGG']:
+            agg_chart_data = []
+            for point in benchmark_data['AGG']:
+                try:
+                    from datetime import datetime
+                    date_obj = datetime.strptime(point['date'], '%Y-%m-%d')
+                    timestamp = int(date_obj.timestamp() * 1000)
+                    agg_chart_data.append({'x': timestamp, 'y': point['cumulative_value']})
+                    all_values.append(point['cumulative_value'])
+                except ValueError:
+                    continue
+            
+            if agg_chart_data:
+                series.append({
+                    'name': 'Fixed Income (AGG)',
+                    'data': agg_chart_data,
+                    'color': '#ffc107'
+                })
+        
+        # Calculate Y-axis range
+        y_min = min(all_values) - 50 if all_values else 950
+        y_max = max(all_values) + 50 if all_values else 1050
+        
+        return {
+            'hasData': len(series) > 0,
+            'message': 'Portfolio performance vs market benchmarks since inception',
+            'series': series,
+            'currentValue': portfolio_chart.get('currentValue', '1000.00'),
+            'currentDate': portfolio_chart.get('currentDate', ''),
+            'yAxisMin': y_min,
+            'yAxisMax': y_max,
+            'colors': ['#5f76a1', '#28a745', '#ffc107'],
+            'inception_date': start_date,
+            'benchmark_count': len([s for s in series if 'VOO' in s['name'] or 'AGG' in s['name']])
         }
     
     def _prepare_enhanced_template_context(self, client: Client, current_date: str, 

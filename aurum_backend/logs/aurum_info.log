@@ -3250,3 +3250,23 @@ INFO 2025-08-27 01:39:48,665 portfolio.services.processing_service processing_se
 INFO 2025-08-27 02:55:43,327 portfolio.services.cash_flow_service cash_flow_service __init__ 272 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)
 INFO 2025-08-27 02:56:51,367 portfolio.services.cash_flow_service cash_flow_service __init__ 272 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)
 INFO 2025-08-27 02:58:33,037 portfolio.services.cash_flow_service cash_flow_service __init__ 273 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)
+ERROR 2025-08-28 14:51:21,652 yfinance base _fetch_ticker_tz 1679 Failed to get ticker 'SPY' reason: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-08-28 14:51:23,200 yfinance base history 269 SPY: No price data found, symbol may be delisted (period=5d)
+INFO 2025-08-28 15:07:33,721 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for VOO
+INFO 2025-08-28 15:07:33,722 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
+INFO 2025-08-28 15:07:35,350 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for AGG
+INFO 2025-08-28 15:07:35,351 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
+INFO 2025-08-28 15:08:14,000 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for VOO
+INFO 2025-08-28 15:08:14,001 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
+INFO 2025-08-28 15:08:15,388 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for AGG
+INFO 2025-08-28 15:08:15,389 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
+INFO 2025-08-28 15:17:32,792 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for VOO
+INFO 2025-08-28 15:17:34,142 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for AGG
+INFO 2025-08-28 15:17:34,144 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
+INFO 2025-08-28 15:17:34,144 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
+INFO 2025-08-28 15:18:59,535 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for VOO
+INFO 2025-08-28 15:18:59,537 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
+INFO 2025-08-28 15:19:00,950 portfolio.services.benchmark_service benchmark_service _fetch_etf_data 115 Cached 59 Alpha Vantage data points for AGG
+INFO 2025-08-28 15:19:00,952 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG
+INFO 2025-08-28 15:19:00,952 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for VOO
+INFO 2025-08-28 15:19:00,952 portfolio.services.benchmark_service benchmark_service get_benchmark_data 45 Successfully fetched 59 data points for AGG

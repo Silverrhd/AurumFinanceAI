@@ -1308,6 +1308,111 @@
         </section>
         {% endif %}
         
+        <!-- Benchmark Comparison Section -->
+        <section class="benchmark-comparison-section">
+            <h2>📈 Benchmark Comparison</h2>
+            <p class="section-description">Portfolio performance compared to market benchmarks since inception (May 29, 2025)</p>
+            
+            <div class="chart-container">
+                <div id="benchmarkComparisonChart" class="chart-area"></div>
+            </div>
+            
+            <div class="benchmark-legend" style="margin-top: 15px; text-align: center; font-size: 12px; color: #666;">
+                <strong>Benchmarks:</strong>
+                <span style="color: #5f76a1; margin-left: 10px;">■ {{ client_name }} Portfolio</span>
+                <span style="color: #28a745; margin-left: 15px;">■ S&P 500 (VOO)</span>
+                <span style="color: #ffc107; margin-left: 15px;">■ Fixed Income (AGG)</span>
+            </div>
+            
+            <script>
+                // Benchmark Comparison Chart
+                if (typeof charts_data !== 'undefined' && charts_data.benchmark_comparison && charts_data.benchmark_comparison.hasData) {
+                    var benchmarkOptions = {
+                        series: charts_data.benchmark_comparison.series,
+                        chart: {
+                            type: 'line',
+                            height: 400,
+                            toolbar: {
+                                show: true,
+                                tools: {
+                                    download: true,
+                                    selection: false,
+                                    zoom: true,
+                                    zoomin: true,
+                                    zoomout: true,
+                                    pan: false,
+                                    reset: true
+                                }
+                            },
+                            animations: {
+                                enabled: false
+                            }
+                        },
+                        stroke: {
+                            curve: 'smooth',
+                            width: 3
+                        },
+                        xaxis: {
+                            type: 'datetime',
+                            labels: {
+                                format: 'MMM dd',
+                                style: {
+                                    fontSize: '11px'
+                                }
+                            }
+                        },
+                        yaxis: {
+                            min: charts_data.benchmark_comparison.yAxisMin,
+                            max: charts_data.benchmark_comparison.yAxisMax,
+                            labels: {
+                                formatter: function (value) {
+                                    return value.toFixed(0);
+                                },
+                                style: {
+                                    fontSize: '11px'
+                                }
+                            },
+                            title: {
+                                text: 'Base 1000 Value',
+                                style: {
+                                    fontSize: '12px'
+                                }
+                            }
+                        },
+                        colors: charts_data.benchmark_comparison.colors,
+                        legend: {
+                            show: true,
+                            position: 'top',
+                            horizontalAlign: 'center'
+                        },
+                        tooltip: {
+                            x: {
+                                format: 'MMM dd, yyyy'
+                            },
+                            y: {
+                                formatter: function (value) {
+                                    return value.toFixed(2);
+                                }
+                            }
+                        },
+                        grid: {
+                            borderColor: '#e7e7e7',
+                            strokeDashArray: 3
+                        },
+                        dataLabels: {
+                            enabled: false
+                        }
+                    };
+                    
+                    var benchmarkChart = new ApexCharts(document.querySelector("#benchmarkComparisonChart"), benchmarkOptions);
+                    benchmarkChart.render();
+                } else {
+                    document.getElementById('benchmarkComparisonChart').innerHTML = 
+                        '<div style="text-align: center; padding: 40px; color: #666;"><p>Benchmark data not available or insufficient historical data</p></div>';
+                }
+            </script>
+        </section>
+        
         <!-- Current Positions Section -->
         <section class="positions-section">
             <h2>Current Positions</h2>
