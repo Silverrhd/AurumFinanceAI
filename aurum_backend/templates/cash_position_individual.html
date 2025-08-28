@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Position Report - {{ client_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .header-left h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header-left .client-info {
+            color: #6c757d;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .report-date {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .generated-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* Concentration Risk Alert - Same style as bond issuer */
+        .risk-analysis-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #e17055;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .risk-analysis-section h3 {
+            color: #856404;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .risk-analysis-section p {
+            color: #856404;
+            margin: 10px 0;
+        }
+        
+        .risk-analysis-section ul {
+            color: #856404;
+            margin: 15px 0;
+        }
+        
+        .risk-analysis-section li {
+            margin: 5px 0;
+        }
+        
+        /* Cash positions table */
+        .positions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+        }
+        
+        .positions-table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .positions-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+        
+        .positions-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .currency {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        /* Summary section */
+        .summary-section {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .summary-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .summary-table td {
+            padding: 8px 12px;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .summary-table td:first-child {
+            font-weight: 600;
+            width: 60%;
+        }
+        
+        .summary-table td:last-child {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        @media print {
+            body { padding: 0; background-color: white; }
+            .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Cash Position Report</h1>
+                <div class="client-info">{{ client_name }} ({{ client_code }})</div>
+            </div>
+            <div class="header-right">
+                <div class="report-date">As of: {{ snapshot_date.strftime('%B %d, %Y') }}</div>
+                <div class="generated-date">Generated: {{ report_generated.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+            </div>
+        </div>
+        
+        <!-- Concentration Risk Alert - Same pattern as bond issuer 20% alert -->
+        {% if concentration_alert %}
+        <div class="risk-analysis-section">
+            <h3>⚠️ Cash Concentration Risk Analysis</h3>
+            <p>{{ client_name }}'s cash positions represent <strong>{{ "{:.1f}".format(concentration_alert.percentage) }}%</strong> 
+               of total portfolio value, which exceeds the {{ "{:.0f}".format(concentration_alert.threshold) }}% monitoring threshold.</p>
+            <ul>
+                <li><strong>Total Cash Positions:</strong> ${{ "{:,.2f}".format(concentration_alert.total_cash) }}</li>
+                <li><strong>Total Portfolio Value:</strong> ${{ "{:,.2f}".format(concentration_alert.total_aum) }}</li>
+                <li><strong>Cash Concentration:</strong> {{ "{:.1f}".format(concentration_alert.percentage) }}%</li>
+            </ul>
+            <p><strong>Risk Assessment:</strong> High cash concentration detected. 
+            Consider deploying excess cash into appropriate investments to optimize portfolio returns and reduce cash drag.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Cash Positions Table -->
+        <h3>Cash and Money Market Positions</h3>
+        
+        {% if cash_positions %}
+        <table class="positions-table">
+            <thead>
+                <tr>
+                    <th>Custody</th>
+                    <th>Asset Name</th>
+                    <th>Ticker</th>
+                    <th>Market Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for position in cash_positions %}
+                <tr>
+                    <td>{{ position.custody or 'N/A' }}</td>
+                    <td>{{ position.asset_name }}</td>
+                    <td>{{ position.ticker }}</td>
+                    <td class="currency">${{ "{:,.2f}".format(position.market_value) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            No cash positions currently
+        </div>
+        {% endif %}
+        
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <h3>Summary</h3>
+            <table class="summary-table">
+                <tr><td>Total Cash and Money Market Value:</td><td class="currency">${{ "{:,.2f}".format(total_cash or 0) }}</td></tr>
+                <tr><td>Number of Cash Positions:</td><td>{{ cash_positions|length or 0 }}</td></tr>
+                {% if concentration_alert %}
+                <tr><td>Cash as % of Portfolio:</td><td>{{ "{:.1f}".format(concentration_alert.percentage) }}%</td></tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>

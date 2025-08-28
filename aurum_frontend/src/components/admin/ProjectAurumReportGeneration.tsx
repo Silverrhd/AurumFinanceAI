@@ -181,8 +181,8 @@ export function ProjectAurumReportGeneration() {
 
   return (
     <div className="space-y-6">
-      {/* 2x2 Grid - Exactly like ProjectAurum */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* 2x3 Grid - Added Cash Report as 5th card */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Card 1: Investment Reports */}
         <ReportCard
           title="Investment Reports"
@@ -217,6 +217,15 @@ export function ProjectAurumReportGeneration() {
           reportType="equity_breakdown"
           generateLabel="Generate Equity Breakdown Report"
           openLabel="Open Equity Breakdown Reports"
+        />
+        
+        {/* Card 5: Cash Position Reports */}
+        <ReportCard
+          title="Cash Position Reports"
+          icon={<DollarSign />}
+          reportType="cash_position"
+          generateLabel="Generate Cash Position Report"
+          openLabel="Open Cash Position Reports"
         />
       </div>
     </div>

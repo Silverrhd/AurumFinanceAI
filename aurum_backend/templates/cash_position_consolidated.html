@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Position Report - All Clients Consolidated</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .header-left h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header-left .subtitle {
+            color: #6c757d;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .report-date {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .generated-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .print-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .print-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Concentration Risk Alert - Same style as bond issuer */
+        .risk-analysis-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #e17055;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .risk-analysis-section h3 {
+            color: #856404;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .risk-analysis-section p {
+            color: #856404;
+            margin: 10px 0;
+        }
+        
+        .risk-analysis-section ul {
+            color: #856404;
+            margin: 15px 0;
+        }
+        
+        .risk-analysis-section li {
+            margin: 5px 0;
+        }
+        
+        /* Client table - expandable rows */
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+        }
+        
+        .clients-table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .clients-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+        
+        /* Client row styling - clickable */
+        .client-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .client-row:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .client-row.alert-row {
+            background-color: #fff3cd;
+        }
+        
+        .client-row.alert-row:hover {
+            background-color: #ffeaa7;
+        }
+        
+        .client-arrow {
+            float: right;
+            transition: transform 0.2s;
+            color: #6c757d;
+        }
+        
+        /* Details row - initially hidden */
+        .details-row {
+            display: none;
+        }
+        
+        .details-content {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .details-table th {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+        
+        .details-table td {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .currency {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .alert-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px;
+        }
+        
+        /* Summary section */
+        .summary-section {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .summary-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .summary-table td {
+            padding: 8px 12px;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .summary-table td:first-child {
+            font-weight: 600;
+            width: 60%;
+        }
+        
+        .summary-table td:last-child {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        @media print {
+            body { padding: 0; background-color: white; }
+            .container { box-shadow: none; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Cash Position Report</h1>
+                <div class="subtitle">All Clients Consolidated</div>
+            </div>
+            <div class="header-right">
+                <div class="generated-date">Generated: {{ report_generated.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                <button onclick="window.print()" class="print-btn">Print PDF</button>
+            </div>
+        </div>
+        
+        <!-- Global Concentration Risk Summary -->
+        {% set clients_with_alerts = clients_with_cash | selectattr('concentration_alert') | list %}
+        {% if clients_with_alerts %}
+        <div class="risk-analysis-section">
+            <h3>⚠️ Cash Concentration Risk Analysis</h3>
+            <p>{{ clients_with_alerts|length }} client{{ 's' if clients_with_alerts|length != 1 else '' }} 
+               exceed{{ '' if clients_with_alerts|length != 1 else 's' }} the 5% cash concentration threshold:</p>
+            <ul>
+                {% for client in clients_with_alerts %}
+                <li><strong>{{ client.client_name }} ({{ client.client_code }}):</strong> 
+                    {{ "{:.1f}".format(client.concentration_alert.percentage) }}% cash concentration</li>
+                {% endfor %}
+            </ul>
+            <p><strong>Risk Assessment:</strong> Multiple clients showing high cash concentrations. 
+            Consider reviewing cash deployment strategies to optimize portfolio returns.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Clients with Cash Positions Table -->
+        <h3>Clients with Cash Positions</h3>
+        
+        {% if clients_with_cash %}
+        <table class="clients-table">
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Snapshot Date</th>
+                    <th>Total Cash Value</th>
+                    <th>Cash % of AUM</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients_with_cash %}
+                <!-- Main client row (clickable) -->
+                <tr class="client-row{% if client.concentration_alert %} alert-row{% endif %}" 
+                    data-client="{{ client.client_code }}" 
+                    onclick="toggleClientDetails('{{ client.client_code }}')">
+                    <td>{{ client.client_name }} ({{ client.client_code }})
+                        <span class="client-arrow" id="arrow-{{ client.client_code }}">▼</span></td>
+                    <td>{{ client.snapshot_date.strftime('%Y-%m-%d') }}</td>
+                    <td class="currency">${{ "{:,.2f}".format(client.total_cash) }}</td>
+                    <td>
+                        {% if client.total_aum > 0 %}
+                            {{ "{:.1f}".format((client.total_cash / client.total_aum) * 100) }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if client.concentration_alert %}
+                        <span class="alert-badge">⚠️ {{ "{:.1f}".format(client.concentration_alert.percentage) }}%</span>
+                        {% else %}
+                        <span style="color: #28a745;">✓ Normal</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                
+                <!-- Details row (initially hidden) -->
+                <tr class="details-row" id="details-{{ client.client_code }}">
+                    <td colspan="5">
+                        <div class="details-content">
+                            <h4>{{ client.client_name }} - Detailed Cash Positions</h4>
+                            
+                            {% if client.concentration_alert %}
+                            <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                                <strong>⚠️ Concentration Alert:</strong> 
+                                {{ "{:.1f}".format(client.concentration_alert.percentage) }}% cash concentration 
+                                exceeds 5% threshold.
+                            </div>
+                            {% endif %}
+                            
+                            <table class="details-table">
+                                <thead>
+                                    <tr>
+                                        <th>Custody</th>
+                                        <th>Asset Name</th>
+                                        <th>Ticker</th>
+                                        <th>Market Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for position in client.detailed_positions %}
+                                    <tr>
+                                        <td>{{ position.custody or 'N/A' }}</td>
+                                        <td>{{ position.asset_name }}</td>
+                                        <td>{{ position.ticker }}</td>
+                                        <td class="currency">${{ "{:,.2f}".format(position.market_value) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            No cash positions currently
+        </div>
+        {% endif %}
+        
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <h3>Summary</h3>
+            <table class="summary-table">
+                <tr><td>Total Clients with Cash Positions:</td><td>{{ total_clients or 0 }}</td></tr>
+                <tr><td>Clients with Concentration Alerts (>5%):</td><td>{{ clients_with_alerts|length or 0 }}</td></tr>
+                {% if clients_with_cash %}
+                <tr><td>Total Cash Value Across All Clients:</td>
+                    <td class="currency">${{ "{:,.2f}".format(clients_with_cash | sum(attribute='total_cash') or 0) }}</td></tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+    
+    <!-- JavaScript for expandable rows - same pattern as bond issuer report -->
+    <script>
+        // Store client data for easy access
+        const clientsData = {
+            {% for client in clients_with_cash %}
+            "{{ client.client_code }}": {
+                "positions": {{ client.detailed_positions|tojson }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        };
+        
+        function toggleClientDetails(clientCode) {
+            const detailsRow = document.getElementById(`details-${clientCode}`);
+            const arrow = document.getElementById(`arrow-${clientCode}`);
+            const clientRow = document.querySelector(`[data-client="${clientCode}"]`);
+            
+            const isVisible = detailsRow.style.display === 'table-row';
+            
+            if (isVisible) {
+                detailsRow.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+                arrow.textContent = '▼';
+            } else {
+                detailsRow.style.display = 'table-row';
+                arrow.style.transform = 'rotate(-90deg)';
+                arrow.textContent = '▶';
+            }
+        }
+        
+        // Handle keyboard navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    const target = event.target;
+                    if (target.classList.contains('client-row')) {
+                        event.preventDefault();
+                        const clientCode = target.getAttribute('data-client');
+                        if (clientCode) {
+                            toggleClientDetails(clientCode);
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

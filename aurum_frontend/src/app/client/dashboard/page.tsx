@@ -307,8 +307,8 @@ export default function ClientDashboardPage() {
 
               {/* Reports Tab Content */}
               <TabsContent value="report" className="mt-6">
-                {/* 2x2 Grid Layout for Report Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 2x3 Grid Layout for Report Cards - Added Cash Position Report */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Investment Reports Card */}
                   <Card className="p-6">
                     <CardHeader>
@@ -422,6 +422,25 @@ export default function ClientDashboardPage() {
                       <Button className="w-full" disabled>
                         <PieChart className="h-4 w-4 mr-2" />
                         Open Equity Breakdown Report
+                      </Button>
+                      <div className="text-xs text-center text-gray-500">
+                        Pending implementation
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Cash Position Reports Card */}
+                  <Card className="p-6 opacity-60 pointer-events-none">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold aurum-text-dark mb-4 flex items-center gap-2">
+                        <DollarSign className="h-5 w-5" />
+                        💰 Cash Position Reports (coming soon)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Button className="w-full" disabled>
+                        <DollarSign className="h-4 w-4 mr-2" />
+                        Open Cash Position Report
                       </Button>
                       <div className="text-xs text-center text-gray-500">
                         Pending implementation

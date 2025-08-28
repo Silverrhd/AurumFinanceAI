@@ -810,7 +810,8 @@ def generate_report_no_open(request):
             'weekly_investment': 'WEEKLY',
             'bond_maturity': 'BOND_MATURITY',
             'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
-            'equity_breakdown': 'EQUITY_BREAKDOWN'
+            'equity_breakdown': 'EQUITY_BREAKDOWN',
+            'cash_position': 'CASH_POSITION'
         }
         
         db_report_type = report_type_mapping.get(report_type)
@@ -958,7 +959,8 @@ def generate_report(request):
             'weekly_investment': 'WEEKLY',
             'bond_maturity': 'BOND_MATURITY',
             'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
-            'equity_breakdown': 'EQUITY_BREAKDOWN'
+            'equity_breakdown': 'EQUITY_BREAKDOWN',
+            'cash_position': 'CASH_POSITION'
         }
         
         db_report_type = report_type_mapping.get(report_type)
@@ -1019,6 +1021,21 @@ def generate_report(request):
                 html_content = f"<html><body><h1>Equity Breakdown Report</h1><p>{result.get('message', 'Report generated successfully')}</p></body></html>"
             else:
                 return Response({'success': False, 'error': result.get('error', 'Equity breakdown report generation failed')})
+                
+        elif report_type == 'cash_position':
+            from .services.cash_report_service import CashReportService
+            report_service = CashReportService()
+            
+            # Determine if this is a consolidated report (client_code == 'ALL' or None)
+            report_subtype = 'consolidated' if (not client_code or client_code == 'ALL') else 'individual'
+            
+            try:
+                if report_subtype == 'consolidated':
+                    html_content = report_service.generate_cash_position_report('ALL', 'consolidated')
+                else:
+                    html_content = report_service.generate_cash_position_report(client_code, 'individual')
+            except Exception as e:
+                return Response({'success': False, 'error': f'Cash position report generation failed: {str(e)}'})
         
         if not html_content:
             return Response({'error': 'Failed to generate report content'}, 
