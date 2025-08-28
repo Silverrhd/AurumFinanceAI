@@ -39,7 +39,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
   
   // Helper function to determine if this is a latest-only report type
   const isLatestOnlyReport = (reportType: string) => {
-    return ['bond_issuer_weight', 'bond_maturity', 'equity_breakdown'].includes(reportType);
+    return ['bond_issuer_weight', 'bond_maturity', 'equity_breakdown', 'cash_position'].includes(reportType);
   };
   
   // Data states
@@ -389,6 +389,14 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
               <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
                 <p className="text-sm text-blue-700">
                   ℹ️ Bond Issuer Weight reports use the latest available portfolio data automatically.
+                </p>
+              </div>
+            )}
+            
+            {reportType === 'cash_position' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <p className="text-sm text-blue-700">
+                  ℹ️ Cash Position reports use the latest available portfolio data automatically.
                 </p>
               </div>
             )}
