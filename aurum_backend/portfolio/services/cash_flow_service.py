@@ -208,10 +208,20 @@ class CashFlowService:
             'EXTERNAL_INFLOWS': [],
             'EXTERNAL_OUTFLOWS': [],
             'TRADING_EXCLUDED': [
-                'Buy', 'Purchase', 'Security Redeemed'
+                'Buy', 'Purchase', 'Sell', 'Security Redeemed'
             ],
             'PROBLEMATIC_EXCLUDED': [
-                'Activity Within Your Acct'
+                'Activity Within Your Acct', 'Foreign Bond Interest', 'Bond Interest Received'
+            ]
+        },
+        'Pershing': {
+            'EXTERNAL_INFLOWS': [],
+            'EXTERNAL_OUTFLOWS': [],
+            'TRADING_EXCLUDED': [
+                'Buy', 'Purchase', 'Sell', 'Security Redeemed'
+            ],
+            'PROBLEMATIC_EXCLUDED': [
+                'Activity Within Your Acct', 'Foreign Bond Interest', 'Bond Interest Received'
             ]
         },
         'BANCHILE': {

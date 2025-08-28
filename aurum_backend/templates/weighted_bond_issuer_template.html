@@ -414,6 +414,7 @@
                                         <th class="text-center">Coupon Rate</th>
                                         <th class="text-center">Maturity Date</th>
                                         <th class="text-right">Est. Annual Income</th>
+                                        <th class="text-center">CUSIP</th>
                                         <th class="text-center">Custody</th>
                                     </tr>
                                 </thead>
@@ -512,7 +513,7 @@
             const issuerData = bondIssuerData[issuerId];
             
             if (!issuerData || !issuerData.bonds) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bond details available</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bond details available</td></tr>';
                 return;
             }
             
@@ -528,6 +529,7 @@
                     <td class="text-center">${bond.coupon_rate}</td>
                     <td class="text-center">${bond.maturity_date}</td>
                     <td class="text-right">$${bond.estimated_annual_income.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td class="text-center">${bond.cusip || 'N/A'}</td>
                     <td class="text-center">${bond.custody}</td>
                 `;
                 
@@ -536,7 +538,7 @@
             
             // Show message if no bonds available
             if (issuerData.bonds.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No bonds found for this issuer</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No bonds found for this issuer</td></tr>';
             }
         }
         

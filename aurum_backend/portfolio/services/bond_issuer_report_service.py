@@ -158,7 +158,8 @@ class BondIssuerReportService(EnhancedReportService):
                 'coupon_rate': f"{position.coupon_rate or asset.coupon_rate or 0}%" if (position.coupon_rate or asset.coupon_rate) else "0.00%",
                 'maturity_date': asset.maturity_date.strftime('%Y-%m-%d') if asset.maturity_date else 'N/A',
                 'estimated_annual_income': float(position.estimated_annual_income or 0),
-                'custody': f"{asset.bank} {asset.account}".strip() or 'Unknown'
+                'custody': f"{asset.bank} {asset.account}".strip() or 'Unknown',
+                'cusip': asset.cusip or 'N/A'
             }
             issuer_data['bonds'].append(bond_detail)
         

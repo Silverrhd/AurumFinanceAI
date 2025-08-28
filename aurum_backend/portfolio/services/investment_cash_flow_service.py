@@ -73,9 +73,10 @@ class InvestmentCashFlowService:
                                'Bought', 'Return of Principal']
         },
         'PERSHING': {
-            'DIVIDEND_INCOME': ['Cash Dividend Received'],
+            'DIVIDEND_INCOME': ['Cash Dividend Received', 'Foreign Bond Interest'],
             'INTEREST_INCOME': ['Bond Interest Received'],
             'TAX_FEES': ['Non-resident Alien Tax'],
+            'TRADING_BUY': ['Buy', 'Purchase', 'Sell'],
             'OTHER_EXCLUDED': ['Activity Within Your Acct']
         },
         'VALLEY': {
@@ -333,7 +334,7 @@ class InvestmentCashFlowService:
             # Enhanced Buy pattern to catch all variations
             (r'^(Buy)\s+[\d,]+\.?\d*\s+Parvalue\s+Of\s+\w+\s+At\s+[\d.]+', r'\1'),
             (r'^(Purchase)\s+\d+\s+Shares\s+of', r'\1'),
-            (r'^(Sell)\s+[\d,]+\.?\d*\s+Parvalue\s+Of', r'\1'),
+            (r'^(Sell)\s+[-\d,]+\.?\d*\s+Parvalue\s+Of', r'\1'),
         ]
         
         for pattern, replacement in patterns:
