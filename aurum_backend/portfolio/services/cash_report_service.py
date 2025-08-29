@@ -31,7 +31,7 @@ class CashReportService(EnhancedReportService):
         logger.info(f"Generating {report_type} Cash Position report for {client_code}")
         
         try:
-            if report_type == 'consolidated':
+            if report_type == 'consolidated' or client_code == 'ALL':
                 return self._generate_consolidated_report()
             else:
                 return self._generate_individual_report(client_code)
@@ -100,10 +100,11 @@ class CashReportService(EnhancedReportService):
         html_content = template.render(template_context)
         
         # Save report to file
+        report_date = snapshot.snapshot_date.strftime('%Y-%m-%d') if snapshot.snapshot_date else datetime.now().strftime('%Y-%m-%d')
         file_path, file_size = save_report_html(
             client_code, 
             'cash_position_reports', 
-            snapshot.snapshot_date.strftime('%Y-%m-%d'), 
+            report_date, 
             html_content
         )
         

@@ -795,9 +795,11 @@ def generate_report_no_open(request):
         comparison_date = data.get('comparison_date')
         
         # Parse dates to ensure they're in the correct format for database operations
-        if current_date:
+        if current_date and current_date.strip():
             current_date = parse_flexible_date(current_date)
-        if comparison_date:
+        else:
+            current_date = datetime.now().date()  # Use today's date if not provided
+        if comparison_date and comparison_date.strip():
             comparison_date = parse_flexible_date(comparison_date)
         
         # Check permissions
