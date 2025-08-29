@@ -71,7 +71,7 @@ class CashReportService(EnhancedReportService):
         
         # Calculate total cash and AUM for concentration check
         total_cash = sum(pos['market_value'] for pos in positions_data)
-        total_aum = self._calculate_total_aum(snapshot)
+        total_aum = float(self._calculate_total_aum(snapshot))
         
         # Check concentration alert (5% threshold)
         concentration_alert = None
@@ -91,7 +91,7 @@ class CashReportService(EnhancedReportService):
             'client_code': client.code,
             'snapshot_date': snapshot.snapshot_date,
             'cash_positions': positions_data,
-            'total_cash': float(total_cash),
+            'total_cash': total_cash,
             'concentration_alert': concentration_alert,
             'report_generated': datetime.now()
         }
@@ -134,11 +134,11 @@ class CashReportService(EnhancedReportService):
                 continue
             
             # Calculate client cash data
-            total_cash = cash_positions.aggregate(
+            total_cash = float(cash_positions.aggregate(
                 total=Sum('market_value')
-            )['total'] or Decimal('0')
+            )['total'] or Decimal('0'))
             
-            total_aum = self._calculate_total_aum(snapshot)
+            total_aum = float(self._calculate_total_aum(snapshot))
             
             # Check concentration alert
             concentration_alert = None
@@ -165,8 +165,8 @@ class CashReportService(EnhancedReportService):
                 'client_code': client.code,
                 'client_name': client.name,
                 'snapshot_date': snapshot.snapshot_date,
-                'total_cash': float(total_cash),
-                'total_aum': float(total_aum),
+                'total_cash': total_cash,
+                'total_aum': total_aum,
                 'concentration_alert': concentration_alert,
                 'detailed_positions': detailed_positions
             })
