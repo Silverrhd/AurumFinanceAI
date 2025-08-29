@@ -12,6 +12,7 @@ from typing import Dict, List, Optional, Tuple
 from django.db.models import Q, Sum
 from portfolio.models import Client, PortfolioSnapshot, Position, Report
 from .enhanced_report_service import EnhancedReportService
+from ..utils.report_utils import save_report_html
 
 logger = logging.getLogger(__name__)
 
@@ -95,10 +96,16 @@ class CashReportService(EnhancedReportService):
             'report_generated': datetime.now()
         }
         
-        html_content = self.render_template('cash_position_individual.html', template_context)
+        template = self.jinja_env.get_template('cash_position_individual.html')
+        html_content = template.render(template_context)
         
-        # Save report record
-        file_path = self.save_report_file(html_content, client_code, 'CASH_POSITION', snapshot.snapshot_date)
+        # Save report to file
+        file_path, file_size = save_report_html(
+            client_code, 
+            'cash_position_reports', 
+            snapshot.snapshot_date.strftime('%Y-%m-%d'), 
+            html_content
+        )
         
         return html_content
     
@@ -171,14 +178,15 @@ class CashReportService(EnhancedReportService):
             'total_clients': len(clients_with_cash)
         }
         
-        html_content = self.render_template('cash_position_consolidated.html', template_context)
+        template = self.jinja_env.get_template('cash_position_consolidated.html')
+        html_content = template.render(template_context)
         
-        # Save report record - use 'ALL' as client code for consolidated reports
-        file_path = self.save_report_file(
-            html_content, 
+        # Save report to file - use 'ALL' as client code for consolidated reports
+        file_path, file_size = save_report_html(
             'ALL', 
-            'CASH_POSITION', 
-            datetime.now().date()
+            'cash_position_reports', 
+            datetime.now().strftime('%Y-%m-%d'), 
+            html_content
         )
         
         return html_content
