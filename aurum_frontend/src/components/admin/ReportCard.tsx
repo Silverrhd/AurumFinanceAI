@@ -80,6 +80,12 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
   }, [selectedClientForBrowse, existingReports]);
 
   const loadAvailableDates = async () => {
+    // Skip loading dates for latest-only report types
+    if (isLatestOnlyReport(reportType)) {
+      setAvailableDates([]);
+      return;
+    }
+    
     try {
       const response = await portfolioAPI.getAvailableDatesByType(reportType, selectedClient);
       if (response.status === 'success' && response.data) {

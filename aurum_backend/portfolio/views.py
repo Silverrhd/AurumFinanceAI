@@ -664,7 +664,8 @@ def get_available_dates_by_type(request, report_type):
         'weekly_investment': 'WEEKLY',
         'bond_maturity': 'BOND_MATURITY',
         'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
-        'equity_breakdown': 'EQUITY_BREAKDOWN'
+        'equity_breakdown': 'EQUITY_BREAKDOWN',
+        'cash_position': 'CASH_POSITION'
     }
     
     db_report_type = report_type_mapping.get(report_type)
@@ -713,7 +714,8 @@ def list_generated_reports_by_type(request, report_type):
         'weekly_investment': 'WEEKLY',
         'bond_maturity': 'BOND_MATURITY',
         'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
-        'equity_breakdown': 'EQUITY_BREAKDOWN'
+        'equity_breakdown': 'EQUITY_BREAKDOWN',
+        'cash_position': 'CASH_POSITION'
     }
     
     db_report_type = report_type_mapping.get(report_type)
@@ -865,6 +867,18 @@ def generate_report_no_open(request):
                 report_service = BondIssuerReportService()
                 html_content = report_service.generate_bond_issuer_weight_report(client_code)
                 
+        elif report_type == 'cash_position':
+            if not client_code or client_code == 'ALL':
+                # Generate for all clients (bulk generation)
+                from .services.cash_report_service import CashReportService
+                report_service = CashReportService()
+                html_content = report_service.generate_consolidated_report()
+            else:
+                # Generate for specific client
+                from .services.cash_report_service import CashReportService
+                report_service = CashReportService()
+                html_content = report_service.generate_individual_report(client_code)
+                
         elif report_type == 'equity_breakdown':
             from .services.report_generation_service import ReportGenerationService
             report_service = ReportGenerationService()
@@ -1012,6 +1026,14 @@ def generate_report(request):
                 html_content = f"<html><body><h1>Bond Issuer Weight Report</h1><p>{result.get('message', 'Report generated successfully')}</p></body></html>"
             else:
                 return Response({'success': False, 'error': result.get('error', 'Bond issuer report generation failed')})
+                
+        elif report_type == 'cash_position':
+            from .services.cash_report_service import CashReportService
+            report_service = CashReportService()
+            if client_code == 'ALL':
+                html_content = report_service.generate_consolidated_report()
+            else:
+                html_content = report_service.generate_individual_report(client_code)
                 
         elif report_type == 'equity_breakdown':
             from .services.report_generation_service import ReportGenerationService
