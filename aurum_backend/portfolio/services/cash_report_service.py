@@ -65,7 +65,7 @@ class CashReportService(EnhancedReportService):
             positions_data.append({
                 'custody': custody,
                 'asset_name': position.asset.name,
-                'market_value': position.market_value,
+                'market_value': float(position.market_value),
                 'ticker': position.asset.ticker
             })
         
@@ -81,8 +81,8 @@ class CashReportService(EnhancedReportService):
                 concentration_alert = {
                     'percentage': round(cash_percentage, 2),
                     'threshold': self.concentration_threshold,
-                    'total_cash': total_cash,
-                    'total_aum': total_aum
+                    'total_cash': float(total_cash),
+                    'total_aum': float(total_aum)
                 }
         
         # Generate report HTML
@@ -91,7 +91,7 @@ class CashReportService(EnhancedReportService):
             'client_code': client.code,
             'snapshot_date': snapshot.snapshot_date,
             'cash_positions': positions_data,
-            'total_cash': total_cash,
+            'total_cash': float(total_cash),
             'concentration_alert': concentration_alert,
             'report_generated': datetime.now()
         }
@@ -157,7 +157,7 @@ class CashReportService(EnhancedReportService):
                 detailed_positions.append({
                     'custody': custody,
                     'asset_name': position.asset.name,
-                    'market_value': position.market_value,
+                    'market_value': float(position.market_value),
                     'ticker': position.asset.ticker
                 })
             
@@ -165,8 +165,8 @@ class CashReportService(EnhancedReportService):
                 'client_code': client.code,
                 'client_name': client.name,
                 'snapshot_date': snapshot.snapshot_date,
-                'total_cash': total_cash,
-                'total_aum': total_aum,
+                'total_cash': float(total_cash),
+                'total_aum': float(total_aum),
                 'concentration_alert': concentration_alert,
                 'detailed_positions': detailed_positions
             })
