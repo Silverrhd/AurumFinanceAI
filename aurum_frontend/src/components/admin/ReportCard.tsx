@@ -159,8 +159,8 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
       return;
     }
     
-    // Bond issuer weight reports don't need date selection (use latest data)
-    if (reportType === 'bond_issuer_weight') {
+    // Latest-only reports don't need date selection (use latest data)
+    if (isLatestOnlyReport(reportType)) {
       if (!selectedClient) {
         toast.error('Please select a client');
         return;

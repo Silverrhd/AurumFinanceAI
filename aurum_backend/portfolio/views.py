@@ -872,12 +872,12 @@ def generate_report_no_open(request):
                 # Generate for all clients (bulk generation)
                 from .services.cash_report_service import CashReportService
                 report_service = CashReportService()
-                html_content = report_service.generate_consolidated_report()
+                html_content = report_service.generate_cash_position_report('ALL', 'consolidated')
             else:
                 # Generate for specific client
                 from .services.cash_report_service import CashReportService
                 report_service = CashReportService()
-                html_content = report_service.generate_individual_report(client_code)
+                html_content = report_service.generate_cash_position_report(client_code, 'individual')
                 
         elif report_type == 'equity_breakdown':
             from .services.report_generation_service import ReportGenerationService
@@ -1031,9 +1031,9 @@ def generate_report(request):
             from .services.cash_report_service import CashReportService
             report_service = CashReportService()
             if client_code == 'ALL':
-                html_content = report_service.generate_consolidated_report()
+                html_content = report_service.generate_cash_position_report('ALL', 'consolidated')
             else:
-                html_content = report_service.generate_individual_report(client_code)
+                html_content = report_service.generate_cash_position_report(client_code, 'individual')
                 
         elif report_type == 'equity_breakdown':
             from .services.report_generation_service import ReportGenerationService
