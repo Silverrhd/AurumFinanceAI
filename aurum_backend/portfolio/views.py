@@ -160,11 +160,14 @@ def generate_all_cash_position_reports():
                 html_content
             )
             
-            # Create database record for consolidated report (use first client)
-            first_client = Client.objects.first()
+            # Create database record for consolidated report (create ALL client)
+            all_client, created = Client.objects.get_or_create(
+                code='ALL',
+                defaults={'name': 'All Clients'}
+            )
             with transaction.atomic():
                 report = Report.objects.create(
-                    client=first_client,  # Use first client as placeholder for ALL
+                    client=all_client,  # Use ALL client for consolidated reports
                     report_type='CASH_POSITION',
                     report_date=datetime.now().date(),
                     file_path=file_path,
@@ -859,7 +862,7 @@ def list_generated_reports_by_type(request, report_type):
             return Response({'error': f'Client {client_code} not found'}, status=404)
     
     # Get reports
-    reports = Report.objects.filter(**filters).select_related('client').order_by('-report_date', '-created_at')
+    reports = Report.objects.filter(**filters).select_related('client').order_by('client__code')
     
     reports_data = []
     for report in reports:
@@ -873,6 +876,12 @@ def list_generated_reports_by_type(request, report_type):
             'generation_time': report.generation_time,
             'created_at': report.created_at.isoformat()
         })
+    
+    # Custom sort: ALL first for cash reports, then alphabetical
+    if db_report_type == 'CASH_POSITION':
+        reports_data.sort(key=lambda r: (r['client_code'] != 'ALL', r['client_code']))
+    else:
+        reports_data.sort(key=lambda r: r['client_code'])
     
     return Response({
         'success': True,

@@ -214,7 +214,7 @@ class CashReportService(EnhancedReportService):
         """Get list of generated cash reports."""
         reports_query = Report.objects.filter(
             report_type='CASH_POSITION'
-        ).select_related('client').order_by('-created_at')
+        ).select_related('client').order_by('client__code')
         
         if client_code and client_code != 'ALL':
             reports_query = reports_query.filter(client__code=client_code)

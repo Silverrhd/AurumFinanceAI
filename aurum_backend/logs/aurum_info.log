@@ -4485,3 +4485,327 @@ INFO 2025-09-01 14:57:15,924 portfolio.services.bond_issuer_report_service bond_
 INFO 2025-09-01 14:57:15,925 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JG/bond_issuer_weight_reports
 INFO 2025-09-01 14:57:15,926 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JG/bond_issuer_weight_reports/bond_issuer_weight_report_2025-09-01.html (39405 bytes)
 INFO 2025-09-01 14:57:15,935 portfolio.views views generate_all_bond_issuer_weight_reports 103 Successfully generated Bond Issuer Weight report for JG
+INFO 2025-09-01 16:01:57,732 portfolio.views views generate_all_cash_position_reports 135 Starting bulk Cash Position report generation
+INFO 2025-09-01 16:01:57,750 portfolio.views views generate_all_cash_position_reports 140 Deleted existing Cash Position reports
+INFO 2025-09-01 16:01:57,752 portfolio.views views generate_all_cash_position_reports 150 Generating consolidated Cash Position report
+INFO 2025-09-01 16:01:57,752 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating consolidated Cash Position report for ALL
+INFO 2025-09-01 16:01:58,190 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ALL/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,192 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ALL/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (198911 bytes)
+INFO 2025-09-01 16:01:58,192 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ALL/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,193 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ALL/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (198911 bytes)
+INFO 2025-09-01 16:01:58,200 portfolio.views views generate_all_cash_position_reports 185 Successfully generated consolidated Cash Position report
+INFO 2025-09-01 16:01:58,800 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for VP
+INFO 2025-09-01 16:01:58,800 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for VP
+INFO 2025-09-01 16:01:58,815 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,816 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VP/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7767 bytes)
+INFO 2025-09-01 16:01:58,816 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,817 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VP/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7767 bytes)
+INFO 2025-09-01 16:01:58,819 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for VP
+INFO 2025-09-01 16:01:58,819 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for JC
+INFO 2025-09-01 16:01:58,819 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for JC
+INFO 2025-09-01 16:01:58,824 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JC/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,825 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JC/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7026 bytes)
+INFO 2025-09-01 16:01:58,825 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JC/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,826 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JC/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7026 bytes)
+INFO 2025-09-01 16:01:58,828 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for JC
+INFO 2025-09-01 16:01:58,828 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for HS
+INFO 2025-09-01 16:01:58,828 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for HS
+INFO 2025-09-01 16:01:58,833 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HS/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,834 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HS/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6803 bytes)
+INFO 2025-09-01 16:01:58,835 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HS/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,835 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HS/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6803 bytes)
+INFO 2025-09-01 16:01:58,837 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for HS
+INFO 2025-09-01 16:01:58,837 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for JN
+INFO 2025-09-01 16:01:58,837 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for JN
+INFO 2025-09-01 16:01:58,847 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JN/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,850 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JN/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (14376 bytes)
+INFO 2025-09-01 16:01:58,850 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JN/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,851 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JN/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (14376 bytes)
+INFO 2025-09-01 16:01:58,852 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for JN
+INFO 2025-09-01 16:01:58,852 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for KP
+INFO 2025-09-01 16:01:58,852 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for KP
+INFO 2025-09-01 16:01:58,857 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/KP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,859 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/KP/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7125 bytes)
+INFO 2025-09-01 16:01:58,859 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/KP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,860 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/KP/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7125 bytes)
+INFO 2025-09-01 16:01:58,861 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for KP
+INFO 2025-09-01 16:01:58,862 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for JAV
+INFO 2025-09-01 16:01:58,862 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for JAV
+INFO 2025-09-01 16:01:58,869 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAV/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,872 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAV/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (11002 bytes)
+INFO 2025-09-01 16:01:58,873 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAV/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,873 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAV/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (11002 bytes)
+INFO 2025-09-01 16:01:58,875 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for JAV
+INFO 2025-09-01 16:01:58,875 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for GW
+INFO 2025-09-01 16:01:58,875 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for GW
+INFO 2025-09-01 16:01:58,882 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GW/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,883 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GW/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6851 bytes)
+INFO 2025-09-01 16:01:58,883 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GW/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,884 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GW/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6851 bytes)
+INFO 2025-09-01 16:01:58,886 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for GW
+INFO 2025-09-01 16:01:58,886 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for ELP
+INFO 2025-09-01 16:01:58,886 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for ELP
+INFO 2025-09-01 16:01:58,893 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ELP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,896 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ELP/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6897 bytes)
+INFO 2025-09-01 16:01:58,897 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ELP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,897 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ELP/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6897 bytes)
+INFO 2025-09-01 16:01:58,899 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for ELP
+INFO 2025-09-01 16:01:58,899 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for NAC
+INFO 2025-09-01 16:01:58,899 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for NAC
+INFO 2025-09-01 16:01:58,904 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/NAC/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,905 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/NAC/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7731 bytes)
+INFO 2025-09-01 16:01:58,905 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/NAC/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,906 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/NAC/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7731 bytes)
+INFO 2025-09-01 16:01:58,908 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for NAC
+INFO 2025-09-01 16:01:58,908 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for HZ
+INFO 2025-09-01 16:01:58,908 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for HZ
+INFO 2025-09-01 16:01:58,913 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,914 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HZ/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (8454 bytes)
+INFO 2025-09-01 16:01:58,914 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,915 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HZ/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (8454 bytes)
+INFO 2025-09-01 16:01:58,916 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for HZ
+INFO 2025-09-01 16:01:58,916 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for CR
+INFO 2025-09-01 16:01:58,916 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for CR
+INFO 2025-09-01 16:01:58,921 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CR/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,922 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CR/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7026 bytes)
+INFO 2025-09-01 16:01:58,923 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CR/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,923 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CR/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7026 bytes)
+INFO 2025-09-01 16:01:58,925 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for CR
+INFO 2025-09-01 16:01:58,925 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for CI
+INFO 2025-09-01 16:01:58,925 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for CI
+INFO 2025-09-01 16:01:58,933 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CI/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,934 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CI/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7641 bytes)
+INFO 2025-09-01 16:01:58,934 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CI/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,935 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CI/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7641 bytes)
+INFO 2025-09-01 16:01:58,937 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for CI
+INFO 2025-09-01 16:01:58,937 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for RP
+INFO 2025-09-01 16:01:58,937 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for RP
+INFO 2025-09-01 16:01:58,943 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,943 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RP/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6900 bytes)
+INFO 2025-09-01 16:01:58,944 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,944 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RP/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6900 bytes)
+INFO 2025-09-01 16:01:58,946 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for RP
+INFO 2025-09-01 16:01:58,946 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for LP
+INFO 2025-09-01 16:01:58,946 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for LP
+INFO 2025-09-01 16:01:58,953 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,955 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LP/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (10208 bytes)
+INFO 2025-09-01 16:01:58,955 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,955 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LP/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (10208 bytes)
+INFO 2025-09-01 16:01:58,957 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for LP
+INFO 2025-09-01 16:01:58,957 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for VLP
+INFO 2025-09-01 16:01:58,957 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for VLP
+INFO 2025-09-01 16:01:58,963 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VLP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,966 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VLP/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (10179 bytes)
+INFO 2025-09-01 16:01:58,966 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VLP/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,967 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VLP/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (10179 bytes)
+INFO 2025-09-01 16:01:58,968 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for VLP
+INFO 2025-09-01 16:01:58,969 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for PS
+INFO 2025-09-01 16:01:58,969 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for PS
+INFO 2025-09-01 16:01:58,974 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/PS/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,976 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/PS/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6575 bytes)
+INFO 2025-09-01 16:01:58,976 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/PS/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,977 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/PS/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6575 bytes)
+INFO 2025-09-01 16:01:58,979 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for PS
+INFO 2025-09-01 16:01:58,979 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for FG
+INFO 2025-09-01 16:01:58,979 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for FG
+INFO 2025-09-01 16:01:58,985 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FG/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,988 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FG/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6133 bytes)
+INFO 2025-09-01 16:01:58,988 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FG/cash_position_reports_reports
+INFO 2025-09-01 16:01:58,988 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FG/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6133 bytes)
+INFO 2025-09-01 16:01:58,991 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for FG
+INFO 2025-09-01 16:01:58,991 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for DA
+INFO 2025-09-01 16:01:58,991 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for DA
+INFO 2025-09-01 16:01:58,998 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DA/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,000 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DA/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7239 bytes)
+INFO 2025-09-01 16:01:59,000 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DA/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,001 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DA/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7239 bytes)
+INFO 2025-09-01 16:01:59,004 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for DA
+INFO 2025-09-01 16:01:59,004 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for JPU
+INFO 2025-09-01 16:01:59,004 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for JPU
+INFO 2025-09-01 16:01:59,012 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JPU/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,013 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JPU/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6157 bytes)
+INFO 2025-09-01 16:01:59,014 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JPU/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,015 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JPU/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6157 bytes)
+INFO 2025-09-01 16:01:59,017 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for JPU
+INFO 2025-09-01 16:01:59,017 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for IA
+INFO 2025-09-01 16:01:59,017 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for IA
+INFO 2025-09-01 16:01:59,024 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IA/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,026 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IA/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6379 bytes)
+INFO 2025-09-01 16:01:59,027 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IA/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,028 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IA/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6379 bytes)
+INFO 2025-09-01 16:01:59,030 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for IA
+INFO 2025-09-01 16:01:59,030 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for HH
+INFO 2025-09-01 16:01:59,031 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for HH
+INFO 2025-09-01 16:01:59,038 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HH/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,039 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HH/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7239 bytes)
+INFO 2025-09-01 16:01:59,040 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HH/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,040 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/HH/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7239 bytes)
+INFO 2025-09-01 16:01:59,043 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for HH
+INFO 2025-09-01 16:01:59,043 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for AC
+INFO 2025-09-01 16:01:59,044 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for AC
+INFO 2025-09-01 16:01:59,052 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AC/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,054 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AC/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7243 bytes)
+INFO 2025-09-01 16:01:59,054 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AC/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,055 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AC/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7243 bytes)
+INFO 2025-09-01 16:01:59,057 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for AC
+INFO 2025-09-01 16:01:59,057 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for IZ
+INFO 2025-09-01 16:01:59,057 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for IZ
+INFO 2025-09-01 16:01:59,065 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,066 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IZ/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7010 bytes)
+INFO 2025-09-01 16:01:59,067 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,067 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/IZ/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7010 bytes)
+INFO 2025-09-01 16:01:59,069 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for IZ
+INFO 2025-09-01 16:01:59,070 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for AG
+INFO 2025-09-01 16:01:59,070 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for AG
+INFO 2025-09-01 16:01:59,077 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,078 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AG/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7230 bytes)
+INFO 2025-09-01 16:01:59,078 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,079 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AG/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7230 bytes)
+INFO 2025-09-01 16:01:59,081 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for AG
+INFO 2025-09-01 16:01:59,082 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for AA
+INFO 2025-09-01 16:01:59,082 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for AA
+INFO 2025-09-01 16:01:59,091 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AA/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,092 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AA/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6126 bytes)
+INFO 2025-09-01 16:01:59,092 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AA/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,093 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AA/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6126 bytes)
+INFO 2025-09-01 16:01:59,096 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for AA
+INFO 2025-09-01 16:01:59,096 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for AU
+INFO 2025-09-01 16:01:59,096 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for AU
+INFO 2025-09-01 16:01:59,101 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AU/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,103 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AU/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6131 bytes)
+INFO 2025-09-01 16:01:59,104 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AU/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,104 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/AU/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6131 bytes)
+INFO 2025-09-01 16:01:59,106 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for AU
+INFO 2025-09-01 16:01:59,107 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for MZ
+INFO 2025-09-01 16:01:59,107 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for MZ
+INFO 2025-09-01 16:01:59,112 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,114 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MZ/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (5639 bytes)
+INFO 2025-09-01 16:01:59,114 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,115 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MZ/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (5639 bytes)
+INFO 2025-09-01 16:01:59,116 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for MZ
+INFO 2025-09-01 16:01:59,117 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for MAC
+INFO 2025-09-01 16:01:59,117 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for MAC
+INFO 2025-09-01 16:01:59,122 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MAC/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,124 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MAC/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6604 bytes)
+INFO 2025-09-01 16:01:59,124 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MAC/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,125 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MAC/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6604 bytes)
+INFO 2025-09-01 16:01:59,128 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for MAC
+INFO 2025-09-01 16:01:59,129 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for GG
+INFO 2025-09-01 16:01:59,129 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for GG
+INFO 2025-09-01 16:01:59,136 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,137 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GG/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6977 bytes)
+INFO 2025-09-01 16:01:59,138 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,138 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GG/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6977 bytes)
+INFO 2025-09-01 16:01:59,141 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for GG
+INFO 2025-09-01 16:01:59,141 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for CH
+INFO 2025-09-01 16:01:59,141 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for CH
+INFO 2025-09-01 16:01:59,146 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CH/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,147 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CH/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6980 bytes)
+INFO 2025-09-01 16:01:59,147 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CH/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,148 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/CH/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6980 bytes)
+INFO 2025-09-01 16:01:59,150 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for CH
+INFO 2025-09-01 16:01:59,150 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for EV
+INFO 2025-09-01 16:01:59,150 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for EV
+INFO 2025-09-01 16:01:59,156 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EV/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,157 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EV/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6983 bytes)
+INFO 2025-09-01 16:01:59,158 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EV/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,158 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EV/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6983 bytes)
+INFO 2025-09-01 16:01:59,160 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for EV
+INFO 2025-09-01 16:01:59,160 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for BK
+INFO 2025-09-01 16:01:59,160 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for BK
+INFO 2025-09-01 16:01:59,165 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/BK/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,166 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/BK/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6415 bytes)
+INFO 2025-09-01 16:01:59,167 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/BK/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,167 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/BK/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6415 bytes)
+INFO 2025-09-01 16:01:59,169 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for BK
+INFO 2025-09-01 16:01:59,169 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for RB
+INFO 2025-09-01 16:01:59,169 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for RB
+INFO 2025-09-01 16:01:59,174 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RB/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,175 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RB/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6409 bytes)
+INFO 2025-09-01 16:01:59,175 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RB/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,176 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RB/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6409 bytes)
+INFO 2025-09-01 16:01:59,177 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for RB
+INFO 2025-09-01 16:01:59,177 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for RM
+INFO 2025-09-01 16:01:59,178 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for RM
+INFO 2025-09-01 16:01:59,183 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RM/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,184 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RM/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6348 bytes)
+INFO 2025-09-01 16:01:59,184 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RM/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,185 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RM/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6348 bytes)
+INFO 2025-09-01 16:01:59,188 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for RM
+INFO 2025-09-01 16:01:59,188 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for FU
+INFO 2025-09-01 16:01:59,188 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for FU
+INFO 2025-09-01 16:01:59,195 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FU/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,197 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FU/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7498 bytes)
+INFO 2025-09-01 16:01:59,198 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FU/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,199 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/FU/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7498 bytes)
+INFO 2025-09-01 16:01:59,200 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for FU
+INFO 2025-09-01 16:01:59,201 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for MB
+INFO 2025-09-01 16:01:59,201 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for MB
+INFO 2025-09-01 16:01:59,208 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MB/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,209 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MB/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6413 bytes)
+INFO 2025-09-01 16:01:59,209 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MB/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,210 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/MB/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6413 bytes)
+INFO 2025-09-01 16:01:59,211 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for MB
+INFO 2025-09-01 16:01:59,212 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for ID
+INFO 2025-09-01 16:01:59,212 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for ID
+INFO 2025-09-01 16:01:59,218 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ID/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,218 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ID/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6129 bytes)
+INFO 2025-09-01 16:01:59,219 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ID/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,219 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/ID/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6129 bytes)
+INFO 2025-09-01 16:01:59,221 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for ID
+INFO 2025-09-01 16:01:59,221 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for JG
+INFO 2025-09-01 16:01:59,222 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for JG
+INFO 2025-09-01 16:01:59,228 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,230 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JG/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6987 bytes)
+INFO 2025-09-01 16:01:59,230 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,231 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JG/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6987 bytes)
+INFO 2025-09-01 16:01:59,235 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for JG
+INFO 2025-09-01 16:01:59,235 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for RS
+INFO 2025-09-01 16:01:59,236 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for RS
+INFO 2025-09-01 16:01:59,243 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RS/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,243 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RS/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7239 bytes)
+INFO 2025-09-01 16:01:59,244 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RS/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,245 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/RS/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7239 bytes)
+INFO 2025-09-01 16:01:59,247 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for RS
+INFO 2025-09-01 16:01:59,247 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for DG
+INFO 2025-09-01 16:01:59,248 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for DG
+INFO 2025-09-01 16:01:59,254 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,255 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DG/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7237 bytes)
+INFO 2025-09-01 16:01:59,256 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,257 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/DG/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7237 bytes)
+INFO 2025-09-01 16:01:59,259 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for DG
+INFO 2025-09-01 16:01:59,259 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for VH
+INFO 2025-09-01 16:01:59,259 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for VH
+INFO 2025-09-01 16:01:59,265 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VH/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,266 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VH/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6133 bytes)
+INFO 2025-09-01 16:01:59,266 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VH/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,267 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/VH/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6133 bytes)
+INFO 2025-09-01 16:01:59,269 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for VH
+INFO 2025-09-01 16:01:59,269 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for GZ
+INFO 2025-09-01 16:01:59,269 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for GZ
+INFO 2025-09-01 16:01:59,277 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,277 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GZ/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (8636 bytes)
+INFO 2025-09-01 16:01:59,278 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GZ/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,278 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/GZ/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (8636 bytes)
+INFO 2025-09-01 16:01:59,281 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for GZ
+INFO 2025-09-01 16:01:59,281 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for EG
+INFO 2025-09-01 16:01:59,281 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for EG
+INFO 2025-09-01 16:01:59,288 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,289 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EG/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (6973 bytes)
+INFO 2025-09-01 16:01:59,289 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EG/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,290 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/EG/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (6973 bytes)
+INFO 2025-09-01 16:01:59,292 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for EG
+INFO 2025-09-01 16:01:59,292 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for JAI
+INFO 2025-09-01 16:01:59,292 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for JAI
+INFO 2025-09-01 16:01:59,303 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAI/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,304 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAI/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (8139 bytes)
+INFO 2025-09-01 16:01:59,304 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAI/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,305 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/JAI/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (8139 bytes)
+INFO 2025-09-01 16:01:59,307 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for JAI
+INFO 2025-09-01 16:01:59,307 portfolio.views views generate_all_cash_position_reports 202 Generating Cash Position report for LV
+INFO 2025-09-01 16:01:59,307 portfolio.services.cash_report_service cash_report_service generate_cash_position_report 31 Generating individual Cash Position report for LV
+INFO 2025-09-01 16:01:59,312 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LV/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,313 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LV/cash_position_reports_reports/cash_position_reports_report_2025-08-14.html (7227 bytes)
+INFO 2025-09-01 16:01:59,313 portfolio.utils.report_utils report_utils get_report_directory 36 Report directory created/verified: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LV/cash_position_reports_reports
+INFO 2025-09-01 16:01:59,313 portfolio.utils.report_utils report_utils save_report_html 143 Report saved: /Users/thomaskemeny/AurumFinanceAI/aurum_backend/reports/LV/cash_position_reports_reports/cash_position_reports_report_2025-09-01.html (7227 bytes)
+INFO 2025-09-01 16:01:59,315 portfolio.views views generate_all_cash_position_reports 233 Successfully generated Cash Position report for LV
