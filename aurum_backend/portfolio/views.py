@@ -51,7 +51,7 @@ def generate_all_bond_issuer_weight_reports():
         clients_with_bonds = Client.objects.filter(
             snapshots__positions__asset__asset_type='Fixed Income',
             snapshots__positions__asset__maturity_date__isnull=False
-        ).distinct()
+        ).exclude(code='ALL').distinct()
         
         if not clients_with_bonds.exists():
             return Response({
@@ -876,6 +876,10 @@ def list_generated_reports_by_type(request, report_type):
             'generation_time': report.generation_time,
             'created_at': report.created_at.isoformat()
         })
+    
+    # Filter out ALL for non-consolidated report types
+    if db_report_type != 'CASH_POSITION':
+        reports_data = [r for r in reports_data if r['client_code'] != 'ALL']
     
     # Custom sort: ALL first for cash reports, then alphabetical
     if db_report_type == 'CASH_POSITION':

@@ -190,21 +190,6 @@
             </div>
         </div>
         
-        <!-- Concentration Risk Alert - Same pattern as bond issuer 20% alert -->
-        {% if concentration_alert %}
-        <div class="risk-analysis-section">
-            <h3>⚠️ Cash Concentration Risk Analysis</h3>
-            <p>{{ client_name }}'s cash positions represent <strong>{{ "{:.1f}".format(concentration_alert.percentage) }}%</strong> 
-               of total portfolio value, which exceeds the {{ "{:.0f}".format(concentration_alert.threshold) }}% monitoring threshold.</p>
-            <ul>
-                <li><strong>Total Cash Positions:</strong> ${{ "{:,.2f}".format(concentration_alert.total_cash) }}</li>
-                <li><strong>Total Portfolio Value:</strong> ${{ "{:,.2f}".format(concentration_alert.total_aum) }}</li>
-                <li><strong>Cash Concentration:</strong> {{ "{:.1f}".format(concentration_alert.percentage) }}%</li>
-            </ul>
-            <p><strong>Risk Assessment:</strong> High cash concentration detected. 
-            Consider deploying excess cash into appropriate investments to optimize portfolio returns and reduce cash drag.</p>
-        </div>
-        {% endif %}
         
         <!-- Cash Positions Table -->
         <h3>Cash and Money Market Positions</h3>
@@ -247,6 +232,22 @@
                 {% endif %}
             </table>
         </div>
+        
+        <!-- Concentration Risk Alert - Moved after summary -->
+        {% if concentration_alert %}
+        <div class="risk-analysis-section">
+            <h3>⚠️ Cash Concentration Risk Analysis</h3>
+            <p>{{ client_name }}'s cash positions represent <strong>{{ "{:.1f}".format(concentration_alert.percentage) }}%</strong> 
+               of total portfolio value, which exceeds the {{ "{:.0f}".format(concentration_alert.threshold) }}% monitoring threshold.</p>
+            <ul>
+                <li><strong>Total Cash Positions:</strong> ${{ "{:,.2f}".format(concentration_alert.total_cash) }}</li>
+                <li><strong>Total Portfolio Value:</strong> ${{ "{:,.2f}".format(concentration_alert.total_aum) }}</li>
+                <li><strong>Cash Concentration:</strong> {{ "{:.1f}".format(concentration_alert.percentage) }}%</li>
+            </ul>
+            <p><strong>Risk Assessment:</strong> High cash concentration detected. 
+            Consider deploying excess cash into appropriate investments to optimize portfolio returns and reduce cash drag.</p>
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>
