@@ -265,24 +265,6 @@
             </div>
         </div>
         
-        <!-- Global Concentration Risk Summary -->
-        {% set clients_with_alerts = clients_with_cash | selectattr('concentration_alert') | list %}
-        {% if clients_with_alerts %}
-        <div class="risk-analysis-section">
-            <h3>⚠️ Cash Concentration Risk Analysis</h3>
-            <p>{{ clients_with_alerts|length }} client{{ 's' if clients_with_alerts|length != 1 else '' }} 
-               exceed{{ '' if clients_with_alerts|length != 1 else 's' }} the 5% cash concentration threshold:</p>
-            <ul>
-                {% for client in clients_with_alerts %}
-                <li><strong>{{ client.client_name }} ({{ client.client_code }}):</strong> 
-                    {{ "{:.1f}".format(client.concentration_alert.percentage) }}% cash concentration</li>
-                {% endfor %}
-            </ul>
-            <p><strong>Risk Assessment:</strong> Multiple clients showing high cash concentrations. 
-            Consider reviewing cash deployment strategies to optimize portfolio returns.</p>
-        </div>
-        {% endif %}
-        
         <!-- Clients with Cash Positions Table -->
         <h3>Clients with Cash Positions</h3>
         
@@ -381,6 +363,24 @@
                 {% endif %}
             </table>
         </div>
+        
+        <!-- Global Concentration Risk Summary - Moved after summary -->
+        {% set clients_with_alerts = clients_with_cash | selectattr('concentration_alert') | list %}
+        {% if clients_with_alerts %}
+        <div class="risk-analysis-section">
+            <h3>⚠️ Cash Concentration Risk Analysis</h3>
+            <p>{{ clients_with_alerts|length }} client{{ 's' if clients_with_alerts|length != 1 else '' }} 
+               exceed{{ '' if clients_with_alerts|length != 1 else 's' }} the 5% cash concentration threshold:</p>
+            <ul>
+                {% for client in clients_with_alerts %}
+                <li><strong>{{ client.client_name }} ({{ client.client_code }}):</strong> 
+                    {{ "{:.1f}".format(client.concentration_alert.percentage) }}% cash concentration</li>
+                {% endfor %}
+            </ul>
+            <p><strong>Risk Assessment:</strong> Multiple clients showing high cash concentrations. 
+            Consider reviewing cash deployment strategies to optimize portfolio returns.</p>
+        </div>
+        {% endif %}
     </div>
     
     <!-- JavaScript for expandable rows - same pattern as bond issuer report -->

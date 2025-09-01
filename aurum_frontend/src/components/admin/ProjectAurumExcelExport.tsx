@@ -259,9 +259,9 @@ function ExportCard({ title, type, description }: ExportCardProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ALL">All Clients</SelectItem>
-                      {clients.map(client => (
+                      {clients.filter(client => client.client_code !== 'ALL').map(client => (
                         <SelectItem key={client.client_code} value={client.client_code}>
-                          {client.name} ({client.client_code})
+                          {client.client_code}
                         </SelectItem>
                       ))}
                     </SelectContent>

@@ -71,7 +71,10 @@ export default function AdminDashboardPage() {
       ]);
 
       if (clientsResponse.status === 'success' && clientsResponse.data) {
-        setClients([{ id: 'all', name: 'All Clients', client_code: 'ALL' }, ...clientsResponse.data]);
+        setClients([
+          { id: 'all', name: 'All Clients', client_code: 'ALL' }, 
+          ...clientsResponse.data.filter(client => client.client_code !== 'ALL')
+        ]);
       }
 
       if (dashboardResponse.status === 'success' && dashboardResponse.data) {

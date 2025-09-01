@@ -422,11 +422,13 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
                   {loadingData ? (
                     <SelectItem value="loading" disabled>Loading clients...</SelectItem>
                   ) : clients.length > 0 ? (
-                    clients.map(client => (
-                      <SelectItem key={client.client_code} value={client.client_code}>
-                        {client.client_code}
-                      </SelectItem>
-                    ))
+                    clients
+                      .filter(client => reportType === 'cash_position' || client.client_code !== 'ALL')
+                      .map(client => (
+                        <SelectItem key={client.client_code} value={client.client_code}>
+                          {client.client_code}
+                        </SelectItem>
+                      ))
                   ) : (
                     <SelectItem value="no-clients" disabled>No clients available</SelectItem>
                   )}
@@ -478,7 +480,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
                       ) : uniqueClients.length > 0 ? (
                         uniqueClients.map((c) => (
                           <SelectItem key={c.code} value={c.code}>
-                            {c.code}
+                            {c.code === 'ALL' ? 'All Clients' : c.code}
                           </SelectItem>
                         ))
                       ) : (
@@ -509,11 +511,13 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
                       {loadingData ? (
                         <SelectItem value="loading" disabled>Loading clients...</SelectItem>
                       ) : clients.length > 0 ? (
-                        clients.map(client => (
-                          <SelectItem key={client.client_code} value={client.client_code}>
-                            {client.client_code}
-                          </SelectItem>
-                        ))
+                        clients
+                          .filter(client => client.client_code !== 'ALL')
+                          .map(client => (
+                            <SelectItem key={client.client_code} value={client.client_code}>
+                              {client.client_code}
+                            </SelectItem>
+                          ))
                       ) : (
                         <SelectItem value="no-clients" disabled>No clients available</SelectItem>
                       )}
