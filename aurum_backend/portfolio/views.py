@@ -126,6 +126,133 @@ def generate_all_bond_issuer_weight_reports():
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def generate_all_cash_position_reports():
+    """Generate Cash Position reports for all clients with cash positions."""
+    from .utils.report_utils import save_report_html
+    from .services.cash_report_service import CashReportService
+    from django.db import IntegrityError, transaction
+    
+    logger.info("Starting bulk Cash Position report generation")
+    
+    try:
+        # Delete existing cash position reports
+        Report.objects.filter(report_type='CASH_POSITION').delete()
+        logger.info("Deleted existing Cash Position reports")
+        
+        # Initialize report service
+        report_service = CashReportService()
+        
+        generated_reports = []
+        failed_reports = []
+        
+        # STEP 1: Generate consolidated report for "All Clients"
+        try:
+            logger.info("Generating consolidated Cash Position report")
+            
+            html_content = report_service.generate_cash_position_report('ALL', 'consolidated')
+            
+            # Save consolidated report file
+            current_date = datetime.now().strftime('%Y-%m-%d')
+            file_path, file_size = save_report_html(
+                'ALL', 
+                'cash_position_reports', 
+                current_date,
+                html_content
+            )
+            
+            # Create database record for consolidated report (use first client)
+            first_client = Client.objects.first()
+            with transaction.atomic():
+                report = Report.objects.create(
+                    client=first_client,  # Use first client as placeholder for ALL
+                    report_type='CASH_POSITION',
+                    report_date=datetime.now().date(),
+                    file_path=file_path,
+                    file_size=file_size,
+                    generation_time=0
+                )
+            
+            generated_reports.append({
+                'client_code': 'ALL',
+                'client_name': 'All Clients',
+                'report_id': report.id,
+                'file_path': file_path
+            })
+            
+            logger.info("Successfully generated consolidated Cash Position report")
+            
+        except Exception as e:
+            logger.error(f"Failed to generate consolidated Cash Position report: {e}")
+            failed_reports.append({
+                'client_code': 'ALL',
+                'error': str(e)
+            })
+        
+        # STEP 2: Generate individual reports for each client with cash positions
+        clients_with_cash = Client.objects.filter(
+            snapshots__positions__asset__asset_type__in=['Cash', 'Money Market'],
+            snapshots__positions__market_value__gt=0
+        ).distinct()
+        
+        for client in clients_with_cash:
+            try:
+                logger.info(f"Generating Cash Position report for {client.code}")
+                
+                # Generate individual report HTML
+                html_content = report_service.generate_cash_position_report(client.code, 'individual')
+                
+                # Save report file
+                file_path, file_size = save_report_html(
+                    client.code, 
+                    'cash_position_reports', 
+                    current_date,
+                    html_content
+                )
+                
+                # Create database record
+                with transaction.atomic():
+                    report = Report.objects.create(
+                        client=client,
+                        report_type='CASH_POSITION',
+                        report_date=datetime.now().date(),
+                        file_path=file_path,
+                        file_size=file_size,
+                        generation_time=0
+                    )
+                
+                generated_reports.append({
+                    'client_code': client.code,
+                    'client_name': client.name,
+                    'report_id': report.id,
+                    'file_path': file_path
+                })
+                
+                logger.info(f"Successfully generated Cash Position report for {client.code}")
+                
+            except Exception as e:
+                logger.error(f"Failed to generate Cash Position report for {client.code}: {e}")
+                failed_reports.append({
+                    'client_code': client.code,
+                    'error': str(e)
+                })
+        
+        # Return results
+        return Response({
+            'success': True,
+            'message': f'Generated {len(generated_reports)} Cash Position reports',
+            'generated_reports': generated_reports,
+            'failed_reports': failed_reports,
+            'total_generated': len(generated_reports),
+            'total_failed': len(failed_reports)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in bulk Cash Position report generation: {e}")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 def generate_all_clients_reports(current_date, comparison_date=None):
     """Generate weekly reports for all clients on given date with robust error handling."""
     from .utils.report_utils import save_report_html
@@ -872,9 +999,7 @@ def generate_report_no_open(request):
         elif report_type == 'cash_position':
             if not client_code or client_code == 'ALL':
                 # Generate for all clients (bulk generation)
-                from .services.cash_report_service import CashReportService
-                report_service = CashReportService()
-                html_content = report_service.generate_cash_position_report('ALL', 'consolidated')
+                return generate_all_cash_position_reports()
             else:
                 # Generate for specific client
                 from .services.cash_report_service import CashReportService

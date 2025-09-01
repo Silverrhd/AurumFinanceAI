@@ -15,3 +15,12 @@ data_export.json
 # Log files (can be large)
 logs/*.log
 logs/*.log.*
+aurum_backend/logs/
+
+# Generated reports directory
+aurum_backend/reports/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
