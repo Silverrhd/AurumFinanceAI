@@ -574,7 +574,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
                         <SelectItem value="loading" disabled>Loading clients...</SelectItem>
                       ) : clients.length > 0 ? (
                         clients
-                          .filter(client => client.client_code !== 'ALL')
+                          .filter(client => ['cash_position', 'monthly_returns_custody'].includes(reportType) || client.client_code !== 'ALL')
                           .map(client => (
                             <SelectItem key={client.client_code} value={client.client_code}>
                               {client.client_code}
