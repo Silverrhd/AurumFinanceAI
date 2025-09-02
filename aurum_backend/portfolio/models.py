@@ -301,7 +301,7 @@ class Report(models.Model):
     ]
     
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='reports')
-    report_type = models.CharField(max_length=20, choices=REPORT_TYPES)
+    report_type = models.CharField(max_length=25, choices=REPORT_TYPES)
     report_date = models.DateField(db_index=True)
     file_path = models.CharField(max_length=255)
     file_size = models.BigIntegerField(null=True, blank=True)
