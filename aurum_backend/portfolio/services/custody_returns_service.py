@@ -178,6 +178,10 @@ class CustodyReturnsService:
                     start_date, 
                     end_date
                 )
+                # Format values for template display
+                custody_result['returns_dollar_formatted'] = f"{custody_result['returns_dollar']:,.2f}"
+                custody_result['returns_percentage_formatted'] = f"{custody_result['returns_percentage']:.2f}"
+                
                 custody_returns.append(custody_result)
                 total_returns_dollar += custody_result['returns_dollar']
             
@@ -195,7 +199,9 @@ class CustodyReturnsService:
                 'end_date': end_date.strftime('%Y-%m-%d'),
                 'custody_returns': custody_returns,
                 'total_returns_dollar': total_returns_dollar,
+                'total_returns_dollar_formatted': f"{total_returns_dollar:,.2f}",
                 'total_returns_percentage': client_return_pct,
+                'total_returns_percentage_formatted': f"{client_return_pct:.2f}",
                 'total_custodies': len(custody_returns)
             }
             
@@ -241,6 +247,7 @@ class CustodyReturnsService:
                 'clients_data': all_clients_data,
                 'total_clients': len(all_clients_data),
                 'grand_total_returns_dollar': grand_total_dollar,
+                'grand_total_returns_dollar_formatted': f"{grand_total_dollar:,.2f}",
                 'report_date': end_date.strftime('%Y-%m-%d')
             }
             

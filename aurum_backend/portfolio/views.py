@@ -796,7 +796,7 @@ def get_available_dates_by_type(request, report_type):
         'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
         'equity_breakdown': 'EQUITY_BREAKDOWN',
         'cash_position': 'CASH_POSITION',
-        'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
+        'monthly_returns_custody': 'MONTHLY_RETURNS'
     }
     
     db_report_type = report_type_mapping.get(report_type)
@@ -847,7 +847,7 @@ def list_generated_reports_by_type(request, report_type):
         'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
         'equity_breakdown': 'EQUITY_BREAKDOWN',
         'cash_position': 'CASH_POSITION',
-        'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
+        'monthly_returns_custody': 'MONTHLY_RETURNS'
     }
     
     db_report_type = report_type_mapping.get(report_type)
@@ -958,7 +958,7 @@ def generate_report_no_open(request):
             'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
             'equity_breakdown': 'EQUITY_BREAKDOWN',
             'cash_position': 'CASH_POSITION',
-            'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
+            'monthly_returns_custody': 'MONTHLY_RETURNS'
         }
         
         db_report_type = report_type_mapping.get(report_type)
@@ -1138,7 +1138,7 @@ def generate_report(request):
             'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
             'equity_breakdown': 'EQUITY_BREAKDOWN',
             'cash_position': 'CASH_POSITION',
-            'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
+            'monthly_returns_custody': 'MONTHLY_RETURNS'
         }
         
         db_report_type = report_type_mapping.get(report_type)

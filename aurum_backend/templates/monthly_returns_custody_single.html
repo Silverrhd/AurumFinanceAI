@@ -209,10 +209,10 @@
                 <tr>
                     <td>{{ custody.custody_name }}</td>
                     <td class="currency{% if custody.returns_dollar > 0 %} positive{% elif custody.returns_dollar < 0 %} negative{% else %} zero{% endif %}">
-                        {% if custody.returns_dollar >= 0 %}${% endif %}{{ "{:,.2f}"|format(custody.returns_dollar) }}
+                        {% if custody.returns_dollar >= 0 %}${% endif %}{{ custody.returns_dollar_formatted }}
                     </td>
                     <td class="percentage{% if custody.returns_percentage > 0 %} positive{% elif custody.returns_percentage < 0 %} negative{% else %} zero{% endif %}">
-                        {{ "{:.2f}"|format(custody.returns_percentage) }}%
+                        {{ custody.returns_percentage_formatted }}%
                     </td>
                 </tr>
                 {% endfor %}
@@ -231,12 +231,12 @@
                 <tr><td>Total Custodies:</td><td>{{ total_custodies|default:0 }}</td></tr>
                 <tr><td>Total Returns $:</td>
                     <td class="currency{% if total_returns_dollar > 0 %} positive{% elif total_returns_dollar < 0 %} negative{% else %} zero{% endif %}">
-                        {% if total_returns_dollar >= 0 %}${% endif %}{{ "{:,.2f}"|format(total_returns_dollar|default:0) }}
+                        {% if total_returns_dollar >= 0 %}${% endif %}{{ total_returns_dollar_formatted }}
                     </td>
                 </tr>
                 <tr><td>Total Returns %:</td>
                     <td class="percentage{% if total_returns_percentage > 0 %} positive{% elif total_returns_percentage < 0 %} negative{% else %} zero{% endif %}">
-                        {{ "{:.2f}"|format(total_returns_percentage|default:0) }}%
+                        {{ total_returns_percentage_formatted }}%
                     </td>
                 </tr>
             </table>

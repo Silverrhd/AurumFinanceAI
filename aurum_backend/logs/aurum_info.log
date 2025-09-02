@@ -5717,3 +5717,5 @@ INFO 2025-09-02 02:59:29,947 portfolio.services.cash_flow_service cash_flow_serv
 INFO 2025-09-02 03:00:23,798 portfolio.services.cash_flow_service cash_flow_service __init__ 282 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)
 INFO 2025-09-02 03:14:35,499 portfolio.services.cash_flow_service cash_flow_service __init__ 282 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)
 INFO 2025-09-02 03:16:21,623 portfolio.services.cash_flow_service cash_flow_service __init__ 282 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)
+INFO 2025-09-02 14:06:21,014 portfolio.services.cash_flow_service cash_flow_service __init__ 282 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)
+INFO 2025-09-02 14:07:36,013 portfolio.services.cash_flow_service cash_flow_service __init__ 282 CashFlowService initialized for Modified Dietz calculations (Phase 1A Enhanced)

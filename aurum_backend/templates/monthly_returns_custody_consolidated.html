@@ -251,10 +251,10 @@
                         <span class="client-arrow" id="arrow-{{ client.client_code }}">▼</span>
                     </td>
                     <td class="currency{% if client.total_returns_dollar > 0 %} positive{% elif client.total_returns_dollar < 0 %} negative{% else %} zero{% endif %}">
-                        {% if client.total_returns_dollar >= 0 %}${% endif %}{{ "{:,.2f}"|format(client.total_returns_dollar) }}
+                        {% if client.total_returns_dollar >= 0 %}${% endif %}{{ client.total_returns_dollar_formatted }}
                     </td>
                     <td class="currency{% if client.total_returns_percentage > 0 %} positive{% elif client.total_returns_percentage < 0 %} negative{% else %} zero{% endif %}">
-                        {{ "{:.2f}"|format(client.total_returns_percentage) }}%
+                        {{ client.total_returns_percentage_formatted }}%
                     </td>
                 </tr>
                 
@@ -277,10 +277,10 @@
                                     <tr>
                                         <td>{{ custody.custody_name }}</td>
                                         <td class="currency{% if custody.returns_dollar > 0 %} positive{% elif custody.returns_dollar < 0 %} negative{% else %} zero{% endif %}">
-                                            {% if custody.returns_dollar >= 0 %}${% endif %}{{ "{:,.2f}"|format(custody.returns_dollar) }}
+                                            {% if custody.returns_dollar >= 0 %}${% endif %}{{ custody.returns_dollar_formatted }}
                                         </td>
                                         <td class="currency{% if custody.returns_percentage > 0 %} positive{% elif custody.returns_percentage < 0 %} negative{% else %} zero{% endif %}">
-                                            {{ "{:.2f}"|format(custody.returns_percentage) }}%
+                                            {{ custody.returns_percentage_formatted }}%
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -306,7 +306,7 @@
                 <tr><td>Total Clients:</td><td>{{ total_clients|default:0 }}</td></tr>
                 <tr><td>Grand Total Returns $:</td>
                     <td class="currency{% if grand_total_returns_dollar > 0 %} positive{% elif grand_total_returns_dollar < 0 %} negative{% else %} zero{% endif %}">
-                        {% if grand_total_returns_dollar >= 0 %}${% endif %}{{ "{:,.2f}"|format(grand_total_returns_dollar|default:0) }}
+                        {% if grand_total_returns_dollar >= 0 %}${% endif %}{{ grand_total_returns_dollar_formatted }}
                     </td>
                 </tr>
             </table>
