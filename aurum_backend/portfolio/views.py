@@ -795,7 +795,8 @@ def get_available_dates_by_type(request, report_type):
         'bond_maturity': 'BOND_MATURITY',
         'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
         'equity_breakdown': 'EQUITY_BREAKDOWN',
-        'cash_position': 'CASH_POSITION'
+        'cash_position': 'CASH_POSITION',
+        'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
     }
     
     db_report_type = report_type_mapping.get(report_type)
@@ -845,7 +846,8 @@ def list_generated_reports_by_type(request, report_type):
         'bond_maturity': 'BOND_MATURITY',
         'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
         'equity_breakdown': 'EQUITY_BREAKDOWN',
-        'cash_position': 'CASH_POSITION'
+        'cash_position': 'CASH_POSITION',
+        'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
     }
     
     db_report_type = report_type_mapping.get(report_type)
@@ -955,7 +957,8 @@ def generate_report_no_open(request):
             'bond_maturity': 'BOND_MATURITY',
             'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
             'equity_breakdown': 'EQUITY_BREAKDOWN',
-            'cash_position': 'CASH_POSITION'
+            'cash_position': 'CASH_POSITION',
+            'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
         }
         
         db_report_type = report_type_mapping.get(report_type)
@@ -1027,6 +1030,26 @@ def generate_report_no_open(request):
                 html_content = f"<html><body><h1>Equity Breakdown Report</h1><p>{result.get('message', 'Report generated successfully')}</p></body></html>"
             else:
                 return Response({'success': False, 'error': result.get('error', 'Equity breakdown report generation failed')})
+                
+        elif report_type == 'monthly_returns_custody':
+            from .services.custody_returns_service import CustodyReturnsService
+            year = int(data.get('year', 2025))
+            month = int(data.get('month', 8))
+            
+            report_service = CustodyReturnsService()
+            
+            if not client_code or client_code == 'ALL':
+                # Generate consolidated report for all clients
+                report_data = report_service.generate_consolidated_monthly_returns(year, month)
+                if 'error' in report_data:
+                    return Response({'success': False, 'error': report_data['error']})
+                html_content = report_service.render_consolidated_template(report_data)
+            else:
+                # Generate single client report
+                report_data = report_service.generate_client_monthly_returns(client_code, year, month)
+                if 'error' in report_data:
+                    return Response({'success': False, 'error': report_data['error']})
+                html_content = report_service.render_single_client_template(report_data)
         
         if not html_content:
             return Response({'error': 'Failed to generate report content'}, 
@@ -1114,7 +1137,8 @@ def generate_report(request):
             'bond_maturity': 'BOND_MATURITY',
             'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
             'equity_breakdown': 'EQUITY_BREAKDOWN',
-            'cash_position': 'CASH_POSITION'
+            'cash_position': 'CASH_POSITION',
+            'monthly_returns_custody': 'MONTHLY_RETURNS_CUSTODY'
         }
         
         db_report_type = report_type_mapping.get(report_type)

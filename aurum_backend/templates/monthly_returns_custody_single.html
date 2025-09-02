@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Returns by Custody - {{ client_name }} ({{ client_code }})</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .header-left h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header-left .subtitle {
+            color: #6c757d;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .report-date {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .generated-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .print-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .print-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Main table styling */
+        .custody-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+        }
+        
+        .custody-table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .custody-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+        
+        .custody-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .currency {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .percentage {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #28a745;
+        }
+        
+        .negative {
+            color: #dc3545;
+        }
+        
+        .zero {
+            color: #6c757d;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px;
+        }
+        
+        /* Summary section */
+        .summary-section {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .summary-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .summary-table td {
+            padding: 8px 12px;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .summary-table td:first-child {
+            font-weight: 600;
+            width: 60%;
+        }
+        
+        .summary-table td:last-child {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        @media print {
+            body { padding: 0; background-color: white; }
+            .container { box-shadow: none; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Monthly Returns by Custody</h1>
+                <div class="subtitle">{{ client_name }} ({{ client_code }}) - {{ month_name }} {{ year }}</div>
+            </div>
+            <div class="header-right">
+                <div class="report-date">Period: {{ start_date }} to {{ end_date }}</div>
+                <div class="generated-date">Generated: {{ "now"|date:"Y-m-d H:i:s" }}</div>
+                <button onclick="window.print()" class="print-btn">Print PDF</button>
+            </div>
+        </div>
+        
+        <!-- Custody Returns Table -->
+        <h3>Custody Returns Breakdown</h3>
+        
+        {% if custody_returns %}
+        <table class="custody-table">
+            <thead>
+                <tr>
+                    <th>Custody</th>
+                    <th>Returns $</th>
+                    <th>Returns %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for custody in custody_returns %}
+                <tr>
+                    <td>{{ custody.custody_name }}</td>
+                    <td class="currency{% if custody.returns_dollar > 0 %} positive{% elif custody.returns_dollar < 0 %} negative{% else %} zero{% endif %}">
+                        {% if custody.returns_dollar >= 0 %}${% endif %}{{ "{:,.2f}"|format(custody.returns_dollar) }}
+                    </td>
+                    <td class="percentage{% if custody.returns_percentage > 0 %} positive{% elif custody.returns_percentage < 0 %} negative{% else %} zero{% endif %}">
+                        {{ "{:.2f}"|format(custody.returns_percentage) }}%
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            No custody returns data available for this period
+        </div>
+        {% endif %}
+        
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <h3>Summary</h3>
+            <table class="summary-table">
+                <tr><td>Total Custodies:</td><td>{{ total_custodies|default:0 }}</td></tr>
+                <tr><td>Total Returns $:</td>
+                    <td class="currency{% if total_returns_dollar > 0 %} positive{% elif total_returns_dollar < 0 %} negative{% else %} zero{% endif %}">
+                        {% if total_returns_dollar >= 0 %}${% endif %}{{ "{:,.2f}"|format(total_returns_dollar|default:0) }}
+                    </td>
+                </tr>
+                <tr><td>Total Returns %:</td>
+                    <td class="percentage{% if total_returns_percentage > 0 %} positive{% elif total_returns_percentage < 0 %} negative{% else %} zero{% endif %}">
+                        {{ "{:.2f}"|format(total_returns_percentage|default:0) }}%
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

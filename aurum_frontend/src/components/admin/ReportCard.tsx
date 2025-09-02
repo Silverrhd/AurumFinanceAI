@@ -36,6 +36,8 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
   const [selectedClient, setSelectedClient] = useState('');
   const [selectedReportId, setSelectedReportId] = useState('');
   const [selectedClientForBrowse, setSelectedClientForBrowse] = useState('');
+  const [selectedYear, setSelectedYear] = useState('2025');
+  const [selectedMonth, setSelectedMonth] = useState('08');
   
   // Helper function to determine if this is a latest-only report type
   const isLatestOnlyReport = (reportType: string) => {
@@ -153,14 +155,19 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
 
   const handleGenerateReport = async () => {
     // Check if report type is implemented
-    const implementedTypes = ['weekly_investment', 'bond_issuer_weight', 'cash_position'];
+    const implementedTypes = ['weekly_investment', 'bond_issuer_weight', 'cash_position', 'monthly_returns_custody'];
     if (!implementedTypes.includes(reportType)) {
       toast.error(`${title} generation is not yet implemented. Coming soon!`);
       return;
     }
     
-    // Latest-only reports don't need date selection (use latest data)
-    if (isLatestOnlyReport(reportType)) {
+    // Validation based on report type
+    if (reportType === 'monthly_returns_custody') {
+      if (!selectedClient || !selectedYear || !selectedMonth) {
+        toast.error('Please select client, year, and month');
+        return;
+      }
+    } else if (isLatestOnlyReport(reportType)) {
       if (!selectedClient) {
         toast.error('Please select a client');
         return;
@@ -181,11 +188,20 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
         toast.loading('Preparing bulk generation...', { id: 'bulk-generation' });
       }
       
-      const response = await portfolioAPI.generateReportNoOpen({
+      const requestData: any = {
         report_type: reportType,
-        client_code: selectedClient,
-        ...(reportType !== 'bond_issuer_weight' && { current_date: selectedDate })
-      });
+        client_code: selectedClient
+      };
+      
+      // Add date parameters based on report type
+      if (reportType === 'monthly_returns_custody') {
+        requestData.year = selectedYear;
+        requestData.month = selectedMonth;
+      } else if (reportType !== 'bond_issuer_weight' && reportType !== 'cash_position') {
+        requestData.current_date = selectedDate;
+      }
+      
+      const response = await portfolioAPI.generateReportNoOpen(requestData);
 
       if (response.status === 'success') {
         // Handle bulk generation results
@@ -228,6 +244,10 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
         // Reset form
         setSelectedDate('');
         setSelectedClient('');
+        if (reportType === 'monthly_returns_custody') {
+          setSelectedYear('2025');
+          setSelectedMonth('08');
+        }
         setGenerateExpanded(false);
         
         // Clear progress after delay
@@ -367,8 +387,49 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
                 )}
               </div>
             )}
-            {/* Date selection - only show for reports that need it */}
-            {reportType !== 'bond_issuer_weight' && reportType !== 'cash_position' && (
+            {/* Monthly Returns Custody - Year and Month selection */}
+            {reportType === 'monthly_returns_custody' && (
+              <>
+                <div>
+                  <Label className="block text-xs font-medium text-gray-700 mb-1">Select Year:</Label>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2025">2025</SelectItem>
+                      <SelectItem value="2024">2024</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label className="block text-xs font-medium text-gray-700 mb-1">Select Month:</Label>
+                  <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="01">January</SelectItem>
+                      <SelectItem value="02">February</SelectItem>
+                      <SelectItem value="03">March</SelectItem>
+                      <SelectItem value="04">April</SelectItem>
+                      <SelectItem value="05">May</SelectItem>
+                      <SelectItem value="06">June</SelectItem>
+                      <SelectItem value="07">July</SelectItem>
+                      <SelectItem value="08">August</SelectItem>
+                      <SelectItem value="09">September</SelectItem>
+                      <SelectItem value="10">October</SelectItem>
+                      <SelectItem value="11">November</SelectItem>
+                      <SelectItem value="12">December</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
+            
+            {/* Date selection - only show for weekly reports */}
+            {reportType === 'weekly_investment' && (
               <div>
                 <Label className="block text-xs font-medium text-gray-700 mb-1">Select Date:</Label>
                 <Select value={selectedDate} onValueChange={setSelectedDate}>
@@ -441,7 +502,8 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
               disabled={
                 isGenerating || 
                 !selectedClient || 
-                (reportType !== 'bond_issuer_weight' && reportType !== 'cash_position' && !selectedDate)
+                (reportType === 'monthly_returns_custody' && (!selectedYear || !selectedMonth)) ||
+                (reportType === 'weekly_investment' && !selectedDate)
               }
               className="w-full px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
             >

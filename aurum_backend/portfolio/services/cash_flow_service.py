@@ -50,7 +50,7 @@ class CashFlowService:
         # MS Bank-Specific
         'Debit Card', 'Funds Transferred',
         # Valley Bank-Specific
-        'WIRE OUT',
+        'WIRE OUT', 'SECURITIES DEBIT',
         # LO Bank-Specific
         'Withdrawal',
         # IDB Bank-Specific
@@ -161,11 +161,10 @@ class CashFlowService:
             ],
             'EXTERNAL_OUTFLOWS': [
                 'WIRE OUT', 'WIRE OUT INTL', 'ACH DEBIT', 'ELECTRONIFIED CHECK',
-                'MISCELLANEOUS FEES'
+                'MISCELLANEOUS FEES', 'SECURITIES DEBIT'
             ],
             'TRADING_EXCLUDED': [],
             'PROBLEMATIC_EXCLUDED': [
-                'SECURITIES DEBIT'
             ]
         },
         'IDB': {

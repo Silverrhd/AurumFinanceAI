@@ -227,6 +227,15 @@ export function ProjectAurumReportGeneration() {
           generateLabel="Generate Cash Position Report"
           openLabel="Open Cash Position Reports"
         />
+        
+        {/* Card 6: Monthly Returns by Custody */}
+        <ReportCard
+          title="Monthly Returns by Custody"
+          icon={<TrendingUp />}
+          reportType="monthly_returns_custody"
+          generateLabel="Generate Monthly Returns by Custody"
+          openLabel="Open Monthly Returns Reports"
+        />
       </div>
     </div>
   );
