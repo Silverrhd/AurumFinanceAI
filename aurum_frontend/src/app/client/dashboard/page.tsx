@@ -118,6 +118,15 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const handleOpenCashReport = async () => {
+    const resp = await portfolioAPI.getGeneratedReportsByType('cash_position');
+    if (resp.status === 'success' && resp.data && resp.data.reports && resp.data.reports.length > 0) {
+      // assume latest-first; if not, sort by created_at desc
+      const reports = resp.data.reports.slice().sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
+      await openReportById(reports[0].id);
+    }
+  };
+
   const clientCode = AuthManager.getClientCode() || '';
 
   const handleLogout = () => {
@@ -431,20 +440,30 @@ export default function ClientDashboardPage() {
                   </Card>
 
                   {/* Cash Position Reports Card */}
-                  <Card className="p-6 opacity-60 pointer-events-none">
+                  <Card className="p-6">
                     <CardHeader>
                       <CardTitle className="text-lg font-semibold aurum-text-dark mb-4 flex items-center gap-2">
                         <DollarSign className="h-5 w-5" />
-                        💰 Cash Position Reports (coming soon)
+                        💰 Cash Position Reports
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <Button className="w-full" disabled>
+                      <Button 
+                        onClick={handleOpenCashReport}
+                        className="w-full"
+                      >
                         <DollarSign className="h-4 w-4 mr-2" />
                         Open Cash Position Report
                       </Button>
+                      
                       <div className="text-xs text-center text-gray-500">
-                        Pending implementation
+                        View your cash and money market positions with concentration analysis
+                      </div>
+                      
+                      <div className="pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">
+                          Comprehensive cash position analysis with concentration risk assessment, showing your cash holdings and money market positions.
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
