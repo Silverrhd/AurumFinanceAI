@@ -270,9 +270,7 @@ def generate_all_monthly_returns_custody_reports(year, month):
         end_date = service._get_month_end_date(year, month)
         report_date_str = end_date.strftime('%Y-%m-%d')
         
-        # Delete existing monthly returns reports
-        Report.objects.filter(report_type='MONTHLY_RETURNS').delete()
-        logger.info("Deleted existing Monthly Returns reports")
+        # No deletion - allow multiple months to coexist like weekly reports
         
         generated_reports = []
         failed_reports = []
@@ -300,15 +298,23 @@ def generate_all_monthly_returns_custody_reports(year, month):
                 code='ALL',
                 defaults={'name': 'All Clients'}
             )
-            with transaction.atomic():
-                report = Report.objects.create(
-                    client=all_client,
-                    report_type='MONTHLY_RETURNS',
-                    report_date=end_date,  # Use period end date, not today
-                    file_path=file_path,
-                    file_size=file_size,
-                    generation_time=0
-                )
+            
+            # Use get_or_create to avoid duplicates, allow multiple months
+            report, created = Report.objects.get_or_create(
+                client=all_client,
+                report_type='MONTHLY_RETURNS',
+                report_date=end_date,
+                defaults={
+                    'file_path': file_path,
+                    'file_size': file_size,
+                    'generation_time': 0
+                }
+            )
+            if not created:
+                # Update existing report for same month
+                report.file_path = file_path
+                report.file_size = file_size
+                report.save()
             
             generated_reports.append({
                 'client_code': 'ALL',
@@ -353,16 +359,22 @@ def generate_all_monthly_returns_custody_reports(year, month):
                     html_content
                 )
                 
-                # Create database record
-                with transaction.atomic():
-                    report = Report.objects.create(
-                        client=client,
-                        report_type='MONTHLY_RETURNS',
-                        report_date=end_date,  # Use period end date, not today
-                        file_path=file_path,
-                        file_size=file_size,
-                        generation_time=0
-                    )
+                # Create database record using get_or_create pattern
+                report, created = Report.objects.get_or_create(
+                    client=client,
+                    report_type='MONTHLY_RETURNS',
+                    report_date=end_date,
+                    defaults={
+                        'file_path': file_path,
+                        'file_size': file_size,
+                        'generation_time': 0
+                    }
+                )
+                if not created:
+                    # Update existing report for same month
+                    report.file_path = file_path
+                    report.file_size = file_size
+                    report.save()
                 
                 generated_reports.append({
                     'client_code': client.code,
