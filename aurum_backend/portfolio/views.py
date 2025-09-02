@@ -256,6 +256,146 @@ def generate_all_cash_position_reports():
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def generate_all_monthly_returns_custody_reports(year, month):
+    """Generate monthly returns reports for ALL clients + individual clients."""
+    from .utils.report_utils import save_report_html
+    from .services.custody_returns_service import CustodyReturnsService
+    from django.db import IntegrityError, transaction
+    
+    logger.info(f"Starting bulk Monthly Returns Custody report generation for {month}/{year}")
+    
+    try:
+        # Calculate proper report period end date
+        service = CustodyReturnsService()
+        end_date = service._get_month_end_date(year, month)
+        report_date_str = end_date.strftime('%Y-%m-%d')
+        
+        # Delete existing monthly returns reports
+        Report.objects.filter(report_type='MONTHLY_RETURNS').delete()
+        logger.info("Deleted existing Monthly Returns reports")
+        
+        generated_reports = []
+        failed_reports = []
+        
+        # STEP 1: Generate consolidated "ALL" report
+        try:
+            logger.info("Generating consolidated Monthly Returns report")
+            
+            consolidated_data = service.generate_consolidated_monthly_returns(year, month)
+            if 'error' in consolidated_data:
+                raise Exception(consolidated_data['error'])
+                
+            html_content = service.render_consolidated_template(consolidated_data)
+            
+            # Save consolidated report file
+            file_path, file_size = save_report_html(
+                'ALL', 
+                'monthly_returns_custody', 
+                report_date_str,
+                html_content
+            )
+            
+            # Create database record for consolidated report
+            all_client, created = Client.objects.get_or_create(
+                code='ALL',
+                defaults={'name': 'All Clients'}
+            )
+            with transaction.atomic():
+                report = Report.objects.create(
+                    client=all_client,
+                    report_type='MONTHLY_RETURNS',
+                    report_date=end_date,  # Use period end date, not today
+                    file_path=file_path,
+                    file_size=file_size,
+                    generation_time=0
+                )
+            
+            generated_reports.append({
+                'client_code': 'ALL',
+                'client_name': 'All Clients',
+                'report_id': report.id,
+                'file_path': file_path
+            })
+            
+            logger.info("Successfully generated consolidated Monthly Returns report")
+            
+        except Exception as e:
+            logger.error(f"Failed to generate consolidated Monthly Returns report: {e}")
+            failed_reports.append({
+                'client_code': 'ALL',
+                'error': str(e)
+            })
+        
+        # STEP 2: Generate individual reports for each client
+        clients = Client.objects.exclude(code='ALL').distinct().order_by('code')
+        
+        for client in clients:
+            try:
+                logger.info(f"Generating Monthly Returns report for {client.code}")
+                
+                # Generate individual report data
+                client_data = service.generate_client_monthly_returns(client.code, year, month)
+                if 'error' in client_data:
+                    raise Exception(client_data['error'])
+                
+                # Skip clients with no custody returns
+                if not client_data.get('custody_returns'):
+                    logger.info(f"Skipping {client.code} - no custody returns for {month}/{year}")
+                    continue
+                
+                html_content = service.render_single_client_template(client_data)
+                
+                # Save report file
+                file_path, file_size = save_report_html(
+                    client.code, 
+                    'monthly_returns_custody', 
+                    report_date_str,
+                    html_content
+                )
+                
+                # Create database record
+                with transaction.atomic():
+                    report = Report.objects.create(
+                        client=client,
+                        report_type='MONTHLY_RETURNS',
+                        report_date=end_date,  # Use period end date, not today
+                        file_path=file_path,
+                        file_size=file_size,
+                        generation_time=0
+                    )
+                
+                generated_reports.append({
+                    'client_code': client.code,
+                    'client_name': client.name,
+                    'report_id': report.id,
+                    'file_path': file_path
+                })
+                
+                logger.info(f"Successfully generated Monthly Returns report for {client.code}")
+                
+            except Exception as e:
+                logger.error(f"Failed to generate Monthly Returns report for {client.code}: {e}")
+                failed_reports.append({
+                    'client_code': client.code,
+                    'error': str(e)
+                })
+        
+        return Response({
+            'success': True,
+            'message': f'Bulk Monthly Returns generation completed for {month}/{year}',
+            'generated_reports': generated_reports,
+            'failed_reports': failed_reports,
+            'total_generated': len(generated_reports),
+            'total_failed': len(failed_reports)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in bulk Monthly Returns report generation: {e}")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 def generate_all_clients_reports(current_date, comparison_date=None):
     """Generate weekly reports for all clients on given date with robust error handling."""
     from .utils.report_utils import save_report_html
@@ -868,11 +1008,17 @@ def list_generated_reports_by_type(request, report_type):
     
     reports_data = []
     for report in reports:
+        # Custom display format for monthly returns
+        if db_report_type == 'MONTHLY_RETURNS':
+            display_date = report.report_date.strftime('%B %Y')  # "August 2025"
+        else:
+            display_date = report.report_date.strftime('%d/%m/%Y')  # "31/08/2025"
+            
         reports_data.append({
             'id': report.id,
             'client_code': report.client.code,
             'client_name': report.client.name,
-            'report_date': report.report_date.strftime('%d/%m/%Y'),
+            'report_date': display_date,
             'file_path': report.file_path,
             'file_size': report.file_size,
             'generation_time': report.generation_time,
@@ -880,11 +1026,11 @@ def list_generated_reports_by_type(request, report_type):
         })
     
     # Filter out ALL for non-consolidated report types
-    if db_report_type != 'CASH_POSITION':
+    if db_report_type not in ['CASH_POSITION', 'MONTHLY_RETURNS']:
         reports_data = [r for r in reports_data if r['client_code'] != 'ALL']
     
-    # Custom sort: ALL first for cash reports, then alphabetical
-    if db_report_type == 'CASH_POSITION':
+    # Custom sort: ALL first for consolidated reports, then alphabetical
+    if db_report_type in ['CASH_POSITION', 'MONTHLY_RETURNS']:
         reports_data.sort(key=lambda r: (r['client_code'] != 'ALL', r['client_code']))
     else:
         reports_data.sort(key=lambda r: r['client_code'])
@@ -1032,24 +1178,29 @@ def generate_report_no_open(request):
                 return Response({'success': False, 'error': result.get('error', 'Equity breakdown report generation failed')})
                 
         elif report_type == 'monthly_returns_custody':
-            from .services.custody_returns_service import CustodyReturnsService
             year = int(data.get('year', 2025))
             month = int(data.get('month', 8))
             
-            report_service = CustodyReturnsService()
-            
             if not client_code or client_code == 'ALL':
-                # Generate consolidated report for all clients
-                report_data = report_service.generate_consolidated_monthly_returns(year, month)
-                if 'error' in report_data:
-                    return Response({'success': False, 'error': report_data['error']})
-                html_content = report_service.render_consolidated_template(report_data)
+                # Bulk generation: consolidated + individual reports
+                return generate_all_monthly_returns_custody_reports(year, month)
             else:
-                # Generate single client report
-                report_data = report_service.generate_client_monthly_returns(client_code, year, month)
+                # Individual client with proper date
+                from .services.custody_returns_service import CustodyReturnsService
+                service = CustodyReturnsService()
+                end_date = service._get_month_end_date(year, month)
+                report_date_str = end_date.strftime('%Y-%m-%d')
+                
+                report_data = service.generate_client_monthly_returns(client_code, year, month)
                 if 'error' in report_data:
                     return Response({'success': False, 'error': report_data['error']})
-                html_content = report_service.render_single_client_template(report_data)
+                html_content = service.render_single_client_template(report_data)
+                
+                # Use end_date for both filename and database record
+                relative_path, file_size = save_report_html(client_code, report_type_for_file, report_date_str, html_content)
+                
+                # Update report_date to use period end date instead of current_date
+                current_date = end_date
         
         if not html_content:
             return Response({'error': 'Failed to generate report content'}, 
