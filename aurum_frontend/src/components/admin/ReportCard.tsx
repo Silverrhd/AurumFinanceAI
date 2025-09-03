@@ -575,9 +575,14 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
                       ) : clients.length > 0 ? (
                         clients
                           .filter(client => ['cash_position', 'monthly_returns_custody'].includes(reportType) || client.client_code !== 'ALL')
+                          .sort((a, b) => {
+                            if (a.client_code === 'ALL') return -1;
+                            if (b.client_code === 'ALL') return 1;
+                            return a.client_code.localeCompare(b.client_code);
+                          })
                           .map(client => (
                             <SelectItem key={client.client_code} value={client.client_code}>
-                              {client.client_code}
+                              {client.client_code === 'ALL' ? 'All Clients' : client.client_code}
                             </SelectItem>
                           ))
                       ) : (
