@@ -35,6 +35,7 @@ urlpatterns = [
     path('weekly-reports/available-dates/', views.available_weekly_report_dates, name='available_weekly_report_dates'),
     path('weekly-reports/generated/', views.list_generated_weekly_reports, name='list_generated_weekly_reports'),
     path('reports/<int:report_id>/view/', views.serve_report_file, name='serve_report_file'),
+    path('reports/<int:report_id>/html/', views.serve_report_html_direct, name='serve_report_html_direct'),
     
     # Dashboard data endpoints
     path('admin/dashboard/', views.admin_dashboard_data, name='admin_dashboard_data'),

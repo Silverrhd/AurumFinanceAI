@@ -1597,6 +1597,48 @@ def serve_report_file(request, report_id):
     except Exception as e:
         logger.error(f"Error serving report file: {e}")
         return Response({
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def serve_report_html_direct(request, report_id):
+    """Serve report HTML directly for mobile browsers."""
+    try:
+        from .models import Report
+        from .utils.report_utils import load_report_html
+        
+        # Get report record
+        try:
+            report = Report.objects.select_related('client').get(id=report_id)
+        except Report.DoesNotExist:
+            return HttpResponse('Report not found', status=404)
+        
+        # Check permissions
+        if hasattr(request.user, 'role') and request.user.role == 'client':
+            if request.user.client_code != report.client.code:
+                return HttpResponse('Access denied', status=403)
+        
+        # Load HTML content from file
+        try:
+            html_content = load_report_html(report.file_path)
+        except FileNotFoundError:
+            return HttpResponse('Report file not found on disk', status=404)
+        
+        # Return raw HTML with proper headers
+        response = HttpResponse(html_content, content_type='text/html; charset=utf-8')
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error serving direct HTML: {e}")
+        return HttpResponse('Internal server error', status=500)
+
+
+    except Exception as e:
+        logger.error(f"Error serving report file: {e}")
+        return Response({
             'success': False,
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
