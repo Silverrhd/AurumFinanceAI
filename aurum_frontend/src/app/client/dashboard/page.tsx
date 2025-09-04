@@ -92,11 +92,18 @@ export default function ClientDashboardPage() {
     const response = await portfolioAPI.getReportFile(reportId);
     if (response.status === 'success' && response.data) {
       const html = response.data.html_content;
-      const newWindow = window.open('', '_blank');
-      if (newWindow) {
-        newWindow.document.open();
-        newWindow.document.write(html);
-        newWindow.document.close();
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile: Use data URL in same tab
+        const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+        window.location.href = dataURL;
+      } else {
+        // Desktop: Keep exact same document.write approach (unchanged)
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+          newWindow.document.open();
+          newWindow.document.write(html);
+          newWindow.document.close();
+        }
       }
     }
   };

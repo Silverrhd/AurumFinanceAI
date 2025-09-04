@@ -278,9 +278,17 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
       const response = await portfolioAPI.getReportFile(parseInt(selectedReportId));
       
       if (response.status === 'success' && response.data?.html_content) {
-        const blob = new Blob([response.data.html_content], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          // Mobile: Use data URL in same tab
+          const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(response.data.html_content);
+          window.location.href = dataURL;
+        } else {
+          // Desktop: Keep exact same blob approach (unchanged)
+          const blob = new Blob([response.data.html_content], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          URL.revokeObjectURL(url);
+        }
         toast.success('Report opened successfully!');
       } else {
         toast.error('Failed to open report: ' + (response.error || 'Unknown error'));
@@ -304,10 +312,17 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
         if (response.ok) {
           const jsonData = await response.json();
           if (jsonData.success && jsonData.html_content) {
-            const blob = new Blob([jsonData.html_content], { type: 'text/html' });
-            const url = window.URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            window.URL.revokeObjectURL(url);
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+              // Mobile: Use data URL in same tab
+              const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(jsonData.html_content);
+              window.location.href = dataURL;
+            } else {
+              // Desktop: Keep exact same blob approach (unchanged)
+              const blob = new Blob([jsonData.html_content], { type: 'text/html' });
+              const url = window.URL.createObjectURL(blob);
+              window.open(url, '_blank');
+              window.URL.revokeObjectURL(url);
+            }
             toast.success('Bond Issuer Weight report opened successfully!');
           } else {
             throw new Error('Invalid report data received');
@@ -321,9 +336,17 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
         if (latestReport) {
           const response = await portfolioAPI.getReportFile(latestReport.id);
           if (response.status === 'success' && response.data?.html_content) {
-            const blob = new Blob([response.data.html_content], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+              // Mobile: Use data URL in same tab
+              const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(response.data.html_content);
+              window.location.href = dataURL;
+            } else {
+              // Desktop: Keep exact same blob approach (unchanged)
+              const blob = new Blob([response.data.html_content], { type: 'text/html' });
+              const url = URL.createObjectURL(blob);
+              window.open(url, '_blank');
+              URL.revokeObjectURL(url);
+            }
             toast.success('Report opened successfully!');
           } else {
             toast.error('Failed to open report: ' + (response.error || 'Unknown error'));

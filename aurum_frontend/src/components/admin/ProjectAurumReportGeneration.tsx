@@ -115,9 +115,17 @@ export function ProjectAurumReportGeneration() {
       
       if (response.status === 'success' && response.data?.html_content) {
         // Open report in new tab
-        const blob = new Blob([response.data.html_content], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          // Mobile: Use data URL in same tab
+          const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(response.data.html_content);
+          window.location.href = dataURL;
+        } else {
+          // Desktop: Keep exact same blob approach (unchanged)
+          const blob = new Blob([response.data.html_content], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          URL.revokeObjectURL(url);
+        }
         
         // Refresh data to update available dates and existing reports
         await loadWeeklyReportData();
@@ -148,9 +156,17 @@ export function ProjectAurumReportGeneration() {
       const response = await portfolioAPI.getReportFile(parseInt(selectedReportId));
       
       if (response.status === 'success' && response.data?.html_content) {
-        const blob = new Blob([response.data.html_content], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          // Mobile: Use data URL in same tab
+          const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(response.data.html_content);
+          window.location.href = dataURL;
+        } else {
+          // Desktop: Keep exact same blob approach (unchanged)
+          const blob = new Blob([response.data.html_content], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          URL.revokeObjectURL(url);
+        }
       } else {
         alert('Failed to open report: ' + (response.error || 'Unknown error'));
       }
