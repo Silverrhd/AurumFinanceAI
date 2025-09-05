@@ -128,13 +128,9 @@ class ModifiedDietzService:
             logger.debug(f"Calculating Modified Dietz return for client {client}: {start_date} to {end_date} ({period_days} days)")
             logger.debug(f"Start value: ${start_value:,.2f}, End value: ${end_value:,.2f}")
             
-            # Calculate ALT position adjustments to prevent phantom gains/losses
-            alt_purchase_adjustment, alt_sale_adjustment = self._calculate_alt_position_adjustments(
-                transactions, cash_flow_service
-            )
-            
-            # Apply adjustments to end value
-            adjusted_end_value = end_value - alt_purchase_adjustment + alt_sale_adjustment
+            # No ALT adjustments needed since ALT transactions are excluded
+            alt_purchase_adjustment, alt_sale_adjustment = 0.0, 0.0
+            adjusted_end_value = end_value
             
             if alt_purchase_adjustment > 0 or alt_sale_adjustment > 0:
                 logger.info(f"ALT adjustments applied: Purchase adj: -${alt_purchase_adjustment:,.2f}, "
@@ -238,10 +234,8 @@ class ModifiedDietzService:
             weighted_external_flows = 0.0
             external_flow_count = 0
             
-            # Calculate ALT position adjustments
-            alt_purchase_adjustment, alt_sale_adjustment = self._calculate_alt_position_adjustments(
-                transactions, cash_flow_service
-            )
+            # No ALT adjustments needed since ALT transactions are excluded
+            alt_purchase_adjustment, alt_sale_adjustment = 0.0, 0.0
             
             for tx in transactions:
                 if cash_flow_service.is_external_cash_flow(tx):
@@ -292,20 +286,20 @@ class ModifiedDietzService:
     
     def _get_portfolio_value_on_date(self, client: str, target_date: date) -> float:
         """
-        Get total portfolio value for a client on a specific date.
+        Get total NON-ALT portfolio value for a client on a specific date.
         
         Args:
             client: Client code
             target_date: Date to get value for
             
         Returns:
-            Float: Total portfolio market value
+            Float: Total NON-ALT portfolio market value
         """
         try:
             total_value = Position.objects.filter(
                 snapshot__client__code=client,
                 snapshot__snapshot_date=target_date
-            ).aggregate(total=Sum('market_value'))['total']
+            ).exclude(asset__bank='ALT').aggregate(total=Sum('market_value'))['total']
             
             return float(total_value) if total_value else 0.0
             
@@ -315,7 +309,7 @@ class ModifiedDietzService:
     
     def _get_transactions_for_period(self, client: str, start_date: date, end_date: date) -> List[Transaction]:
         """
-        Get all transactions for a client during a period.
+        Get all NON-ALT transactions for a client during a period.
         
         Args:
             client: Client code
@@ -323,14 +317,14 @@ class ModifiedDietzService:
             end_date: End date (inclusive)
             
         Returns:
-            List of Transaction objects
+            List of NON-ALT Transaction objects
         """
         try:
             transactions = Transaction.objects.filter(
                 client__code=client,
                 date__gte=start_date,
                 date__lte=end_date
-            ).select_related('asset').order_by('date')
+            ).exclude(bank='ALT').select_related('asset').order_by('date')
             
             return list(transactions)
             

@@ -32,9 +32,9 @@ class PortfolioCalculationService:
         client = Client.objects.get(code=client_code)
         snapshot = PortfolioSnapshot.objects.get(client=client, snapshot_date=snapshot_date)
         
-        # Get positions and transactions
-        positions = Position.objects.filter(snapshot=snapshot).select_related('asset')
-        transactions = Transaction.objects.filter(client=client, date__lte=snapshot_date)
+        # Get positions and transactions (EXCLUDE ALT for presentation)
+        positions = Position.objects.filter(snapshot=snapshot).exclude(asset__bank='ALT').select_related('asset')
+        transactions = Transaction.objects.filter(client=client, date__lte=snapshot_date).exclude(bank='ALT')
         
         # Calculate core metrics
         metrics = {

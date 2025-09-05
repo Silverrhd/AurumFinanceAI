@@ -43,12 +43,13 @@ class BondIssuerReportService(EnhancedReportService):
             if not snapshot:
                 raise ValueError(f"No portfolio data found for {client_code}")
             
-            # CRITICAL: Filter ONLY actual bonds (Fixed Income with maturity dates)
+            # CRITICAL: Filter ONLY actual bonds (Fixed Income with maturity dates) 
             # This excludes ETFs and mutual funds which don't have maturity dates
+            # Also exclude ALT positions for presentation
             bond_positions = snapshot.positions.select_related('asset').filter(
                 asset__asset_type='Fixed Income',
                 asset__maturity_date__isnull=False
-            )
+            ).exclude(asset__bank='ALT')
             
             if not bond_positions.exists():
                 logger.warning(f"No bond positions found for {client_code} (Fixed Income with maturity dates)")

@@ -134,8 +134,8 @@ class CashReportService(EnhancedReportService):
             if not cash_positions.exists():
                 continue
             
-            # Calculate client cash data
-            total_cash = float(cash_positions.aggregate(
+            # Calculate client cash data (excluding ALT)
+            total_cash = float(cash_positions.exclude(asset__bank='ALT').aggregate(
                 total=Sum('market_value')
             )['total'] or Decimal('0'))
             
@@ -193,8 +193,8 @@ class CashReportService(EnhancedReportService):
         return html_content
     
     def _calculate_total_aum(self, snapshot: PortfolioSnapshot) -> Decimal:
-        """Calculate total AUM for a snapshot."""
-        total = snapshot.positions.aggregate(
+        """Calculate total NON-ALT AUM for a snapshot."""
+        total = snapshot.positions.exclude(asset__bank='ALT').aggregate(
             total=Sum('market_value')
         )['total']
         return total or Decimal('0')
