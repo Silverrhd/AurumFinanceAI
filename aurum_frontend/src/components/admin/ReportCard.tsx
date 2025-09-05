@@ -277,43 +277,35 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
     try {
       // Detect mobile device
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const token = localStorage.getItem('access_token');
+      const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${selectedReportId}/html/`;
       
       if (isMobile) {
-        // Mobile: Use direct URL approach
-        const token = localStorage.getItem('access_token');
-        const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${selectedReportId}/html/`;
+        // Mobile: Navigate in same tab (most reliable)
+        window.location.href = reportUrl;
+        return; // Don't show success toast since we're navigating away
+      } else {
+        // Desktop: Pre-open window to bypass Safari popup blocker
+        const newWindow = window.open('', '_blank');
         
-        const response = await fetch(reportUrl, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (response.ok) {
-          const htmlContent = await response.text();
-          const newWindow = window.open('', '_blank');
-          if (newWindow) {
+        try {
+          const response = await fetch(reportUrl, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const htmlContent = await response.text();
             newWindow.document.write(htmlContent);
             newWindow.document.close();
+          } else {
+            newWindow.close();
+            throw new Error('Failed to load report');
           }
-        } else {
-          throw new Error('Failed to load report');
-        }
-      } else {
-        // Desktop: Keep existing blob URL approach
-        const response = await portfolioAPI.getReportFile(parseInt(selectedReportId));
-        
-        if (response.status === 'success' && response.data?.html_content) {
-          const blob = new Blob([response.data.html_content], { type: 'text/html' });
-          const url = URL.createObjectURL(blob);
-          window.open(url, '_blank');
-          
-          setTimeout(() => {
-            URL.revokeObjectURL(url);
-          }, 1000);
-        } else {
-          toast.error('Failed to open report: ' + (response.error || 'Unknown error'));
-          return;
+        } catch (error) {
+          newWindow.close();
+          throw error;
         }
       }
       toast.success('Report opened successfully!');
@@ -339,32 +331,26 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             
             if (isMobile) {
-              // Mobile: Use direct URL approach
-              const token = localStorage.getItem('access_token');
+              // Mobile: Navigate in same tab (most reliable)
               const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${jsonData.report_id}/html/`;
-              
-              const directResponse = await fetch(reportUrl, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-              
-              if (directResponse.ok) {
-                const htmlContent = await directResponse.text();
-                const newWindow = window.open('', '_blank');
-                if (newWindow) {
-                  newWindow.document.write(htmlContent);
-                  newWindow.document.close();
-                }
-              } else {
-                throw new Error('Failed to load report via direct URL');
-              }
+              window.location.href = reportUrl;
+              return; // Don't continue to success toast since we're navigating away
             } else {
-              // Desktop: Keep exact same blob approach (unchanged)
-              const blob = new Blob([jsonData.html_content], { type: 'text/html' });
-              const url = window.URL.createObjectURL(blob);
-              window.open(url, '_blank');
-              window.URL.revokeObjectURL(url);
+              // Desktop: Pre-open window to bypass Safari popup blocker
+              const newWindow = window.open('', '_blank');
+              try {
+                const token = localStorage.getItem('access_token');
+                const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${jsonData.report_id}/html/`;
+                const response = await fetch(reportUrl, {
+                  headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const htmlContent = await response.text();
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+              } catch (error) {
+                newWindow.close();
+                throw error;
+              }
             }
             toast.success('Bond Issuer Weight report opened successfully!');
           } else {
@@ -380,40 +366,25 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
           const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
           
           if (isMobile) {
-            // Mobile: Use direct URL approach
-            const token = localStorage.getItem('access_token');
+            // Mobile: Navigate in same tab (most reliable)
             const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${latestReport.id}/html/`;
-            
-            const directResponse = await fetch(reportUrl, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-            
-            if (directResponse.ok) {
-              const htmlContent = await directResponse.text();
-              const newWindow = window.open('', '_blank');
-              if (newWindow) {
-                newWindow.document.write(htmlContent);
-                newWindow.document.close();
-              }
-            } else {
-              throw new Error('Failed to load report via direct URL');
-            }
+            window.location.href = reportUrl;
+            return; // Don't continue to success toast since we're navigating away
           } else {
-            // Desktop: Keep exact same blob approach (unchanged)
-            const response = await portfolioAPI.getReportFile(latestReport.id);
-            if (response.status === 'success' && response.data?.html_content) {
-              const blob = new Blob([response.data.html_content], { type: 'text/html' });
-              const url = URL.createObjectURL(blob);
-              window.open(url, '_blank');
-              
-              setTimeout(() => {
-                URL.revokeObjectURL(url);
-              }, 1000);
-            } else {
-              toast.error('Failed to open report: ' + (response.error || 'Unknown error'));
-              return;
+            // Desktop: Pre-open window to bypass Safari popup blocker
+            const newWindow = window.open('', '_blank');
+            try {
+              const token = localStorage.getItem('access_token');
+              const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${latestReport.id}/html/`;
+              const response = await fetch(reportUrl, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              const htmlContent = await response.text();
+              newWindow.document.write(htmlContent);
+              newWindow.document.close();
+            } catch (error) {
+              newWindow.close();
+              throw error;
             }
           }
             toast.success('Report opened successfully!');
