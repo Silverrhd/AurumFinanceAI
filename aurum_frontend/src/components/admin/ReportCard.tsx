@@ -387,10 +387,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
               throw error;
             }
           }
-            toast.success('Report opened successfully!');
-          } else {
-            toast.error('Failed to open report: ' + (response.error || 'Unknown error'));
-          }
+          toast.success('Report opened successfully!');
         } else {
           toast.error('No report found for this client');
         }
