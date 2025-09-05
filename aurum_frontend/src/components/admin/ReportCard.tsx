@@ -275,39 +275,31 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
     }
 
     try {
-      // Detect mobile device
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      // Universal pre-open window approach for all devices
       const token = localStorage.getItem('access_token');
       const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${selectedReportId}/html/`;
+      const newWindow = window.open('', '_blank');
       
-      if (isMobile) {
-        // Mobile: Navigate in same tab (most reliable)
-        window.location.href = reportUrl;
-        return; // Don't show success toast since we're navigating away
-      } else {
-        // Desktop: Pre-open window to bypass Safari popup blocker
-        const newWindow = window.open('', '_blank');
-        
-        try {
-          const response = await fetch(reportUrl, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          
-          if (response.ok) {
-            const htmlContent = await response.text();
-            newWindow.document.write(htmlContent);
-            newWindow.document.close();
-          } else {
-            newWindow.close();
-            throw new Error('Failed to load report');
+      try {
+        const response = await fetch(reportUrl, {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        } catch (error) {
+        });
+        
+        if (response.ok) {
+          const htmlContent = await response.text();
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+        } else {
           newWindow.close();
-          throw error;
+          throw new Error('Failed to load report');
         }
+      } catch (error) {
+        newWindow.close();
+        throw error;
       }
+      
       toast.success('Report opened successfully!');
     } catch (error) {
       console.error('Report opening error:', error);
@@ -328,29 +320,20 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
         if (response.ok) {
           const jsonData = await response.json();
           if (jsonData.success && jsonData.html_content) {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-              // Mobile: Navigate in same tab (most reliable)
+            // Universal pre-open window approach for Bond Issuer Weight reports
+            const newWindow = window.open('', '_blank');
+            try {
+              const token = localStorage.getItem('access_token');
               const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${jsonData.report_id}/html/`;
-              window.location.href = reportUrl;
-              return; // Don't continue to success toast since we're navigating away
-            } else {
-              // Desktop: Pre-open window to bypass Safari popup blocker
-              const newWindow = window.open('', '_blank');
-              try {
-                const token = localStorage.getItem('access_token');
-                const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${jsonData.report_id}/html/`;
-                const response = await fetch(reportUrl, {
-                  headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const htmlContent = await response.text();
-                newWindow.document.write(htmlContent);
-                newWindow.document.close();
-              } catch (error) {
-                newWindow.close();
-                throw error;
-              }
+              const response = await fetch(reportUrl, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              const htmlContent = await response.text();
+              newWindow.document.write(htmlContent);
+              newWindow.document.close();
+            } catch (error) {
+              newWindow.close();
+              throw error;
             }
             toast.success('Bond Issuer Weight report opened successfully!');
           } else {
@@ -363,29 +346,20 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
         // For other latest-only reports, find the latest report and open it
         const latestReport = filteredReports.find(r => r.client_code === selectedClientForBrowse);
         if (latestReport) {
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-          
-          if (isMobile) {
-            // Mobile: Navigate in same tab (most reliable)
+          // Universal pre-open window approach for other latest-only reports
+          const newWindow = window.open('', '_blank');
+          try {
+            const token = localStorage.getItem('access_token');
             const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${latestReport.id}/html/`;
-            window.location.href = reportUrl;
-            return; // Don't continue to success toast since we're navigating away
-          } else {
-            // Desktop: Pre-open window to bypass Safari popup blocker
-            const newWindow = window.open('', '_blank');
-            try {
-              const token = localStorage.getItem('access_token');
-              const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${latestReport.id}/html/`;
-              const response = await fetch(reportUrl, {
-                headers: { 'Authorization': `Bearer ${token}` }
-              });
-              const htmlContent = await response.text();
-              newWindow.document.write(htmlContent);
-              newWindow.document.close();
-            } catch (error) {
-              newWindow.close();
-              throw error;
-            }
+            const response = await fetch(reportUrl, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const htmlContent = await response.text();
+            newWindow.document.write(htmlContent);
+            newWindow.document.close();
+          } catch (error) {
+            newWindow.close();
+            throw error;
           }
           toast.success('Report opened successfully!');
         } else {
