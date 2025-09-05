@@ -1597,6 +1597,9 @@ def serve_report_file(request, report_id):
     except Exception as e:
         logger.error(f"Error serving report file: {e}")
         return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -1634,14 +1637,6 @@ def serve_report_html_direct(request, report_id):
     except Exception as e:
         logger.error(f"Error serving direct HTML: {e}")
         return HttpResponse('Internal server error', status=500)
-
-
-    except Exception as e:
-        logger.error(f"Error serving report file: {e}")
-        return Response({
-            'success': False,
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
