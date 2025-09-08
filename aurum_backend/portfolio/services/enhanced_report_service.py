@@ -150,7 +150,7 @@ class EnhancedReportService:
         """
         Calculate enhanced metrics including position tables and ApexCharts data.
         """
-        positions = snapshot.positions.select_related('asset').all()
+        positions = snapshot.positions.select_related('asset').exclude(asset__bank='ALT').all()
         
         # Basic calculations
         total_value = sum(pos.market_value for pos in positions)
@@ -209,7 +209,7 @@ class EnhancedReportService:
         custody, name, ticker, quantity, market_value, cost_basis, 
         unrealized_gain, unrealized_gain_pct, coupon_rate, annual_income
         """
-        positions = snapshot.positions.select_related('asset').all()
+        positions = snapshot.positions.select_related('asset').exclude(asset__bank='ALT').all()
         
         # Group positions by asset type
         grouped_positions = defaultdict(list)
@@ -260,7 +260,7 @@ class EnhancedReportService:
         """Generate HTML tables for positions instead of dict."""
         from collections import defaultdict
         
-        positions = snapshot.positions.select_related('asset').all()
+        positions = snapshot.positions.select_related('asset').exclude(asset__bank='ALT').all()
         
         # Group positions by asset type
         grouped_positions = defaultdict(list)

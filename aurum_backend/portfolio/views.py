@@ -1943,7 +1943,7 @@ def _generate_single_client_charts(client_code, report_service):
         if not latest_snapshot:
             return _get_empty_chart_data()
         
-        positions = latest_snapshot.positions.select_related('asset').all()
+        positions = latest_snapshot.positions.select_related('asset').exclude(asset__bank='ALT').all()
         
         # 1. Asset Allocation - REUSE existing method
         asset_allocation_data = report_service._calculate_asset_allocation(positions)
