@@ -58,7 +58,8 @@ class InvestmentCashFlowService:
             'TRADING_BUY': ['Purchase'],
             'TRADING_SELL': ['Sale', 'Redemption', 'Sales of Securities'],
             'EXTERNAL_FLOWS': ['Misc. Disbursement', 'Misc Debit / Credit', 'ACH Deposit', 'Misc. Receipt', 'Misc.Receipt', 'Misc Receipt'],
-            'OTHER_EXCLUDED': ['Cost Adjustment', 'UNKNOWN', 'Accrued Int Pd', 'Accrued Int Rcv']
+            'OTHER_EXCLUDED': ['Cost Adjustment', 'UNKNOWN', 'Accrued Int Pd', 'Accrued Int Rcv',
+                              'Free Delivery', 'Receipt of Assets']
         },
         'MS': {
             'DIVIDEND_INCOME': ['Dividend', 'Interest', 'Qualified Dividend', 'Dividend - Adjustment'],

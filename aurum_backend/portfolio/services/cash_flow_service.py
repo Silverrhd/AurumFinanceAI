@@ -137,7 +137,8 @@ class CashFlowService:
                 'Purchase', 'Sale', 'Redemption', 'Sales of Securities'
             ],
             'PROBLEMATIC_EXCLUDED': [
-                'Cost Adjustment', 'UNKNOWN', 'Accrued Int Pd', 'Accrued Int Rcv'
+                'Cost Adjustment', 'UNKNOWN', 'Accrued Int Pd', 'Accrued Int Rcv',
+                'Free Delivery', 'Receipt of Assets'
             ]
         },
         'MS': {
