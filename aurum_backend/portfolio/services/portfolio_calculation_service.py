@@ -241,7 +241,7 @@ class PortfolioCalculationService:
         previous_positions = Position.objects.filter(
             snapshot__client=client,
             snapshot__snapshot_date=previous_snapshot.snapshot_date
-        ).select_related('asset')
+        ).exclude(asset__bank='ALT').select_related('asset')
         
         # Create lookup for previous values
         previous_values = {pos.asset.ticker: float(pos.market_value) for pos in previous_positions}

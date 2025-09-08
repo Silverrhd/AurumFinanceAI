@@ -42,7 +42,7 @@ class CustodyReturnsService:
             custodies = Position.objects.filter(
                 snapshot__client__code=client_code,
                 snapshot__snapshot_date=end_date
-            ).values('bank', 'account').distinct().order_by('bank', 'account')
+            ).exclude(asset__bank='ALT').values('bank', 'account').distinct().order_by('bank', 'account')
             
             custody_list = []
             for custody in custodies:
@@ -289,7 +289,7 @@ class CustodyReturnsService:
                 snapshot__snapshot_date=target_date,
                 bank=bank,
                 account=account
-            ).aggregate(total=Sum('market_value'))['total']
+            ).exclude(asset__bank='ALT').aggregate(total=Sum('market_value'))['total']
             
             return float(total_value) if total_value else 0.0
             

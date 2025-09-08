@@ -133,7 +133,7 @@ class CalculationService:
         return list(Position.objects.filter(
             client=client,
             date=date
-        ).select_related('asset'))
+        ).exclude(asset__bank='ALT').select_related('asset'))
     
     def _get_transactions_for_period(self, client: str, start_date: str, end_date: str) -> List[Transaction]:
         """Get transactions for a specific client and date range."""
