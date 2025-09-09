@@ -7,52 +7,62 @@ Shows: custody, description, ticker, quantity, market_value only.
 import logging
 from collections import defaultdict
 from decimal import Decimal
+from datetime import datetime
 from typing import Dict, List, Any
 from django.db.models import Sum
 from ..models import Client, PortfolioSnapshot, Position
+from ..utils.report_utils import save_report_html
+from .enhanced_report_service import EnhancedReportService
 
 logger = logging.getLogger(__name__)
 
 
-class TotalPositionsReportService:
-    """Service for generating total positions reports including ALT positions."""
+class TotalPositionsReportService(EnhancedReportService):
+    """Service for generating Total Positions reports including ALT positions."""
     
     def __init__(self):
-        self.logger = logger
+        super().__init__()
     
-    def generate_total_positions_report(self, client_code: str) -> Dict[str, Any]:
+    def generate_total_positions_report(self, client_code: str) -> str:
         """
-        Generate total positions report including ALT positions.
-        Shows: custody, description, ticker, quantity, market_value
+        Generate Total Positions Report HTML including ALT positions.
+        Shows: custody, description, ticker, quantity, market_value only.
         Excludes: coupon_rate, maturity_date, gain_loss, cost_basis
         
         Args:
             client_code: Client code to generate report for
             
         Returns:
-            Dict with report data including ALT positions
+            str: HTML content of the generated report
         """
+        logger.info(f"Generating Total Positions report for {client_code}")
+        
         try:
-            # Get latest snapshot for client
-            snapshot = self._get_latest_snapshot(client_code)
+            # Get client and latest snapshot
+            client = Client.objects.get(code=client_code)
+            snapshot = PortfolioSnapshot.objects.filter(
+                client=client
+            ).order_by('-snapshot_date').first()
+            
             if not snapshot:
-                error_msg = f"No portfolio snapshots found for client {client_code}"
-                self.logger.warning(error_msg)
-                return self._get_empty_report(client_code, error_msg)
+                logger.warning(f"No portfolio snapshots found for client {client_code}")
+                return self._generate_empty_report(client_code, "No portfolio data found")
             
             # Get ALL positions (including ALTs) - this is the key difference
             positions = snapshot.positions.select_related('asset').all()
             
             if not positions.exists():
-                error_msg = f"No positions found for client {client_code} in snapshot {snapshot.snapshot_date}"
-                self.logger.warning(error_msg)
-                return self._get_empty_report(client_code, error_msg)
+                logger.warning(f"No positions found for client {client_code} in snapshot {snapshot.snapshot_date}")
+                return self._generate_empty_report(client_code, f"No positions found for snapshot {snapshot.snapshot_date}")
             
             # Calculate metrics WITH ALTs included
             total_positions = positions.count()
             total_market_value = float(positions.aggregate(
                 total=Sum('market_value')
             )['total'] or Decimal('0'))
+            
+            # Count ALT positions for information
+            alt_positions_count = positions.filter(asset__bank='ALT').count()
             
             # Generate simplified positions table (no cost basis, gain/loss, etc.)
             positions_table = self._generate_total_positions_table(positions)
@@ -63,16 +73,11 @@ class TotalPositionsReportService:
             # Calculate custody allocation WITH ALTs  
             custody_allocation = self._calculate_total_custody_allocation(positions)
             
-            # Count ALT positions for information
-            alt_positions_count = positions.filter(asset__bank='ALT').count()
-            
-            self.logger.info(f"Generated total positions report for {client_code}: "
-                           f"{total_positions} positions (including {alt_positions_count} ALTs), "
-                           f"${total_market_value:,.2f} total value")
-            
-            return {
+            # Prepare template context
+            template_context = {
                 'client_code': client_code,
-                'snapshot_date': str(snapshot.snapshot_date),
+                'client_name': client.name,
+                'snapshot_date': snapshot.snapshot_date,
                 'positions_table': positions_table,
                 'asset_allocation': asset_allocation,
                 'custody_allocation': custody_allocation,
@@ -80,26 +85,37 @@ class TotalPositionsReportService:
                 'total_market_value': total_market_value,
                 'alt_positions_count': alt_positions_count,
                 'includes_alts': True,
-                'report_type': 'total_positions'
+                'report_type': 'total_positions',
+                'report_generated': datetime.now()
             }
             
-        except Exception as e:
-            self.logger.error(f"Error generating total positions report for {client_code}: {str(e)}")
-            return self._get_empty_report(client_code, error=str(e))
-    
-    def _get_latest_snapshot(self, client_code: str) -> PortfolioSnapshot:
-        """Get the latest snapshot for a client."""
-        try:
-            client = Client.objects.get(code=client_code)
-            return PortfolioSnapshot.objects.filter(
-                client=client
-            ).order_by('-snapshot_date').first()
+            # Render template using inherited jinja_env
+            template = self.jinja_env.get_template('total_positions_template.html')
+            html_content = template.render(template_context)
+            
+            # Save report to file
+            report_date = snapshot.snapshot_date.strftime('%Y-%m-%d')
+            file_path, file_size = save_report_html(
+                client_code, 
+                'total_positions', 
+                html_content,
+                report_date
+            )
+            
+            logger.info(f"Successfully generated Total Positions report for {client_code}: "
+                       f"{total_positions} positions (including {alt_positions_count} ALTs), "
+                       f"${total_market_value:,.2f} total value")
+            
+            return html_content
+            
         except Client.DoesNotExist:
-            self.logger.error(f"Client {client_code} not found")
-            return None
+            error_msg = f"Client {client_code} not found"
+            logger.error(error_msg)
+            return self._generate_empty_report(client_code, error_msg)
         except Exception as e:
-            self.logger.error(f"Error getting latest snapshot for {client_code}: {str(e)}")
-            return None
+            error_msg = f"Error generating Total Positions report for {client_code}: {str(e)}"
+            logger.error(error_msg)
+            return self._generate_empty_report(client_code, error_msg)
     
     def _generate_total_positions_table(self, positions) -> str:
         """
@@ -204,12 +220,11 @@ class TotalPositionsReportService:
         
         return result
     
-    def _get_empty_report(self, client_code: str, error: str = None) -> Dict[str, Any]:
-        """Return empty report structure with proper error handling."""
-        error_message = error or "No positions data available"
-        
-        return {
+    def _generate_empty_report(self, client_code: str, error_message: str) -> str:
+        """Generate empty report with error message."""
+        template_context = {
             'client_code': client_code,
+            'client_name': 'Unknown',
             'snapshot_date': None,
             'positions_table': f'<div class="no-data-message"><p>{error_message}</p></div>',
             'asset_allocation': {},
@@ -219,5 +234,10 @@ class TotalPositionsReportService:
             'alt_positions_count': 0,
             'includes_alts': True,
             'report_type': 'total_positions',
-            'error': error_message
+            'error': error_message,
+            'report_generated': datetime.now()
         }
+        
+        # Render template using inherited jinja_env
+        template = self.jinja_env.get_template('total_positions_template.html')
+        return template.render(template_context)

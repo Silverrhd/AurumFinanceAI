@@ -1339,13 +1339,6 @@ def generate_html_report_content(week1_data, week2_data, asset_name_map_week1, a
         'rollover_accounts': week2_data.get('rollover_accounts', [])
     }
     
-    # Filter ALT accounts from rollover alert display (ALTs still get rolled over normally)
-    if week2_summary.get('rollover_accounts'):
-        week2_summary['rollover_accounts'] = [
-            account for account in week2_summary['rollover_accounts'] 
-            if not account.startswith('ALT_')
-        ]
-    
     # Calculate derived metrics
     week1_summary['total_gain_loss'] = week1_summary['total_portfolio_value'] - week1_summary['total_cost_basis']
     week1_summary['total_gain_loss_percentage'] = (week1_summary['total_gain_loss'] / week1_summary['total_cost_basis'] * 100) if week1_summary['total_cost_basis'] != 0 else 0

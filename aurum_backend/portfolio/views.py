@@ -261,8 +261,6 @@ def generate_all_total_positions_reports():
     from .utils.report_utils import save_report_html
     from .services.total_positions_report_service import TotalPositionsReportService
     from django.db import IntegrityError, transaction
-    from jinja2 import Environment, FileSystemLoader
-    import os
     
     logger.info("Starting bulk Total Positions report generation")
     
@@ -271,64 +269,51 @@ def generate_all_total_positions_reports():
         Report.objects.filter(report_type='TOTAL_POSITIONS').delete()
         logger.info("Deleted existing Total Positions reports")
         
-        # Initialize services
+        # Initialize report service
         report_service = TotalPositionsReportService()
-        template_dir = os.path.join(os.path.dirname(__file__), '../../templates')
-        env = Environment(loader=FileSystemLoader(template_dir))
-        template = env.get_template('total_positions_template.html')
-        
-        # Get all clients
-        clients = Client.objects.all()
         
         generated_reports = []
         failed_reports = []
         
-        # Generate report for each client
+        # Generate individual reports for each client
+        clients = Client.objects.all()
+        
         for client in clients:
             try:
-                logger.info(f"Generating Total Positions report for client {client.code}")
+                logger.info(f"Generating Total Positions report for {client.code}")
                 
-                # Generate report data
-                report_data = report_service.generate_total_positions_report(client.code)
+                # Generate individual report HTML (service handles template rendering and file saving)
+                html_content = report_service.generate_total_positions_report(client.code)
                 
-                if report_data.get('error'):
-                    failed_reports.append({'client': client.code, 'status': 'error', 'error': report_data['error']})
-                    continue
-                
-                # Render HTML content
-                html_content = template.render(**report_data)
-                
-                # Save report file
+                # Service already saved the file, now create database record
                 current_date = datetime.now().strftime('%Y-%m-%d')
-                file_path, file_size = save_report_html(
-                    client.code, 
-                    'total_positions', 
-                    html_content, 
-                    current_date
-                )
                 
-                # Create database record
-                report = Report.objects.create(
-                    client=client,
-                    report_type='TOTAL_POSITIONS',
-                    report_date=current_date,
-                    file_path=file_path,
-                    file_size=file_size
-                )
+                # Create database record (file already saved by service)
+                with transaction.atomic():
+                    report = Report.objects.create(
+                        client=client,
+                        report_type='TOTAL_POSITIONS',
+                        report_date=current_date,
+                        file_path=f'reports/{client.code}/total_positions/total_positions_report_{current_date}.html',
+                        file_size=len(html_content.encode('utf-8'))
+                    )
                 
                 generated_reports.append({
-                    'client': client.code, 
-                    'status': 'success', 
+                    'client': client.code,
+                    'status': 'success',
                     'report_id': report.id,
-                    'positions': report_data.get('total_positions', 0),
-                    'alts': report_data.get('alt_positions_count', 0)
+                    'file_size': len(html_content.encode('utf-8'))
                 })
                 
                 logger.info(f"Successfully generated Total Positions report for {client.code}")
                 
             except Exception as e:
                 logger.error(f"Error generating Total Positions report for {client.code}: {e}")
-                failed_reports.append({'client': client.code, 'status': 'error', 'error': str(e)})
+                failed_reports.append({
+                    'client': client.code,
+                    'status': 'error',
+                    'error': str(e)
+                })
         
         total_generated = len(generated_reports)
         total_failed = len(failed_reports)
@@ -340,11 +325,8 @@ def generate_all_total_positions_reports():
             'message': f'Generated {total_generated} Total Positions reports, {total_failed} failed',
             'results': generated_reports + failed_reports,
             'summary': {
-                'total': total_generated + total_failed,
-                'success': total_generated,
-                'errors': total_failed,
-                'already_exists': 0,
-                'generation_time': 0.0
+                'total_generated': len(generated_reports),
+                'total_failed': len(failed_reports)
             }
         })
         
@@ -1287,17 +1269,8 @@ def generate_report_no_open(request):
             else:
                 # Generate for specific client
                 from .services.total_positions_report_service import TotalPositionsReportService
-                from jinja2 import Environment, FileSystemLoader
-                import os
-                
                 report_service = TotalPositionsReportService()
-                report_data = report_service.generate_total_positions_report(client_code)
-                
-                # Render with Jinja2 template
-                template_dir = os.path.join(os.path.dirname(__file__), '../../templates')
-                env = Environment(loader=FileSystemLoader(template_dir))
-                template = env.get_template('total_positions_template.html')
-                html_content = template.render(**report_data)
+                html_content = report_service.generate_total_positions_report(client_code)
                 
         elif report_type == 'equity_breakdown':
             from .services.report_generation_service import ReportGenerationService

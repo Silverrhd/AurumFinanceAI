@@ -1302,7 +1302,9 @@ class EnhancedReportService:
                 account_list = []
                 for account_key, rolled_from in snapshot.rollover_summary.items():
                     bank, account = account_key.split('_', 1)
-                    account_list.append(f"{account} {bank}")
+                    # Filter ALT accounts from rollover alert display (ALTs still get rolled over normally)
+                    if bank != 'ALT':
+                        account_list.append(f"{account} {bank}")
                 
                 rollover_info = {
                     'has_rollover': True,
