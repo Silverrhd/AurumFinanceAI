@@ -321,7 +321,7 @@ def generate_all_total_positions_reports():
         logger.info(f"Bulk Total Positions report generation complete: {total_generated} successful, {total_failed} failed")
         
         return Response({
-            'success': total_failed == 0,
+            'status': 'success',
             'message': f'Generated {total_generated} Total Positions reports, {total_failed} failed',
             'results': generated_reports + failed_reports,
             'summary': {
@@ -333,7 +333,7 @@ def generate_all_total_positions_reports():
     except Exception as e:
         logger.error(f"Error in bulk Total Positions report generation: {e}")
         return Response({
-            'success': False,
+            'status': 'error',
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

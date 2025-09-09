@@ -119,72 +119,137 @@ class TotalPositionsReportService(EnhancedReportService):
     
     def _generate_total_positions_table(self, positions) -> str:
         """
-        Generate HTML table for total positions (simplified version).
-        Only shows: custody, description, ticker, quantity, market_value
+        Generate HTML tables for total positions organized by asset class.
+        Follows weekly report structure with separate tables and subtotals.
         """
-        # Group positions by asset type for organization
-        grouped_positions = defaultdict(list)
+        # Consolidate positions by asset class
+        consolidated_positions = self._consolidate_asset_classes(positions)
+        
+        html_sections = []
+        
+        # Define section order (same as weekly report)
+        section_order = [
+            'Cash/Money Market',
+            'Fixed Income', 
+            'Equities',
+            'Alternatives'
+        ]
+        
+        # Generate each asset class section
+        for asset_class in section_order:
+            positions_list = consolidated_positions.get(asset_class, [])
+            if positions_list:  # Only include if there are positions
+                section_html = self._generate_asset_class_section(asset_class, positions_list)
+                html_sections.append(section_html)
+        
+        return ''.join(html_sections)
+    
+    def _consolidate_asset_classes(self, positions) -> dict:
+        """
+        Consolidate positions by asset class following weekly report structure.
+        Maps to: Cash/Money Market, Fixed Income, Equities, Alternatives
+        """
+        consolidated = defaultdict(list)
         
         for position in positions:
-            asset_type = position.asset.asset_type or 'Other'
-            grouped_positions[asset_type].append(position)
-        
-        # Start building HTML table
-        html = '''
-        <div class="positions-table-container">
-            <table class="positions-table">
-                <thead>
-                    <tr>
-                        <th>Custody</th>
-                        <th>Description</th>
-                        <th>Ticker</th>
-                        <th>Quantity</th>
-                        <th>Market Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-        '''
-        
-        # Add positions grouped by asset type
-        for asset_type, positions_list in sorted(grouped_positions.items()):
-            # Add asset type header row
-            html += f'''
-                    <tr class="asset-type-header">
-                        <td colspan="5"><strong>{asset_type}</strong></td>
-                    </tr>
-            '''
+            # Prepare simplified position data (only 5 columns for total positions report)
+            custody = f"{position.account} {position.bank}" if position.account and position.bank else "Unknown"
             
-            # Add positions for this asset type
-            for position in sorted(positions_list, key=lambda p: p.asset.name):
-                custody = f"{position.bank}"
-                if position.account and position.account != position.bank:
-                    custody += f" - {position.account}"
-                
-                html += f'''
-                    <tr>
-                        <td>{custody}</td>
-                        <td>{position.asset.name or 'N/A'}</td>
-                        <td>{position.asset.ticker or 'N/A'}</td>
-                        <td>{position.quantity:,.2f}</td>
-                        <td>${position.market_value:,.2f}</td>
-                    </tr>
-                '''
+            position_data = {
+                'custody': custody,
+                'name': position.asset.name or 'N/A',
+                'ticker': position.asset.ticker or 'N/A',
+                'quantity': float(position.quantity),
+                'market_value': float(position.market_value)
+            }
+            
+            # Map asset types to consolidated categories (same logic as weekly report)
+            asset_type = position.asset.asset_type
+            if asset_type in ['Fixed Income', 'Bond', 'Treasury', 'Corporate Bond']:
+                consolidated['Fixed Income'].append(position_data)
+            elif asset_type in ['Equities', 'Equity', 'Stock', 'Common Stock']:
+                consolidated['Equities'].append(position_data)
+            elif asset_type in ['Cash', 'Money Market']:
+                consolidated['Cash/Money Market'].append(position_data)
+            else:
+                # This includes ALTs and any other types
+                consolidated['Alternatives'].append(position_data)
         
-        html += '''
-                </tbody>
-            </table>
-        </div>
-        '''
+        # Sort each group by market_value descending
+        for asset_class in consolidated:
+            consolidated[asset_class].sort(key=lambda x: x['market_value'], reverse=True)
+            
+        return consolidated
+    
+    def _generate_asset_class_section(self, asset_class: str, positions_list: list) -> str:
+        """
+        Generate HTML section for a single asset class with subtotal.
+        """
+        if not positions_list:
+            return ''
+            
+        # Calculate subtotal
+        subtotal_market_value = sum(p['market_value'] for p in positions_list)
         
-        return html
+        html_parts = []
+        html_parts.append(f'<h3>{asset_class}</h3>')
+        html_parts.append('<div class="position-table-container">')
+        html_parts.append('<table class="position-table">')
+        html_parts.append('''
+            <thead>
+                <tr>
+                    <th class="col-custody">Custody</th>
+                    <th class="col-name">Description</th>
+                    <th class="col-ticker">Ticker</th>
+                    <th class="col-quantity">Quantity</th>
+                    <th class="col-market-value">Market Value</th>
+                </tr>
+            </thead>
+            <tbody>
+        ''')
+        
+        # Add individual positions
+        for position in positions_list:
+            html_parts.append(f'''
+                <tr>
+                    <td class="col-custody">{position['custody']}</td>
+                    <td class="col-name">{position['name']}</td>
+                    <td class="col-ticker">{position['ticker']}</td>
+                    <td class="numeric">{position['quantity']:,.2f}</td>
+                    <td class="numeric">${position['market_value']:,.2f}</td>
+                </tr>
+            ''')
+        
+        # Add subtotal row
+        html_parts.append(f'''
+            <tr class="subtotal-row">
+                <td class="col-custody"></td>
+                <td class="col-name">Subtotal</td>
+                <td class="col-ticker"></td>
+                <td class="numeric">-</td>
+                <td class="numeric">${subtotal_market_value:,.2f}</td>
+            </tr>
+        ''')
+        
+        html_parts.append('</tbody></table></div>')
+        return ''.join(html_parts)
     
     def _calculate_total_asset_allocation(self, positions) -> Dict[str, Any]:
-        """Calculate asset allocation INCLUDING ALTs."""
+        """Calculate asset allocation INCLUDING ALTs with consolidated categories."""
         allocation = defaultdict(float)
         
         for position in positions:
-            asset_type = position.asset.asset_type or 'Other'
-            allocation[asset_type] += float(position.market_value)
+            # Map asset types to consolidated categories (same logic as table)
+            asset_type = position.asset.asset_type
+            if asset_type in ['Fixed Income', 'Bond', 'Treasury', 'Corporate Bond']:
+                allocation['Fixed Income'] += float(position.market_value)
+            elif asset_type in ['Equities', 'Equity', 'Stock', 'Common Stock']:
+                allocation['Equities'] += float(position.market_value)
+            elif asset_type in ['Cash', 'Money Market']:
+                allocation['Cash/Money Market'] += float(position.market_value)
+            else:
+                # This includes ALTs and any other types
+                allocation['Alternatives'] += float(position.market_value)
         
         total_value = sum(allocation.values())
         
