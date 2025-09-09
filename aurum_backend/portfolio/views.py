@@ -275,8 +275,8 @@ def generate_all_total_positions_reports():
         generated_reports = []
         failed_reports = []
         
-        # Generate individual reports for each client
-        clients = Client.objects.all()
+        # Generate individual reports for each client (exclude ALL which is not a real client)
+        clients = Client.objects.exclude(code='ALL')
         
         for client in clients:
             try:

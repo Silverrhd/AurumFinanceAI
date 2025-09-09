@@ -239,7 +239,7 @@
         <!-- ALT Notice -->
         <div class="alt-notice">
             <h4>📊 Complete Portfolio View</h4>
-            <p>This report includes ALL positions including Alternative Investments (ALTs). 
+            <p>This report includes ALL positions including non-bank alternative investments. 
                Asset and custody allocations reflect the complete portfolio composition.</p>
         </div>
         {% endif %}
@@ -251,26 +251,14 @@
                 <div class="metric-label">Total Positions</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value">${{ "%.2f"|format(total_market_value)|replace('.00', '') }}</div>
+                <div class="metric-value">${{ "{:,.2f}".format(total_market_value) }}</div>
                 <div class="metric-label">Total Market Value</div>
             </div>
             <div class="metric-card">
                 <div class="metric-value">{{ alt_positions_count }}</div>
-                <div class="metric-label">ALT Positions</div>
+                <div class="metric-label">Non-Bank Alternatives</div>
             </div>
         </div>
-        
-        <!-- Positions Section -->
-        <section class="positions-section">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">All Positions (Including ALTs)</h2>
-                </div>
-                <div class="card-body">
-                    {{ positions_table | safe }}
-                </div>
-            </div>
-        </section>
         
         <!-- Charts Section -->
         <div class="grid grid-2">
@@ -294,6 +282,18 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Positions Section -->
+        <section class="positions-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">All Positions</h2>
+                </div>
+                <div class="card-body">
+                    {{ positions_table | safe }}
+                </div>
+            </div>
+        </section>
     </div>
     
     <!-- Chart JavaScript -->
