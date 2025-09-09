@@ -294,7 +294,7 @@ def generate_all_total_positions_reports():
                         client=client,
                         report_type='TOTAL_POSITIONS',
                         report_date=current_date,
-                        file_path=f'reports/{client.code}/total_positions/total_positions_report_{current_date}.html',
+                        file_path=f'reports/{client.code}/total_positions_reports/total_positions_report_{current_date}.html',
                         file_size=len(html_content.encode('utf-8'))
                     )
                 
@@ -1080,7 +1080,8 @@ def list_generated_reports_by_type(request, report_type):
         'bond_issuer_weight': 'BOND_ISSUER_WEIGHT',
         'equity_breakdown': 'EQUITY_BREAKDOWN',
         'cash_position': 'CASH_POSITION',
-        'monthly_returns_custody': 'MONTHLY_RETURNS'
+        'monthly_returns_custody': 'MONTHLY_RETURNS',
+        'total_positions': 'TOTAL_POSITIONS'
     }
     
     db_report_type = report_type_mapping.get(report_type)

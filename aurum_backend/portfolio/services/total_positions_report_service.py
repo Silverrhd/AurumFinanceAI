@@ -98,8 +98,8 @@ class TotalPositionsReportService(EnhancedReportService):
             file_path, file_size = save_report_html(
                 client_code, 
                 'total_positions', 
-                html_content,
-                report_date
+                report_date,
+                html_content
             )
             
             logger.info(f"Successfully generated Total Positions report for {client_code}: "
