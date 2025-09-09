@@ -83,7 +83,8 @@ class InvestmentCashFlowService:
         'VALLEY': {
             'OTHER_INCOME': ['SECURITIES CREDIT'],
             'SERVICE_FEES': ['MISCELLANEOS FEES', 'BALANCE FEES', 'MISCELLANEOUS FEES'],
-            'EXTERNAL_FLOWS': ['WIRE OUT', 'WIRE IN', 'WIRE OUT INTL', 'SECURITIES DEBIT']
+            'EXTERNAL_FLOWS': ['WIRE OUT', 'WIRE IN', 'WIRE OUT INTL'],
+            'OTHER_EXCLUDED': ['SECURITIES DEBIT']
         },
         'CS': {
             'DIVIDEND_INCOME': ['Cash dividend', 'Payment', 'Interest payment', 'Reversal Cash dividend'],
