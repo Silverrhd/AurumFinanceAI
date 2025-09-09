@@ -298,6 +298,7 @@ class Report(models.Model):
         ('EQUITY_BREAKDOWN', 'Equity Breakdown Report'),
         ('CASH_POSITION', 'Cash Position Report'),
         ('MONTHLY_RETURNS', 'Monthly Returns by Custody'),
+        ('TOTAL_POSITIONS', 'Total Positions Report'),
     ]
     
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='reports')

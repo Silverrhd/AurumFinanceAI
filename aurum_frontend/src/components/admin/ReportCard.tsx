@@ -41,7 +41,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
   
   // Helper function to determine if this is a latest-only report type
   const isLatestOnlyReport = (reportType: string) => {
-    return ['bond_issuer_weight', 'bond_maturity', 'equity_breakdown', 'cash_position'].includes(reportType);
+    return ['bond_issuer_weight', 'bond_maturity', 'equity_breakdown', 'cash_position', 'total_positions'].includes(reportType);
   };
   
   // Data states
@@ -155,7 +155,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
 
   const handleGenerateReport = async () => {
     // Check if report type is implemented
-    const implementedTypes = ['weekly_investment', 'bond_issuer_weight', 'cash_position', 'monthly_returns_custody'];
+    const implementedTypes = ['weekly_investment', 'bond_issuer_weight', 'cash_position', 'monthly_returns_custody', 'total_positions'];
     if (!implementedTypes.includes(reportType)) {
       toast.error(`${title} generation is not yet implemented. Coming soon!`);
       return;

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Total Positions Report{% if client_code %} - {{ client_code }}{% endif %}</title>
+    <style>
+        /* Base reset and typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Main container */
+        .report-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 0.5em;
+            color: #333;
+        }
+        
+        h1 { 
+            font-size: 1.8rem; 
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        h2 { 
+            font-size: 1.5rem; 
+            color: #333;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .period-info {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        /* Card Components */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            background-color: #f8f9fa;
+        }
+        
+        .card-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #003366;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        /* Summary metrics */
+        .summary-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #003366;
+        }
+        
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Positions table */
+        .positions-table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .positions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .positions-table th {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .positions-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        .positions-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .asset-type-header {
+            background-color: #e9ecef !important;
+            font-weight: bold;
+        }
+        
+        /* Chart containers */
+        .chart-container {
+            height: 400px;
+            margin: 1rem 0;
+        }
+        
+        /* ALT notice */
+        .alt-notice {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .alt-notice h4 {
+            color: #155724;
+            margin: 0 0 8px 0;
+        }
+        
+        .alt-notice p {
+            color: #155724;
+            margin: 0;
+        }
+        
+        /* Error handling */
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .error-notice {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .error-notice h4 {
+            color: #721c24;
+            margin: 0 0 8px 0;
+        }
+        
+        .error-notice p {
+            color: #721c24;
+            margin: 0;
+        }
+        
+        /* Print styles */
+        @media print {
+            .report-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header -->
+        <h1>Total Positions Report</h1>
+        {% if client_code %}
+        <div class="period-info">
+            Client: <strong>{{ client_code }}</strong><br>
+            {% if snapshot_date %}As of: {{ snapshot_date }}{% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Error Notice -->
+        {% if error %}
+        <div class="error-notice">
+            <h4>⚠️ Report Generation Issue</h4>
+            <p>{{ error }}</p>
+        </div>
+        {% else %}
+        <!-- ALT Notice -->
+        <div class="alt-notice">
+            <h4>📊 Complete Portfolio View</h4>
+            <p>This report includes ALL positions including Alternative Investments (ALTs). 
+               Asset and custody allocations reflect the complete portfolio composition.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Summary Metrics -->
+        <div class="summary-metrics">
+            <div class="metric-card">
+                <div class="metric-value">{{ total_positions }}</div>
+                <div class="metric-label">Total Positions</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${{ "%.2f"|format(total_market_value)|replace('.00', '') }}</div>
+                <div class="metric-label">Total Market Value</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">{{ alt_positions_count }}</div>
+                <div class="metric-label">ALT Positions</div>
+            </div>
+        </div>
+        
+        <!-- Positions Section -->
+        <section class="positions-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">All Positions (Including ALTs)</h2>
+                </div>
+                <div class="card-body">
+                    {{ positions_table | safe }}
+                </div>
+            </div>
+        </section>
+        
+        <!-- Charts Section -->
+        <div class="grid grid-2">
+            <!-- Asset Allocation Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Asset Allocation (Including ALTs)</h3>
+                </div>
+                <div class="card-body">
+                    <div id="assetAllocationChart" class="chart-container"></div>
+                </div>
+            </div>
+            
+            <!-- Custody Allocation Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Custody Allocation (Including ALTs)</h3>
+                </div>
+                <div class="card-body">
+                    <div id="custodyAllocationChart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.js"></script>
+    <script>
+        // Asset Allocation Polar Chart - Exact copy from weekly report template
+        {% if asset_allocation %}
+        var assetAllocationPolarOptions = {
+            series: [{% for data in asset_allocation.values() %}{{ "%.2f"|format(data.percentage) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            chart: {
+                type: 'polarArea',
+                toolbar: { 
+                    show: false 
+                },
+                animations: { 
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                background: 'transparent',
+                fontFamily: 'Arial, sans-serif'
+            },
+            labels: [{% for asset_type in asset_allocation.keys() %}'{{ asset_type }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            colors: ['#5f76a1', '#072061', '#b7babe', '#dae1f3'],
+            stroke: {
+                colors: ['#fff']
+            },
+            fill: {
+                opacity: 0.8
+            },
+            legend: {
+                position: 'bottom',
+                fontSize: '13px',
+                fontWeight: '500',
+                labels: {
+                    colors: '#333'
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function(value, opts) {
+                        const monetaryValues = [{% for data in asset_allocation.values() %}{{ "%.2f"|format(data.market_value) }}{% if not loop.last %}, {% endif %}{% endfor %}];
+                        const monetaryValue = monetaryValues[opts.seriesIndex];
+                        return value.toFixed(1) + '% ($' + monetaryValue.toLocaleString() + ')';
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+        
+        var assetAllocationChart = new ApexCharts(document.querySelector("#assetAllocationChart"), assetAllocationPolarOptions);
+        assetAllocationChart.render();
+        {% endif %}
+        
+        // Custody Allocation Polar Chart - Exact copy from weekly report template
+        {% if custody_allocation %}
+        var custodyAllocationPolarOptions = {
+            series: [{% for data in custody_allocation.values() %}{{ "%.2f"|format(data.percentage) }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            chart: {
+                type: 'polarArea',
+                toolbar: { 
+                    show: false 
+                },
+                animations: { 
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                background: 'transparent',
+                fontFamily: 'Arial, sans-serif'
+            },
+            labels: [{% for custody in custody_allocation.keys() %}'{{ custody }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+            colors: ['#5f76a1', '#072061', '#b7babe', '#dae1f3'],
+            stroke: {
+                colors: ['#fff']
+            },
+            fill: {
+                opacity: 0.8
+            },
+            legend: {
+                position: 'bottom',
+                fontSize: '13px',
+                fontWeight: '500',
+                labels: {
+                    colors: '#333'
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function(value, opts) {
+                        const monetaryValues = [{% for data in custody_allocation.values() %}{{ "%.2f"|format(data.market_value) }}{% if not loop.last %}, {% endif %}{% endfor %}];
+                        const monetaryValue = monetaryValues[opts.seriesIndex];
+                        return value.toFixed(1) + '% ($' + monetaryValue.toLocaleString() + ')';
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+        
+        var custodyAllocationChart = new ApexCharts(document.querySelector("#custodyAllocationChart"), custodyAllocationPolarOptions);
+        custodyAllocationChart.render();
+        {% endif %}
+    </script>
+</body>
+</html>

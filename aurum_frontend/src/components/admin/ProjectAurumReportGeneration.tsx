@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { FileText, BarChart3, Calendar, Building, TrendingUp, DollarSign } from 'lucide-react';
+import { FileText, BarChart3, Calendar, Building, TrendingUp, DollarSign, PieChart } from 'lucide-react';
 import { portfolioAPI } from '@/lib/api/portfolio';
 import { Client } from '@/types/portfolio';
 import { ReportCard } from './ReportCard';
@@ -226,13 +226,13 @@ export function ProjectAurumReportGeneration() {
           openLabel="Open Bond Maturity Reports"
         />
         
-        {/* Card 4: Equity Breakdown Reports */}
+        {/* Card 4: Total Positions Reports */}
         <ReportCard
-          title="Equity Breakdown Reports"
-          icon={<TrendingUp />}
-          reportType="equity_breakdown"
-          generateLabel="Generate Equity Breakdown Report"
-          openLabel="Open Equity Breakdown Reports"
+          title="Total Positions Reports"
+          icon={<PieChart />}
+          reportType="total_positions"
+          generateLabel="Generate Total Positions Report"
+          openLabel="Open Total Positions Reports"
         />
         
         {/* Card 5: Cash Position Reports */}
