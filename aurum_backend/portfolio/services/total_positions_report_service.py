@@ -64,7 +64,7 @@ class TotalPositionsReportService(EnhancedReportService):
             # Count ALT positions for information
             alt_positions_count = positions.filter(asset__bank='ALT').count()
             
-            # Generate simplified positions table (no cost basis, gain/loss, etc.)
+            # Generate positions table organized by asset class (like weekly report)
             positions_table = self._generate_total_positions_table(positions)
             
             # Calculate asset allocation WITH ALTs

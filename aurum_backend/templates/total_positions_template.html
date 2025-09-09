@@ -157,6 +157,50 @@
             font-weight: bold;
         }
         
+        /* Subtotal row styling */
+        .subtotal-row {
+            background-color: #f8f9fa !important;
+            font-weight: bold;
+            border-top: 2px solid #dee2e6;
+        }
+        
+        /* Column specific styling */
+        .col-custody {
+            width: 15%;
+        }
+        
+        .col-name {
+            width: 30%;
+        }
+        
+        .col-ticker {
+            width: 10%;
+        }
+        
+        .col-quantity {
+            width: 15%;
+            text-align: right;
+        }
+        
+        .col-market-value {
+            width: 15%;
+            text-align: right;
+        }
+        
+        /* Numeric column alignment */
+        .numeric {
+            text-align: right;
+        }
+        
+        /* Section headers */
+        h3 {
+            color: #003366;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #003366;
+        }
+        
         /* Chart containers */
         .chart-container {
             height: 400px;
@@ -287,7 +331,7 @@
         <section class="positions-section">
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">All Positions</h2>
+                    <h2 class="card-title">Portfolio Positions by Asset Class</h2>
                 </div>
                 <div class="card-body">
                     {{ positions_table | safe }}
