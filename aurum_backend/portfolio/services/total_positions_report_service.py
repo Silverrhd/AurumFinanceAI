@@ -33,7 +33,7 @@ class TotalPositionsReportService(EnhancedReportService):
             client_code: Client code to generate report for
             
         Returns:
-            str: HTML content of the generated report
+            tuple: (HTML content, snapshot_date) of the generated report
         """
         logger.info(f"Generating Total Positions report for {client_code}")
         
@@ -106,16 +106,16 @@ class TotalPositionsReportService(EnhancedReportService):
                        f"{total_positions} positions (including {alt_positions_count} ALTs), "
                        f"${total_market_value:,.2f} total value")
             
-            return html_content
+            return html_content, snapshot.snapshot_date
             
         except Client.DoesNotExist:
             error_msg = f"Client {client_code} not found"
             logger.error(error_msg)
-            return self._generate_empty_report(client_code, error_msg)
+            return self._generate_empty_report(client_code, error_msg), None
         except Exception as e:
             error_msg = f"Error generating Total Positions report for {client_code}: {str(e)}"
             logger.error(error_msg)
-            return self._generate_empty_report(client_code, error_msg)
+            return self._generate_empty_report(client_code, error_msg), None
     
     def _generate_total_positions_table(self, positions) -> str:
         """

@@ -283,10 +283,10 @@ def generate_all_total_positions_reports():
                 logger.info(f"Generating Total Positions report for {client.code}")
                 
                 # Generate individual report HTML (service handles template rendering and file saving)
-                html_content = report_service.generate_total_positions_report(client.code)
+                html_content, snapshot_date = report_service.generate_total_positions_report(client.code)
                 
                 # Service already saved the file, now create database record
-                current_date = datetime.now().strftime('%Y-%m-%d')
+                current_date = snapshot_date.strftime('%Y-%m-%d') if snapshot_date else datetime.now().strftime('%Y-%m-%d')
                 
                 # Create database record (file already saved by service)
                 with transaction.atomic():
@@ -294,7 +294,7 @@ def generate_all_total_positions_reports():
                         client=client,
                         report_type='TOTAL_POSITIONS',
                         report_date=current_date,
-                        file_path=f'reports/{client.code}/total_positions_reports/total_positions_report_{current_date}.html',
+                        file_path=f'{client.code}/total_positions_reports/total_positions_report_{current_date}.html',
                         file_size=len(html_content.encode('utf-8'))
                     )
                 
@@ -1271,7 +1271,7 @@ def generate_report_no_open(request):
                 # Generate for specific client
                 from .services.total_positions_report_service import TotalPositionsReportService
                 report_service = TotalPositionsReportService()
-                html_content = report_service.generate_total_positions_report(client_code)
+                html_content, _ = report_service.generate_total_positions_report(client_code)
                 
         elif report_type == 'equity_breakdown':
             from .services.report_generation_service import ReportGenerationService
