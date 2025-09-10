@@ -635,7 +635,7 @@ class EnhancedReportService:
         4. Cumulative Return (line chart)
         5. Benchmark Comparison (line chart)
         """
-        positions = current_snapshot.positions.select_related('asset').all()
+        positions = current_snapshot.positions.select_related('asset').exclude(asset__bank='ALT').all()
         total_value = sum(pos.market_value for pos in positions)
         
         # 1. Asset Allocation Chart
