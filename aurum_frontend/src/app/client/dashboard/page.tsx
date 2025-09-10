@@ -183,6 +183,38 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const handleOpenTotalPositionsReport = async () => {
+    // Pre-open window immediately to prevent popup blocking
+    const newWindow = window.open('', '_blank');
+    
+    try {
+      const resp = await portfolioAPI.getGeneratedReportsByType('total_positions');
+      if (resp.status === 'success' && resp.data && resp.data.reports && resp.data.reports.length > 0) {
+        // assume latest-first; if not, sort by created_at desc
+        const reports = resp.data.reports.slice().sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
+        const reportId = reports[0].id;
+        
+        // Fetch report content
+        const token = localStorage.getItem('access_token');
+        const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${reportId}/html/`;
+        const response = await fetch(reportUrl, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const htmlContent = await response.text();
+        
+        if (newWindow) {
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+        }
+      } else {
+        if (newWindow) newWindow.close();
+      }
+    } catch (error) {
+      console.error('Error opening total positions report:', error);
+      if (newWindow) newWindow.close();
+    }
+  };
+
   const clientCode = AuthManager.getClientCode() || '';
 
   const handleLogout = () => {
@@ -519,6 +551,35 @@ export default function ClientDashboardPage() {
                       <div className="pt-4 border-t border-gray-200">
                         <p className="text-xs text-gray-500">
                           Comprehensive cash position analysis with concentration risk assessment, showing your cash holdings and money market positions.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Total Positions Reports Card */}
+                  <Card className="p-6">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold aurum-text-dark mb-4 flex items-center gap-2">
+                        <PieChart className="h-5 w-5" />
+                        📊 Total Positions Reports
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Button 
+                        onClick={handleOpenTotalPositionsReport}
+                        className="w-full"
+                      >
+                        <PieChart className="h-4 w-4 mr-2" />
+                        Open Total Positions Report
+                      </Button>
+                      
+                      <div className="text-xs text-center text-gray-500">
+                        Complete portfolio overview with all positions and allocations
+                      </div>
+                      
+                      <div className="pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">
+                          Comprehensive portfolio analysis showing all your positions with detailed breakdown by asset class, custody, and concentration metrics.
                         </p>
                       </div>
                     </CardContent>
