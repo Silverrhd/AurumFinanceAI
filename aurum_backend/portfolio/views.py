@@ -322,6 +322,7 @@ def generate_all_total_positions_reports():
         
         return Response({
             'status': 'success',
+            'report_id': 0,  # Fake ID for bulk generation to prevent frontend crash
             'message': f'Generated {total_generated} Total Positions reports, {total_failed} failed',
             'results': generated_reports + failed_reports,
             'summary': {

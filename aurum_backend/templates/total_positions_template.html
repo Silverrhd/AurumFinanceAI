@@ -133,18 +133,27 @@
             font-size: 0.9rem;
         }
         
+        .positions-table th,
+        .positions-table td {
+            padding: 8px 12px;
+            white-space: normal;
+            word-wrap: break-word;
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+        
         .positions-table th {
             background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            padding: 8px 12px;
-            text-align: left;
             font-weight: 600;
             color: #495057;
+            font-size: 12px;
+            line-height: 1.2;
+            text-transform: capitalize;
+            text-align: left;
         }
         
         .positions-table td {
-            border: 1px solid #dee2e6;
-            padding: 8px 12px;
+            font-size: 12px;
             text-align: left;
         }
         
@@ -157,11 +166,12 @@
             font-weight: bold;
         }
         
-        /* Subtotal row styling */
-        .subtotal-row {
-            background-color: #f8f9fa !important;
+        /* Subtotal row styling - specific to subtotal rows only */
+        .subtotal-row td {
             font-weight: bold;
+            background-color: #f8f9fa !important;
             border-top: 2px solid #dee2e6;
+            border-bottom: 2px solid #dee2e6;
         }
         
         /* Column specific styling */
@@ -309,7 +319,7 @@
             <!-- Asset Allocation Chart -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Asset Allocation (Including ALTs)</h3>
+                    <h3 class="card-title">Asset Allocation</h3>
                 </div>
                 <div class="card-body">
                     <div id="assetAllocationChart" class="chart-container"></div>
@@ -319,7 +329,7 @@
             <!-- Custody Allocation Chart -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Custody Allocation (Including ALTs)</h3>
+                    <h3 class="card-title">Custody Allocation</h3>
                 </div>
                 <div class="card-body">
                     <div id="custodyAllocationChart" class="chart-container"></div>
