@@ -1307,7 +1307,7 @@ class EnhancedReportService:
                         account_list.append(f"{account} {bank}")
                 
                 rollover_info = {
-                    'has_rollover': True,
+                    'has_rollover': bool(account_list),
                     'accounts': account_list,
                     'message': (f"⚠️ Data was rolled over for client {client.code} "
                                f"for accounts: {', '.join(account_list)}. "
