@@ -89,21 +89,24 @@ export default function ClientDashboardPage() {
   };
 
   const openReportById = async (reportId: number) => {
-    const response = await portfolioAPI.getReportFile(reportId);
-    if (response.status === 'success' && response.data) {
-      const html = response.data.html_content;
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile: Use data URL in same tab
-        const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
-        window.location.href = dataURL;
-      } else {
-        // Desktop: Keep exact same document.write approach (unchanged)
-        const newWindow = window.open('', '_blank');
-        if (newWindow) {
-          newWindow.document.open();
-          newWindow.document.write(html);
-          newWindow.document.close();
-        }
+    // Universal pre-open window approach for all devices
+    const newWindow = window.open('', '_blank');
+    
+    try {
+      const token = localStorage.getItem('access_token');
+      const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${reportId}/html/`;
+      const response = await fetch(reportUrl, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const htmlContent = await response.text();
+      if (newWindow) {
+        newWindow.document.write(htmlContent);
+        newWindow.document.close();
+      }
+    } catch (error) {
+      console.error('Error opening report:', error);
+      if (newWindow) {
+        newWindow.close();
       }
     }
   };
