@@ -120,20 +120,66 @@ export default function ClientDashboardPage() {
   };
 
   const handleOpenBondIssuerReport = async () => {
-    const resp = await portfolioAPI.getGeneratedReportsByType('bond_issuer_weight');
-    if (resp.status === 'success' && resp.data && resp.data.reports && resp.data.reports.length > 0) {
-      // assume latest-first; if not, sort by created_at desc
-      const reports = resp.data.reports.slice().sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
-      await openReportById(reports[0].id);
+    // Pre-open window immediately to prevent popup blocking
+    const newWindow = window.open('', '_blank');
+    
+    try {
+      const resp = await portfolioAPI.getGeneratedReportsByType('bond_issuer_weight');
+      if (resp.status === 'success' && resp.data && resp.data.reports && resp.data.reports.length > 0) {
+        // assume latest-first; if not, sort by created_at desc
+        const reports = resp.data.reports.slice().sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
+        const reportId = reports[0].id;
+        
+        // Fetch report content
+        const token = localStorage.getItem('access_token');
+        const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${reportId}/html/`;
+        const response = await fetch(reportUrl, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const htmlContent = await response.text();
+        
+        if (newWindow) {
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+        }
+      } else {
+        if (newWindow) newWindow.close();
+      }
+    } catch (error) {
+      console.error('Error opening bond issuer report:', error);
+      if (newWindow) newWindow.close();
     }
   };
 
   const handleOpenCashReport = async () => {
-    const resp = await portfolioAPI.getGeneratedReportsByType('cash_position');
-    if (resp.status === 'success' && resp.data && resp.data.reports && resp.data.reports.length > 0) {
-      // assume latest-first; if not, sort by created_at desc
-      const reports = resp.data.reports.slice().sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
-      await openReportById(reports[0].id);
+    // Pre-open window immediately to prevent popup blocking
+    const newWindow = window.open('', '_blank');
+    
+    try {
+      const resp = await portfolioAPI.getGeneratedReportsByType('cash_position');
+      if (resp.status === 'success' && resp.data && resp.data.reports && resp.data.reports.length > 0) {
+        // assume latest-first; if not, sort by created_at desc
+        const reports = resp.data.reports.slice().sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
+        const reportId = reports[0].id;
+        
+        // Fetch report content
+        const token = localStorage.getItem('access_token');
+        const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${reportId}/html/`;
+        const response = await fetch(reportUrl, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const htmlContent = await response.text();
+        
+        if (newWindow) {
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+        }
+      } else {
+        if (newWindow) newWindow.close();
+      }
+    } catch (error) {
+      console.error('Error opening cash report:', error);
+      if (newWindow) newWindow.close();
     }
   };
 

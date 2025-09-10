@@ -276,9 +276,9 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
 
     try {
       // Universal pre-open window approach for all devices
+      const newWindow = window.open('', '_blank');
       const token = localStorage.getItem('access_token');
       const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${selectedReportId}/html/`;
-      const newWindow = window.open('', '_blank');
       
       try {
         const response = await fetch(reportUrl, {
@@ -316,31 +316,38 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
     try {
       // For latest-only reports, use the specific API method
       if (reportType === 'bond_issuer_weight') {
-        const response = await portfolioAPI.getBondIssuerWeightReport(selectedClientForBrowse);
-        if (response.ok) {
-          const jsonData = await response.json();
-          if (jsonData.success && jsonData.html_content) {
-            // Universal pre-open window approach for Bond Issuer Weight reports
-            const newWindow = window.open('', '_blank');
-            try {
+        // Universal pre-open window approach - open BEFORE any API calls
+        const newWindow = window.open('', '_blank');
+        
+        try {
+          const response = await portfolioAPI.getBondIssuerWeightReport(selectedClientForBrowse);
+          if (response.ok) {
+            const jsonData = await response.json();
+            if (jsonData.success && jsonData.report_id) {
+              // Fetch report content from the HTML endpoint
               const token = localStorage.getItem('access_token');
               const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${jsonData.report_id}/html/`;
-              const response = await fetch(reportUrl, {
+              const htmlResponse = await fetch(reportUrl, {
                 headers: { 'Authorization': `Bearer ${token}` }
               });
-              const htmlContent = await response.text();
-              newWindow.document.write(htmlContent);
-              newWindow.document.close();
-            } catch (error) {
-              newWindow.close();
-              throw error;
+              const htmlContent = await htmlResponse.text();
+              
+              if (newWindow) {
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+              }
+              toast.success('Bond Issuer Weight report opened successfully!');
+            } else {
+              if (newWindow) newWindow.close();
+              throw new Error('Invalid report data received');
             }
-            toast.success('Bond Issuer Weight report opened successfully!');
           } else {
-            throw new Error('Invalid report data received');
+            if (newWindow) newWindow.close();
+            throw new Error('Failed to open report');
           }
-        } else {
-          throw new Error('Failed to open report');
+        } catch (error) {
+          if (newWindow) newWindow.close();
+          throw error;
         }
       } else {
         // For other latest-only reports, find the latest report and open it
