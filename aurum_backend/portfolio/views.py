@@ -321,20 +321,18 @@ def generate_all_total_positions_reports():
         logger.info(f"Bulk Total Positions report generation complete: {total_generated} successful, {total_failed} failed")
         
         return Response({
-            'status': 'success',
-            'report_id': 0,  # Fake ID for bulk generation to prevent frontend crash
-            'message': f'Generated {total_generated} Total Positions reports, {total_failed} failed',
-            'results': generated_reports + failed_reports,
-            'summary': {
-                'total_generated': len(generated_reports),
-                'total_failed': len(failed_reports)
-            }
+            'success': True,
+            'message': f'Generated {len(generated_reports)} Total Positions reports',
+            'generated_reports': generated_reports,
+            'failed_reports': failed_reports,
+            'total_generated': len(generated_reports),
+            'total_failed': len(failed_reports)
         })
         
     except Exception as e:
         logger.error(f"Error in bulk Total Positions report generation: {e}")
         return Response({
-            'status': 'error',
+            'success': False,
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
