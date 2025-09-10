@@ -997,12 +997,12 @@
                 <!-- YTD Card (Placeholder) -->
                 <div class="metrics-card">
                     <div class="metrics-card-title">Year-to-Date</div>
-                    <div class="metrics-card-value {{ 'positive' if week2_summary.weekly_dollar_performance >= 0 else 'negative' }}">
-                        <strong>{{ week2_summary.weekly_dollar_performance | format_currency }}</strong>
+                    <div class="metrics-card-value">
+                        <strong>-</strong>
                     </div>
                     <div class="metrics-card-subtitle">
-                        <span class="{{ 'positive' if week2_summary.total_return_pct >= 0 else 'negative' }}">
-                            <strong>{{ week2_summary.total_return_pct | format_percentage }}</strong>
+                        <span>
+                            <strong>-</strong>
                         </span>
                         <span class="performance-label">YTD Return</span>
                     </div>
