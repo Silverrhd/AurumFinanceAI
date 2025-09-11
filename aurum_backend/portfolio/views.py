@@ -3786,6 +3786,47 @@ def get_export_available_dates(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def export_monthly_returns_excel(request):
+    """Export Monthly Returns by Custody to Excel for individual client."""
+    try:
+        client_code = request.data.get('client_code')
+        year = request.data.get('year')
+        month = request.data.get('month')
+        
+        if not all([client_code, year, month]):
+            return Response({
+                'error': 'client_code, year, and month are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate client access for non-admin users
+        if not request.user.is_staff:
+            user_client = getattr(request.user, 'client', None)
+            if not user_client or user_client.client_code != client_code:
+                return Response({
+                    'error': 'Access denied'
+                }, status=status.HTTP_403_FORBIDDEN)
+        
+        export_service = ExcelExportService()
+        excel_bytes, filename = export_service.export_monthly_returns_excel(client_code, year, month)
+        
+        response = HttpResponse(
+            excel_bytes, 
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        logger.info(f"Monthly Returns Excel export successful: {filename} for client={client_code}")
+        return response
+        
+    except Exception as e:
+        logger.error(f"Monthly Returns Excel export error: {e}")
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # Database Backup and Restore Endpoints
 
 @api_view(['POST'])

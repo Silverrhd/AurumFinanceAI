@@ -66,6 +66,7 @@ urlpatterns = [
     # Excel Export endpoints (admin only)
     path('export/positions/', views.export_positions_excel, name='export_positions'),
     path('export/transactions/', views.export_transactions_excel, name='export_transactions'),
+    path('export/monthly-returns/', views.export_monthly_returns_excel, name='export_monthly_returns'),
     path('export/available-dates/', views.get_export_available_dates, name='export_dates'),
     
     # Database Backup and Restore endpoints (admin only)

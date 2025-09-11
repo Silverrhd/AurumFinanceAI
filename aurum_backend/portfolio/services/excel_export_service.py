@@ -297,3 +297,91 @@ class ExcelExportService:
         except Exception as e:
             self.logger.error(f"Error getting available export dates: {e}")
             raise
+    
+    def export_monthly_returns_excel(self, client_code: str, year: str, month: str) -> Tuple[bytes, str]:
+        """
+        Export Monthly Returns by Custody data to Excel format.
+        
+        Args:
+            client_code: Client code (e.g., 'BK', 'JAV')
+            year: Year as string (e.g., '2025')
+            month: Month as string (e.g., '07')
+            
+        Returns:
+            Tuple of (excel_bytes, filename)
+        """
+        try:
+            self.logger.info(f"Starting monthly returns export for client={client_code}, year={year}, month={month}")
+            
+            # Get monthly returns data using the same logic as the report generation
+            from .custody_returns_service import CustodyReturnsService
+            
+            custody_service = CustodyReturnsService()
+            
+            # Generate the same data that's shown in the HTML report
+            context = custody_service.generate_client_monthly_returns(
+                client_code=client_code,
+                year=int(year),
+                month=int(month)
+            )
+            
+            # Extract custody returns data
+            custody_returns = context.get('custody_returns', [])
+            
+            if not custody_returns:
+                raise ValueError(f"No monthly returns data found for {client_code} in {year}-{month}")
+            
+            # Prepare data for Excel export
+            excel_data = []
+            for custody in custody_returns:
+                excel_data.append({
+                    'Custody': custody.get('custody_name', ''),
+                    '$ Gain/Loss': custody.get('returns_dollar', 0),
+                    '% Gain/Loss': custody.get('returns_percentage', 0)
+                })
+            
+            # Create DataFrame
+            df = pd.DataFrame(excel_data)
+            
+            # Format percentage column
+            df['% Gain/Loss'] = df['% Gain/Loss'].apply(lambda x: f"{float(x):.2f}%" if x != 0 else "0.00%")
+            
+            # Format dollar column
+            df['$ Gain/Loss'] = df['$ Gain/Loss'].apply(lambda x: f"${float(x):,.2f}" if x != 0 else "$0.00")
+            
+            # Generate Excel file
+            excel_buffer = BytesIO()
+            with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+                df.to_excel(
+                    writer, 
+                    sheet_name='Monthly Returns by Custody',
+                    index=False,
+                    startrow=0
+                )
+                
+                # Get workbook and worksheet for formatting
+                workbook = writer.book
+                worksheet = writer.sheets['Monthly Returns by Custody']
+                
+                # Auto-adjust column widths
+                for column in worksheet.columns:
+                    max_length = 0
+                    column_letter = column[0].column_letter
+                    for cell in column:
+                        try:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                            pass
+                    adjusted_width = min(max_length + 2, 50)
+                    worksheet.column_dimensions[column_letter].width = adjusted_width
+            
+            excel_bytes = excel_buffer.getvalue()
+            filename = f"monthly_returns_{year}_{month}_{client_code}.xlsx"
+            
+            self.logger.info(f"Monthly returns export completed: {filename}")
+            return excel_bytes, filename
+            
+        except Exception as e:
+            self.logger.error(f"Error exporting monthly returns to Excel: {e}")
+            raise

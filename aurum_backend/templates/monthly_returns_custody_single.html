@@ -188,7 +188,7 @@
             <div class="header-right">
                 <div class="report-date">Period: {{ start_date }} to {{ end_date }}</div>
                 <div class="generated-date">Generated: {{ "now"|date:"Y-m-d H:i:s" }}</div>
-                <button onclick="window.print()" class="print-btn">Print PDF</button>
+                <button onclick="exportToExcel()" class="export-btn" style="background-color: #10B981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">📊 Export to Excel</button>
             </div>
         </div>
         
@@ -242,5 +242,48 @@
             </table>
         </div>
     </div>
+
+<script>
+async function exportToExcel() {
+    try {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            alert('Authentication required. Please refresh the page.');
+            return;
+        }
+
+        const response = await fetch('/api/portfolio/export/monthly-returns/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                client_code: '{{ client_code }}',
+                year: '{{ year }}',
+                month: '{{ month }}'
+            })
+        });
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `monthly_returns_{{ year }}_{{ month }}_{{ client_code }}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } else {
+            const error = await response.json().catch(() => ({ error: 'Export failed' }));
+            alert('Export failed: ' + (error.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Export error:', error);
+        alert('Export failed. Please try again.');
+    }
+}
+</script>
 </body>
 </html>
