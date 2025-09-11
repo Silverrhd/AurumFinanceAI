@@ -1513,9 +1513,9 @@ class EnhancedReportService:
         max_quantity_change_pct = 5.0  # Maximum allowed quantity change percentage
         min_position_size = 5000  # Minimum position size to avoid noise
         
-        # Convert Django positions to ProjectAurum format
-        week1_positions = self._convert_positions_to_dict(comparison_snapshot.positions.select_related('asset').all())
-        week2_positions = self._convert_positions_to_dict(current_snapshot.positions.select_related('asset').all())
+        # Convert Django positions to ProjectAurum format (EXCLUDE ALT positions)
+        week1_positions = self._convert_positions_to_dict(comparison_snapshot.positions.select_related('asset').exclude(asset__bank='ALT').all())
+        week2_positions = self._convert_positions_to_dict(current_snapshot.positions.select_related('asset').exclude(asset__bank='ALT').all())
         
         # Create dictionary mapping from position identifier to position details for week 1
         week1_positions_dict = {}
