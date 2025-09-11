@@ -1,26 +1,45 @@
-# Security files - do not commit
-CREDENTIALS_README.md
-secure_credentials/
-temp_credentials.txt
-*credentials*.txt
-# Excel data files (large and sensitive)
-aurum_backend/data/excel/input_files/
-data/excel/input_files/
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+*.env
 
-# Large database and backup files
-*.sqlite3
-db_backup_*.sqlite3
-data_export.json
+# Database files
+db.sqlite3
+*.sql
+*backup*.sql
+production_backup.sql
+plain_backup.sql
 
-# Log files (can be large)
-logs/*.log
-logs/*.log.*
-aurum_backend/logs/
+# Backup files
+*.backup_*
+**/Mappings.xlsx.backup_*
 
-# Generated reports directory
+# Reports directory (generated files)
 aurum_backend/reports/
 
-# Python cache files
+# Temporary credentials
+temp_credentials.txt
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.Python
+
+# Django
+*.log
+logs/
+media/
+static_collected/
+
+# Local development
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules/
