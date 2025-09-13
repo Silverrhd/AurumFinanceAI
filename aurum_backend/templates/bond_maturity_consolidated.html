@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Maturity Report - All Clients</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .report-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: white;
+            color: #374151;
+            padding: 30px;
+            position: relative;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header-content {
+            text-align: center;
+        }
+        
+        .report-date {
+            position: absolute;
+            right: 30px;
+            color: #64748b;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            max-height: 40px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+        
+        .header .subtitle {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .metadata {
+            background-color: #f1f5f9;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .metadata-label {
+            font-size: 0.9em;
+            color: #64748b;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .metadata-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        {% if risk_analysis.imminent_count > 0 %}
+        .alert-section {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .alert-icon {
+            color: #dc2626;
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        
+        .alert-title {
+            color: #dc2626;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .alert-summary {
+            color: #7f1d1d;
+            margin-bottom: 15px;
+        }
+        {% endif %}
+        
+        .bonds-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .bonds-table thead th {
+            background: #f8fafc;
+            color: #374151;
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .bonds-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+        }
+        
+        .bonds-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .bonds-table tbody tr.imminent-maturity {
+            background-color: #fef2f2;
+        }
+        
+        .bonds-table tbody tr.imminent-maturity:hover {
+            background-color: #fee2e2;
+        }
+        
+        .bonds-table tbody td {
+            padding: 12px;
+            vertical-align: top;
+        }
+        
+        .numeric {
+            text-align: right;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.95em;
+        }
+        
+        .days-to-maturity {
+            font-weight: 600;
+        }
+        
+        .days-imminent {
+            color: #dc2626;
+            font-weight: 700;
+            background-color: #fee2e2;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .days-short {
+            color: #d97706;
+            font-weight: 600;
+        }
+        
+        .days-medium {
+            color: #059669;
+        }
+        
+        .bond-name {
+            font-weight: 500;
+            max-width: 250px;
+        }
+        
+        .client-name {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 0.95em;
+        }
+        
+        .custody {
+            font-size: 0.9em;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .summary-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .summary-title {
+            color: #64748b;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-value {
+            color: #1e293b;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        
+        .summary-imminent {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+        
+        .summary-imminent .summary-value {
+            color: #dc2626;
+        }
+        
+        
+        .no-data-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .no-data-message h2 {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+        
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px 30px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .report-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .header {
+                background: #2563eb !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .bonds-table {
+                font-size: 11px;
+            }
+            .bonds-table th, .bonds-table td {
+                padding: 6px 4px;
+            }
+            .table-container {
+                max-height: none;
+                overflow: visible;
+            }
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .header {
+                padding: 20px 15px;
+            }
+            .header h1 {
+                font-size: 1.6em;
+            }
+            .content {
+                padding: 20px 15px;
+            }
+            .bonds-table {
+                font-size: 0.8em;
+            }
+            .bonds-table th, .bonds-table td {
+                padding: 8px 6px;
+            }
+            .bond-name {
+                max-width: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .bonds-table th:nth-child(2), 
+            .bonds-table td:nth-child(2) {
+                display: none; /* Hide bond name on very small screens */
+            }
+            .bonds-table {
+                font-size: 0.75em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header -->
+        <div class="header">
+            {% if logo_base64 %}
+            <img src="data:image/png;base64,{{ logo_base64 }}" alt="Logo" class="logo">
+            {% endif %}
+            <div class="header-content">
+                <h1>Bond Maturity Report</h1>
+                <div class="subtitle">Consolidated - All Clients</div>
+            </div>
+            <div class="report-date">{{ snapshot_date.strftime('%B %d, %Y') }}</div>
+        </div>
+        
+        
+        <!-- Content -->
+        <div class="content">
+            {% if empty_report %}
+                <div class="no-data-message">
+                    <h2>No Bond Positions Found</h2>
+                    <p>No Fixed Income positions with maturity dates were found across all clients.</p>
+                    <p>This report only includes bonds with defined maturity dates, excluding ETFs and mutual funds.</p>
+                </div>
+            {% else %}
+                <!-- Imminent Maturity Alert -->
+                {% if risk_analysis.imminent_count > 0 %}
+                <div class="alert-section">
+                    <div class="alert-header">
+                        <span class="alert-icon">⚠️</span>
+                        <h3 class="alert-title">Imminent Maturity Alert</h3>
+                    </div>
+                    <div class="alert-summary">
+                        <strong>{{ risk_analysis.imminent_count }}</strong> bonds across all clients maturing within 30 days
+                        with a total value of <strong>${{ "{:,.2f}".format(risk_analysis.imminent_value) }}</strong>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Bonds Table -->
+                <table class="bonds-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Custody</th>
+                                <th>Bond Name</th>
+                                <th>Quantity</th>
+                                <th>Market Value</th>
+                                <th>Maturity Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bond in all_bonds %}
+                            <tr {% if bond.is_imminent %}class="imminent-maturity"{% endif %}>
+                                <td class="client-name">{{ bond.client }}</td>
+                                <td class="custody">{{ bond.custody }}</td>
+                                <td class="bond-name">{{ bond.name }}</td>
+                                <td class="numeric">{{ "{:,.0f}".format(bond.quantity) }}</td>
+                                <td class="numeric">${{ "{:,.2f}".format(bond.market_value) }}</td>
+                                <td class="numeric">{{ bond.maturity_date_formatted }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                </table>
+                
+                
+            {% endif %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Consolidated Bond Maturity Report generated on {{ report_generated.strftime('%B %d, %Y at %I:%M %p') }} | 
+            Sorted by maturity date across all clients (closest first) | Only includes Fixed Income positions with defined maturity dates</p>
+        </div>
+    </div>
+</body>
+</html>
