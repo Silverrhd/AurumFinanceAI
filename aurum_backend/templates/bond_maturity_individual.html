@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Maturity Report - {{ client_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .report-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: white;
+            color: #374151;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            max-height: 40px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+        
+        .header .subtitle {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .metadata {
+            background-color: #f1f5f9;
+            padding: 25px 40px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .metadata-label {
+            font-size: 0.9em;
+            color: #64748b;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .metadata-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        {% if risk_analysis.imminent_count > 0 %}
+        .alert-section {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .alert-icon {
+            color: #dc2626;
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        
+        .alert-title {
+            color: #dc2626;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .alert-summary {
+            color: #7f1d1d;
+            margin-bottom: 15px;
+        }
+        {% endif %}
+        
+        .bonds-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .bonds-table thead th {
+            background: #f8fafc;
+            color: #374151;
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .bonds-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+        }
+        
+        .bonds-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .bonds-table tbody tr.imminent-maturity {
+            background-color: #fef2f2;
+        }
+        
+        .bonds-table tbody tr.imminent-maturity:hover {
+            background-color: #fee2e2;
+        }
+        
+        .bonds-table tbody td {
+            padding: 12px;
+            vertical-align: top;
+        }
+        
+        .numeric {
+            text-align: right;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.95em;
+        }
+        
+        .days-to-maturity {
+            font-weight: 600;
+        }
+        
+        .days-imminent {
+            color: #dc2626;
+            font-weight: 700;
+            background-color: #fee2e2;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .days-short {
+            color: #d97706;
+            font-weight: 600;
+        }
+        
+        .days-medium {
+            color: #059669;
+        }
+        
+        .bond-name {
+            font-weight: 500;
+            max-width: 300px;
+        }
+        
+        .custody {
+            font-size: 0.9em;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .maturity-summary {
+            background-color: #f8fafc;
+            padding: 25px 40px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 12px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .summary-card:hover {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .summary-title {
+            color: #64748b;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-value {
+            color: #1e293b;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        
+        .summary-face-value {
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        .summary-imminent {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+        
+        .summary-imminent .summary-value {
+            color: #dc2626;
+        }
+        
+        .no-data-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .no-data-message h2 {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+        
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px 30px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .report-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .header {
+                background: #2563eb !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .bonds-table {
+                font-size: 12px;
+            }
+            .bonds-table th, .bonds-table td {
+                padding: 8px 6px;
+            }
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .header {
+                padding: 20px 15px;
+            }
+            .header h1 {
+                font-size: 1.6em;
+            }
+            .content {
+                padding: 20px 15px;
+            }
+            .bonds-table {
+                font-size: 0.85em;
+            }
+            .bonds-table th, .bonds-table td {
+                padding: 10px 8px;
+            }
+            .metadata-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+        
+        .chart-section {
+            background-color: #f8fafc;
+            padding: 25px 40px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .chart-container {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-title {
+            color: #374151;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <div class="report-container">
+        <!-- Header -->
+        <div class="header">
+            {% if logo_base64 %}
+            <img src="data:image/png;base64,{{ logo_base64 }}" alt="Logo" class="logo">
+            {% endif %}
+            <h1>Bond Maturity Report</h1>
+            <div class="subtitle">{{ client_name }} ({{ client_code }})</div>
+        </div>
+        
+        <!-- Metadata -->
+        <div class="metadata">
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <div class="metadata-label">Report Date</div>
+                    <div class="metadata-value">{{ snapshot_date.strftime('%B %d, %Y') }}</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Total Bonds</div>
+                    <div class="metadata-value">{{ total_bonds }}</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Total Market Value</div>
+                    <div class="metadata-value">${{ "{:,.2f}".format(total_market_value) }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Maturity Summary -->
+        {% if not empty_report %}
+        <div class="maturity-summary">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-title">1 Year</div>
+                    <div class="summary-value">{{ risk_analysis.maturity_periods['1_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['1_year'].face_value) }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">2 Years</div>
+                    <div class="summary-value">{{ risk_analysis.maturity_periods['2_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['2_year'].face_value) }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">3 Years</div>
+                    <div class="summary-value">{{ risk_analysis.maturity_periods['3_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['3_year'].face_value) }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">4 Years</div>
+                    <div class="summary-value">{{ risk_analysis.maturity_periods['4_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['4_year'].face_value) }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">5 Years</div>
+                    <div class="summary-value">{{ risk_analysis.maturity_periods['5_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['5_year'].face_value) }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-title">6+ Years</div>
+                    <div class="summary-value">{{ risk_analysis.maturity_periods['6_plus_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['6_plus_year'].face_value) }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Chart Section -->
+        {% if not empty_report %}
+        <div class="chart-section">
+            <div class="chart-container">
+                <div class="chart-title">Bond Maturity Distribution</div>
+                <div id="maturityChart"></div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Content -->
+        <div class="content">
+            {% if empty_report %}
+                <div class="no-data-message">
+                    <h2>No Bond Positions Found</h2>
+                    <p>No Fixed Income positions with maturity dates were found for {{ client_name }}.</p>
+                    <p>This report only includes bonds with defined maturity dates, excluding ETFs and mutual funds.</p>
+                </div>
+            {% else %}
+                <!-- Imminent Maturity Alert -->
+                {% if risk_analysis.imminent_count > 0 %}
+                <div class="alert-section">
+                    <div class="alert-header">
+                        <span class="alert-icon">⚠️</span>
+                        <h3 class="alert-title">Imminent Maturity Alert</h3>
+                    </div>
+                    <div class="alert-summary">
+                        <strong>{{ risk_analysis.imminent_count }}</strong> bonds maturing within 30 days
+                        with a total value of <strong>${{ "{:,.2f}".format(risk_analysis.imminent_value) }}</strong>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Bonds Table -->
+                <table class="bonds-table">
+                    <thead>
+                        <tr>
+                            <th>Custody</th>
+                            <th>Bond Name</th>
+                            <th>Quantity</th>
+                            <th>Market Value</th>
+                            <th>Maturity Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bond in bonds %}
+                        <tr {% if bond.is_imminent %}class="imminent-maturity"{% endif %}>
+                            <td class="custody">{{ bond.custody }}</td>
+                            <td class="bond-name">{{ bond.name }}</td>
+                            <td class="numeric">{{ "{:,.0f}".format(bond.quantity) }}</td>
+                            <td class="numeric">${{ "{:,.2f}".format(bond.market_value) }}</td>
+                            <td class="numeric">{{ bond.maturity_date_formatted }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+            {% endif %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Bond Maturity Report generated on {{ report_generated.strftime('%B %d, %Y at %I:%M %p') }} | 
+            Sorted by maturity date (closest first) | Only includes Fixed Income positions with defined maturity dates</p>
+        </div>
+    </div>
+
+    {% if not empty_report %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart data from template
+            const chartData = [
+                {{ risk_analysis.maturity_periods['1_year'].face_value }},
+                {{ risk_analysis.maturity_periods['2_year'].face_value }},
+                {{ risk_analysis.maturity_periods['3_year'].face_value }},
+                {{ risk_analysis.maturity_periods['4_year'].face_value }},
+                {{ risk_analysis.maturity_periods['5_year'].face_value }},
+                {{ risk_analysis.maturity_periods['6_plus_year'].face_value }}
+            ];
+            
+            const categories = ['1 Year', '2 Years', '3 Years', '4 Years', '5 Years', '6+ Years'];
+            
+            const options = {
+                series: [{
+                    name: 'Face Value',
+                    data: chartData
+                }],
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    fontFamily: 'Arial, sans-serif',
+                    toolbar: {
+                        show: false
+                    },
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800
+                    },
+                    background: 'transparent'
+                },
+                colors: ['#5f76a1'],
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#dae1f3'],
+                        opacityFrom: 0.7,
+                        opacityTo: 0.1,
+                        stops: [0, 100]
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                markers: {
+                    size: 0,
+                    hover: {
+                        size: 6,
+                        sizeOffset: 3
+                    }
+                },
+                grid: {
+                    borderColor: '#e0e0e0',
+                    strokeDashArray: 3,
+                    xaxis: {
+                        lines: {
+                            show: false
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    padding: {
+                        left: 20,
+                        right: 20
+                    }
+                },
+                xaxis: {
+                    categories: categories,
+                    axisBorder: {
+                        show: false
+                    },
+                    axisTicks: {
+                        show: false
+                    },
+                    labels: {
+                        style: {
+                            colors: '#666',
+                            fontSize: '12px'
+                        }
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: 'Face Value',
+                        style: {
+                            color: '#666',
+                            fontSize: '14px',
+                            fontWeight: 500
+                        }
+                    },
+                    labels: {
+                        style: {
+                            colors: '#666',
+                            fontSize: '12px'
+                        },
+                        formatter: function (val) {
+                            return '$' + val.toLocaleString();
+                        }
+                    },
+                    min: 0
+                },
+                tooltip: {
+                    theme: 'light',
+                    style: {
+                        fontSize: '12px'
+                    },
+                    y: {
+                        formatter: function (val) {
+                            return '$' + val.toLocaleString();
+                        }
+                    }
+                },
+                responsive: [{
+                    breakpoint: 768,
+                    options: {
+                        chart: {
+                            height: 300
+                        },
+                        xaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '10px'
+                                }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '10px'
+                                }
+                            }
+                        }
+                    }
+                }]
+            };
+
+            const chart = new ApexCharts(document.querySelector("#maturityChart"), options);
+            chart.render();
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

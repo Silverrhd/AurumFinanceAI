@@ -126,6 +126,142 @@ def generate_all_bond_issuer_weight_reports():
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+def generate_all_bond_maturity_reports():
+    """Generate Bond Maturity reports for all clients with Fixed Income positions."""
+    from .utils.report_utils import save_report_html
+    from .services.bond_maturity_report_service import BondMaturityReportService
+    from django.db import IntegrityError, transaction
+    
+    logger.info("Starting bulk Bond Maturity report generation")
+    
+    try:
+        # Delete existing bond maturity reports
+        Report.objects.filter(report_type='BOND_MATURITY').delete()
+        logger.info("Deleted existing Bond Maturity reports")
+        
+        # Initialize report service
+        report_service = BondMaturityReportService()
+        
+        generated_reports = []
+        failed_reports = []
+        
+        # STEP 1: Generate consolidated report for "All Clients"
+        try:
+            logger.info("Generating consolidated Bond Maturity report")
+            
+            html_content = report_service.generate_bond_maturity_report('ALL', 'consolidated')
+            
+            # Save consolidated report file
+            current_date = datetime.now().strftime('%Y-%m-%d')
+            file_path, file_size = save_report_html(
+                'ALL', 
+                'bond_maturity', 
+                current_date,
+                html_content
+            )
+            
+            # Create database record for consolidated report (create ALL client)
+            all_client, created = Client.objects.get_or_create(
+                code='ALL',
+                defaults={'name': 'All Clients'}
+            )
+            with transaction.atomic():
+                report = Report.objects.create(
+                    client=all_client,  # Use ALL client for consolidated reports
+                    report_type='BOND_MATURITY',
+                    report_date=datetime.now().date(),
+                    file_path=file_path,
+                    file_size=file_size,
+                    generation_time=0
+                )
+            
+            generated_reports.append({
+                'client_code': 'ALL',
+                'client_name': 'All Clients',
+                'report_id': report.id,
+                'file_path': file_path
+            })
+            
+            logger.info("Successfully generated consolidated Bond Maturity report")
+            
+        except Exception as e:
+            logger.error(f"Failed to generate consolidated Bond Maturity report: {e}")
+            failed_reports.append({
+                'client_code': 'ALL',
+                'error': str(e)
+            })
+        
+        # STEP 2: Generate individual reports for each client with bond positions
+        clients_with_bonds = Client.objects.filter(
+            snapshots__positions__asset__asset_type='Fixed Income',
+            snapshots__positions__asset__maturity_date__isnull=False
+        ).exclude(code='ALL').distinct()
+        
+        for client in clients_with_bonds:
+            try:
+                logger.info(f"Generating Bond Maturity report for {client.code}")
+                
+                # Generate individual report HTML
+                html_content = report_service.generate_bond_maturity_report(client.code, 'individual')
+                
+                # Save report file
+                file_path, file_size = save_report_html(
+                    client.code, 
+                    'bond_maturity', 
+                    current_date,
+                    html_content
+                )
+                
+                # Create database record for individual report
+                with transaction.atomic():
+                    report = Report.objects.create(
+                        client=client,
+                        report_type='BOND_MATURITY',
+                        report_date=datetime.now().date(),
+                        file_path=file_path,
+                        file_size=file_size,
+                        generation_time=0
+                    )
+                
+                generated_reports.append({
+                    'client_code': client.code,
+                    'client_name': client.name,
+                    'report_id': report.id,
+                    'file_path': file_path
+                })
+                
+                logger.info(f"Successfully generated Bond Maturity report for {client.code}")
+                
+            except Exception as e:
+                logger.error(f"Failed to generate Bond Maturity report for {client.code}: {e}")
+                failed_reports.append({
+                    'client_code': client.code,
+                    'error': str(e)
+                })
+        
+        # Return summary
+        logger.info(f"Bulk Bond Maturity generation completed: {len(generated_reports)} success, {len(failed_reports)} failed")
+        
+        return Response({
+            'success': True,
+            'message': f'Generated {len(generated_reports)} Bond Maturity reports',
+            'generated_reports': generated_reports,
+            'failed_reports': failed_reports,
+            'total_generated': len(generated_reports),
+            'total_failed': len(failed_reports)
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to generate bulk Bond Maturity reports: {str(e)}")
+        return Response({
+            'success': False,
+            'error': f'Bulk generation failed: {str(e)}',
+            'generated_reports': [],
+            'failed_reports': []
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 def generate_all_cash_position_reports():
     """Generate Cash Position reports for all clients with cash positions."""
     from .utils.report_utils import save_report_html
@@ -1119,11 +1255,11 @@ def list_generated_reports_by_type(request, report_type):
         })
     
     # Filter out ALL for non-consolidated report types
-    if db_report_type not in ['CASH_POSITION', 'MONTHLY_RETURNS']:
+    if db_report_type not in ['CASH_POSITION', 'MONTHLY_RETURNS', 'BOND_MATURITY']:
         reports_data = [r for r in reports_data if r['client_code'] != 'ALL']
     
     # Custom sort: ALL first for consolidated reports, then alphabetical
-    if db_report_type in ['CASH_POSITION', 'MONTHLY_RETURNS']:
+    if db_report_type in ['CASH_POSITION', 'MONTHLY_RETURNS', 'BOND_MATURITY']:
         reports_data.sort(key=lambda r: (r['client_code'] != 'ALL', r['client_code']))
     else:
         reports_data.sort(key=lambda r: r['client_code'])
@@ -1211,8 +1347,8 @@ def generate_report_no_open(request):
             return Response({'error': 'current_date is required for weekly investment reports'}, 
                           status=status.HTTP_400_BAD_REQUEST)
         
-        # Check if report already exists
-        if report_exists(client_code, 'weekly' if report_type == 'weekly_investment' else report_type, current_date):
+        # Check if report already exists (skip for bond_maturity which handles its own deletion)
+        if report_type != 'bond_maturity' and report_exists(client_code, 'weekly' if report_type == 'weekly_investment' else report_type, current_date):
             return Response({'error': f'Report already exists for {client_code or "ALL_CLIENTS"} on {current_date}'}, 
                           status=status.HTTP_400_BAD_REQUEST)
         
@@ -1234,13 +1370,17 @@ def generate_report_no_open(request):
                     html_content = report_service.generate_report_for_client(client_code)
                 
         elif report_type == 'bond_maturity':
-            from .services.report_generation_service import ReportGenerationService
-            report_service = ReportGenerationService()
-            result = report_service.generate_bond_maturity_report(current_date or '2025-07-24', client_code)
-            if result.get('success'):
-                html_content = f"<html><body><h1>Bond Maturity Report</h1><p>{result.get('message', 'Report generated successfully')}</p></body></html>"
+            if not client_code or client_code == 'ALL':
+                # Generate for all clients (bulk generation)
+                return generate_all_bond_maturity_reports()
             else:
-                return Response({'success': False, 'error': result.get('error', 'Bond maturity report generation failed')})
+                # Generate for specific client
+                from .services.bond_maturity_report_service import BondMaturityReportService
+                report_service = BondMaturityReportService()
+                
+                # Determine report subtype (same pattern as cash_position)
+                report_subtype = 'consolidated' if client_code == 'ALL' else 'individual'
+                html_content = report_service.generate_bond_maturity_report(client_code, report_subtype)
                 
         elif report_type == 'bond_issuer_weight':
             if not client_code or client_code == 'ALL':
@@ -1407,8 +1547,8 @@ def generate_report(request):
             return Response({'error': 'current_date is required for weekly investment reports'}, 
                           status=status.HTTP_400_BAD_REQUEST)
         
-        # Check if report already exists
-        if report_exists(client_code, 'weekly' if report_type == 'weekly_investment' else report_type, current_date):
+        # Check if report already exists (skip for bond_maturity which handles its own deletion)
+        if report_type != 'bond_maturity' and report_exists(client_code, 'weekly' if report_type == 'weekly_investment' else report_type, current_date):
             return Response({'error': f'Report already exists for {client_code or "ALL_CLIENTS"} on {current_date}'}, 
                           status=status.HTTP_400_BAD_REQUEST)
         
@@ -1430,13 +1570,17 @@ def generate_report(request):
                     html_content = report_service.generate_report_for_client(client_code)
                 
         elif report_type == 'bond_maturity':
-            from .services.report_generation_service import ReportGenerationService
-            report_service = ReportGenerationService()
-            result = report_service.generate_bond_maturity_report(current_date or '2025-07-24', client_code)
-            if result.get('success'):
-                html_content = f"<html><body><h1>Bond Maturity Report</h1><p>{result.get('message', 'Report generated successfully')}</p></body></html>"
+            if not client_code or client_code == 'ALL':
+                # Generate for all clients (bulk generation)
+                return generate_all_bond_maturity_reports()
             else:
-                return Response({'success': False, 'error': result.get('error', 'Bond maturity report generation failed')})
+                # Generate for specific client
+                from .services.bond_maturity_report_service import BondMaturityReportService
+                report_service = BondMaturityReportService()
+                
+                # Determine report subtype (same pattern as cash_position)
+                report_subtype = 'consolidated' if client_code == 'ALL' else 'individual'
+                html_content = report_service.generate_bond_maturity_report(client_code, report_subtype)
                 
         elif report_type == 'bond_issuer_weight':
             from .services.report_generation_service import ReportGenerationService
