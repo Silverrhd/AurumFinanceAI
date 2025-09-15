@@ -24,3 +24,5 @@ aurum_backend/reports/
 __pycache__/
 *.pyc
 *.pyo
+*.env
+aurum_backend/.env
