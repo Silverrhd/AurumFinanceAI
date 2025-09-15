@@ -197,7 +197,17 @@ class STDSZSecuritiesParser:
                 continue
                 
             # Get standard headers for this asset type
-            standard_headers = assets[0]['headers']
+            # The headers from subsection include the subsection name first, then actual column headers
+            raw_headers = assets[0]['headers']
+            
+            # The actual data columns start with Security Name, then the subsection headers (minus the subsection name)
+            if asset_type == 'CASH':
+                # Cash has different structure: ["ACCOUNT NUMBER", "MARKET VALUE", ...]
+                standard_headers = ['Security_Name'] + raw_headers
+            else:
+                # Bonds/Equities: subsection headers are ["ISIN", "FREQUENCY", ...] 
+                standard_headers = ['Security_Name'] + raw_headers
+                
             self.logger.info(f"📋 {asset_type} headers: {standard_headers[:4]}...")
             
             # Create data matrix
@@ -221,10 +231,189 @@ class STDSZSecuritiesParser:
             all_columns = list(standard_headers) + ['Asset_Class', 'Sub_Class', 'Bank_Code', 'Source_Row']
             df = pd.DataFrame(data_matrix, columns=all_columns)
             
+            # Apply post-processing fixes for specific asset types
+            if asset_type == 'BONDS':
+                df = self._fix_commercial_paper_market_value(df)
+            
             dataframes[asset_type.lower()] = df
             self.logger.info(f"📊 Created {asset_type} DataFrame: {len(df)} rows x {len(df.columns)} columns")
             
         return dataframes
+    
+    def _fix_commercial_paper_market_value(self, bonds_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Fix Commercial Paper market values that get misaligned during parsing.
+        
+        Issue: Commercial Paper data has market value at position 13 in raw data,
+        but our parser maps it to ACCRUED INTEREST instead of MARKET VALUE column.
+        
+        Solution: Move the value from ACCRUED INTEREST to MARKET VALUE for Commercial Paper only.
+        """
+        cp_mask = bonds_df['Sub_Class'] == 'COMMERCIAL PAPER'
+        
+        if cp_mask.any():
+            # Get the correct market value from ACCRUED INTEREST column
+            correct_market_values = bonds_df.loc[cp_mask, 'ACCRUED INTEREST']
+            
+            # Move it to MARKET VALUE column
+            bonds_df.loc[cp_mask, 'MARKET VALUE'] = correct_market_values
+            
+            self.logger.info(f"🔧 Fixed {cp_mask.sum()} Commercial Paper market values")
+            
+            # Log the fix for transparency
+            for idx in bonds_df[cp_mask].index:
+                security_name = bonds_df.loc[idx, 'Security_Name']
+                market_value = bonds_df.loc[idx, 'MARKET VALUE']
+                self.logger.info(f"   📈 {security_name}: Market Value = {market_value}")
+        
+        return bonds_df
+
+
+class STDSZUnifiedMapper:
+    """Step 2: Map different asset types to unified schema"""
+    
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("🔄 STDSZ Unified Mapper initialized")
+        
+        # Define unified mapping schema
+        self.mapping_schema = {
+            'Description': {
+                'BONDS': 'Sub_Class',
+                'EQUITIES': 'Sub_Class', 
+                'CASH': 'Sub_Class'
+            },
+            'Security_Name': {
+                'BONDS': 'Security_Name',
+                'EQUITIES': 'Security_Name',
+                'CASH': 'Security_Name'
+            },
+            'ISIN': {
+                'BONDS': 'ISIN',
+                'EQUITIES': 'ISIN',
+                'CASH': 'ACCOUNT NUMBER'
+            },
+            'Frequency': {
+                'BONDS': 'FREQUENCY',
+                'EQUITIES': '',
+                'CASH': ''
+            },
+            'Maturity_Date': {
+                'BONDS': 'MATURITY DATE',
+                'EQUITIES': '',
+                'CASH': ''
+            },
+            'Quantity': {
+                'BONDS': 'NOMINAL',
+                'EQUITIES': 'QUANTITY',
+                'CASH': ''
+            },
+            'Unit_Cost': {
+                'BONDS': 'COST',
+                'EQUITIES': 'UNIT COST',
+                'CASH': ''
+            },
+            'Current_Price': {
+                'BONDS': 'CURRENT PRICE',
+                'EQUITIES': 'CURRENT PRICE',
+                'CASH': ''
+            },
+            'Market_Value': {
+                'BONDS': 'MARKET VALUE',
+                'EQUITIES': 'MARKET VALUE',
+                'CASH': 'MARKET VALUE'
+            },
+            'Currency': {
+                'BONDS': 'CURRENCY',
+                'EQUITIES': 'CURRENCY',
+                'CASH': 'CURRENCY'
+            },
+            'Asset_Class': {
+                'BONDS': 'Asset_Class',
+                'EQUITIES': 'Asset_Class',
+                'CASH': 'Asset_Class'
+            },
+            'Bank_Code': {
+                'BONDS': 'Bank_Code',
+                'EQUITIES': 'Bank_Code',
+                'CASH': 'Bank_Code'
+            }
+        }
+    
+    def _find_similar_column(self, target_col: str, available_cols: List[str]) -> Optional[str]:
+        """Find a similar column name when exact match fails"""
+        target_upper = target_col.upper()
+        
+        # Look for columns that start with the target name
+        for col in available_cols:
+            if col.upper().startswith(target_upper):
+                return col
+        
+        # Look for columns that contain the target name
+        for col in available_cols:
+            if target_upper in col.upper():
+                return col
+                
+        return None
+    
+    def map_to_unified_schema(self, grouped_dataframes: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+        """
+        Combine all asset type DataFrames into a single unified DataFrame
+        """
+        try:
+            unified_data = []
+            
+            for asset_type, df in grouped_dataframes.items():
+                if df.empty:
+                    continue
+                    
+                asset_type_key = asset_type.upper()
+                self.logger.info(f"🔄 Mapping {asset_type} assets to unified schema ({len(df)} rows)")
+                
+                # Create unified rows for this asset type
+                for _, row in df.iterrows():
+                    unified_row = {}
+                    
+                    # Map each target column
+                    for target_col, source_mapping in self.mapping_schema.items():
+                        source_col = source_mapping.get(asset_type_key, '')
+                        
+                        if source_col == '':
+                            # Empty for this asset type
+                            unified_row[target_col] = ''
+                        elif source_col in df.columns:
+                            # Direct mapping - ensure we get scalar value
+                            value = row[source_col]
+                            # Handle pandas Series (multiple columns issue)
+                            if hasattr(value, 'iloc'):
+                                unified_row[target_col] = value.iloc[0] if len(value) > 0 else ''
+                            else:
+                                unified_row[target_col] = value
+                        else:
+                            # Column missing - try to find a similar column or set empty
+                            similar_col = self._find_similar_column(source_col, df.columns)
+                            if similar_col:
+                                value = row[similar_col]
+                                if hasattr(value, 'iloc'):
+                                    unified_row[target_col] = value.iloc[0] if len(value) > 0 else ''
+                                else:
+                                    unified_row[target_col] = value
+                                self.logger.debug(f"Used similar column '{similar_col}' for '{source_col}' in {asset_type}")
+                            else:
+                                self.logger.warning(f"Column '{source_col}' not found in {asset_type} data")
+                                unified_row[target_col] = ''
+                    
+                    unified_data.append(unified_row)
+            
+            # Create unified DataFrame
+            unified_df = pd.DataFrame(unified_data)
+            self.logger.info(f"✅ Created unified DataFrame: {len(unified_df)} rows x {len(unified_df.columns)} columns")
+            
+            return unified_df
+            
+        except Exception as e:
+            self.logger.error(f"❌ Unified mapping failed: {e}")
+            raise
 
 
 class STDSZTransformer:
@@ -233,32 +422,41 @@ class STDSZTransformer:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.parser = STDSZSecuritiesParser()
+        self.mapper = STDSZUnifiedMapper()
         self.logger.info("🏦 STDSZ Transformer initialized")
         
     def transform_securities(self, input_file: str, output_file: str, mappings: dict = None):
         """
-        Step 1: Parse STDSZ securities file into grouped DataFrames.
-        Steps 2-3 (column mapping and final output) to be implemented.
+        Complete STDSZ Securities transformation:
+        Step 1: Parse file into grouped DataFrames
+        Step 2: Map to unified schema  
+        Step 3: Generate final output file
         """
         try:
             self.logger.info(f"🚀 Starting STDSZ Securities transformation: {input_file}")
             
             # Step 1: Parse file into grouped DataFrames
+            self.logger.info("📋 Step 1: Parsing securities file...")
             parsed_dataframes = self.parser.parse_securities_file(input_file)
             
-            # For now, save the parsed DataFrames to see the results
-            base_name = os.path.splitext(output_file)[0]
+            # Step 2: Map to unified schema
+            self.logger.info("🔄 Step 2: Mapping to unified schema...")
+            unified_df = self.mapper.map_to_unified_schema(parsed_dataframes)
             
+            # Step 3: Generate final output file
+            self.logger.info("💾 Step 3: Generating final output...")
+            unified_df.to_excel(output_file, index=False)
+            self.logger.info(f"✅ Final unified file saved: {output_file}")
+            
+            # Also save intermediate files for debugging
+            base_name = os.path.splitext(output_file)[0]
             for asset_type, df in parsed_dataframes.items():
                 if not df.empty:
-                    temp_output = f"{base_name}_{asset_type}_parsed.xlsx"
+                    temp_output = f"{base_name}_{asset_type}_step1.xlsx"
                     df.to_excel(temp_output, index=False)
-                    self.logger.info(f"💾 Saved {asset_type} data to: {temp_output}")
             
-            self.logger.info(f"✅ STDSZ Securities Step 1 completed successfully")
-            
-            # TODO: Step 2 - Column mapping to Aurum standard format
-            # TODO: Step 3 - Generate final unified output file
+            self.logger.info(f"🎉 STDSZ Securities transformation completed successfully!")
+            self.logger.info(f"📊 Final result: {len(unified_df)} assets in unified format")
             
             return True
             
