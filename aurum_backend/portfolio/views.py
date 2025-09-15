@@ -3418,7 +3418,8 @@ def get_bank_status(request):
             {'code': 'Pershing', 'name': 'Pershing', 'type': 'enrichment_combination'},
             {'code': 'LO', 'name': 'Lombard', 'type': 'enrichment_combination'},
             {'code': 'ALT', 'name': 'Alternative Assets', 'type': 'combination'},
-            {'code': 'Citi', 'name': 'Citi Bank', 'type': 'simple'}
+            {'code': 'Citi', 'name': 'Citi Bank', 'type': 'simple'},
+            {'code': 'STDSZ', 'name': 'Santander Switzerland', 'type': 'simple'}
         ]
         
         def get_next_steps(processing_type):

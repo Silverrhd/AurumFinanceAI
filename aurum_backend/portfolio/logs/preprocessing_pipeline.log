@@ -2720,3 +2720,8 @@ The information contained on this website is designed solely for your individual
 2025-08-20 14:13:37,188 - portfolio.preprocessing.preprocess - INFO -   📊 Adding Pershing: 33 securities, 2 transactions
 2025-08-20 14:13:37,192 - portfolio.preprocessing.preprocess - INFO - ✅ Combined totals: 1657 securities, 347 transactions
 2025-08-20 14:13:38,388 - portfolio.services.processing_service - ERROR - Error processing all banks for date 14_08_2025: 'bool' object has no attribute 'get'
+2025-09-15 12:48:57,875 - portfolio.preprocessing.preprocess - INFO - 🚀 Unified preprocessor initialized
+2025-09-15 12:48:57,875 - portfolio.preprocessing.preprocess - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ
+2025-09-15 12:48:57,880 - portfolio.preprocessing.transformers.stdsz_transformer - INFO - 🏦 STDSZ Transformer initialized (skeleton)
+2025-09-15 12:54:50,794 - portfolio.preprocessing.preprocess - INFO - 🚀 Unified preprocessor initialized
+2025-09-15 12:54:50,795 - portfolio.preprocessing.preprocess - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ
