@@ -95,6 +95,7 @@ class BondMaturityReportService(EnhancedReportService):
         # Get all clients with bond positions
         all_bonds = []
         clients_processed = 0
+        latest_snapshot_date = None
         
         all_clients = Client.objects.exclude(code='ALL').order_by('code')
         
@@ -105,6 +106,10 @@ class BondMaturityReportService(EnhancedReportService):
             
             if not snapshot:
                 continue
+            
+            # Track the latest snapshot date across all clients
+            if latest_snapshot_date is None or snapshot.snapshot_date > latest_snapshot_date:
+                latest_snapshot_date = snapshot.snapshot_date
             
             # Get bond positions for this client
             bond_positions = snapshot.positions.select_related('asset').filter(
@@ -138,7 +143,7 @@ class BondMaturityReportService(EnhancedReportService):
             'total_market_value': sum(bond['market_value'] for bond in all_bonds),
             'risk_analysis': risk_analysis,
             'report_generated': datetime.now(),
-            'snapshot_date': datetime.now().date(),  # Use current date for consolidated
+            'snapshot_date': latest_snapshot_date,  # Use actual latest snapshot date
             'logo_base64': self._get_logo_base64()
         }
         
