@@ -210,12 +210,12 @@ class BondMaturityReportService(EnhancedReportService):
         
         # Categorize bonds by year-based maturity periods
         maturity_periods = {
-            '1_year': {'bonds': [], 'count': 0, 'value': 0.0},
-            '2_year': {'bonds': [], 'count': 0, 'value': 0.0},
-            '3_year': {'bonds': [], 'count': 0, 'value': 0.0},
-            '4_year': {'bonds': [], 'count': 0, 'value': 0.0},
-            '5_year': {'bonds': [], 'count': 0, 'value': 0.0},
-            '6_plus_year': {'bonds': [], 'count': 0, 'value': 0.0}
+            '1_year': {'bonds': [], 'count': 0, 'value': 0.0, 'face_value': 0.0},
+            '2_year': {'bonds': [], 'count': 0, 'value': 0.0, 'face_value': 0.0},
+            '3_year': {'bonds': [], 'count': 0, 'value': 0.0, 'face_value': 0.0},
+            '4_year': {'bonds': [], 'count': 0, 'value': 0.0, 'face_value': 0.0},
+            '5_year': {'bonds': [], 'count': 0, 'value': 0.0, 'face_value': 0.0},
+            '6_plus_year': {'bonds': [], 'count': 0, 'value': 0.0, 'face_value': 0.0}
         }
         
         imminent_bonds = []
@@ -243,6 +243,7 @@ class BondMaturityReportService(EnhancedReportService):
             maturity_periods[period]['bonds'].append(bond)
             maturity_periods[period]['count'] += 1
             maturity_periods[period]['value'] += value
+            maturity_periods[period]['face_value'] += bond['quantity']
         
         # Remove bonds list to reduce template size, keep just counts/values
         for period in maturity_periods:

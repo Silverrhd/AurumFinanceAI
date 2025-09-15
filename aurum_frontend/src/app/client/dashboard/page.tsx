@@ -215,6 +215,38 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const handleOpenBondMaturityReport = async () => {
+    // Pre-open window immediately to prevent popup blocking
+    const newWindow = window.open('', '_blank');
+    
+    try {
+      const resp = await portfolioAPI.getGeneratedReportsByType('bond_maturity');
+      if (resp.status === 'success' && resp.data && resp.data.reports && resp.data.reports.length > 0) {
+        // assume latest-first; if not, sort by created_at desc
+        const reports = resp.data.reports.slice().sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
+        const reportId = reports[0].id;
+        
+        // Fetch report content
+        const token = localStorage.getItem('access_token');
+        const reportUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/portfolio/reports/${reportId}/html/`;
+        const response = await fetch(reportUrl, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const htmlContent = await response.text();
+        
+        if (newWindow) {
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+        }
+      } else {
+        if (newWindow) newWindow.close();
+      }
+    } catch (error) {
+      console.error('Error opening bond maturity report:', error);
+      if (newWindow) newWindow.close();
+    }
+  };
+
   const clientCode = AuthManager.getClientCode() || '';
 
   const handleLogout = () => {
@@ -490,20 +522,30 @@ export default function ClientDashboardPage() {
                   </Card>
 
                   {/* Bond Maturity Reports Card */}
-                  <Card className="p-6 opacity-60 pointer-events-none">
+                  <Card className="p-6">
                     <CardHeader>
                       <CardTitle className="text-lg font-semibold aurum-text-dark mb-4 flex items-center gap-2">
                         <Calendar className="h-5 w-5" />
-                        📅 Bond Maturity Reports (coming soon)
+                        📅 Bond Maturity Reports
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <Button className="w-full" disabled>
+                      <Button 
+                        onClick={handleOpenBondMaturityReport}
+                        className="w-full"
+                      >
                         <Calendar className="h-4 w-4 mr-2" />
                         Open Bond Maturity Report
                       </Button>
+                      
                       <div className="text-xs text-center text-gray-500">
-                        Pending implementation
+                        View your bond portfolio maturity timeline with risk analysis
+                      </div>
+                      
+                      <div className="pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">
+                          Comprehensive bond maturity analysis showing when your bonds mature, with concentration risk assessment and maturity timeline visualization.
+                        </p>
                       </div>
                     </CardContent>
                   </Card>

@@ -245,6 +245,13 @@
             font-weight: 700;
         }
         
+        .summary-face-value {
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
         .summary-imminent {
             background: #fef2f2;
             border-color: #fecaca;
@@ -388,26 +395,32 @@
                 <div class="summary-card">
                     <div class="summary-title">1 Year</div>
                     <div class="summary-value">{{ risk_analysis.maturity_periods['1_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['1_year'].face_value) }}</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-title">2 Years</div>
                     <div class="summary-value">{{ risk_analysis.maturity_periods['2_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['2_year'].face_value) }}</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-title">3 Years</div>
                     <div class="summary-value">{{ risk_analysis.maturity_periods['3_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['3_year'].face_value) }}</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-title">4 Years</div>
                     <div class="summary-value">{{ risk_analysis.maturity_periods['4_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['4_year'].face_value) }}</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-title">5 Years</div>
                     <div class="summary-value">{{ risk_analysis.maturity_periods['5_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['5_year'].face_value) }}</div>
                 </div>
                 <div class="summary-card">
                     <div class="summary-title">6+ Years</div>
                     <div class="summary-value">{{ risk_analysis.maturity_periods['6_plus_year'].count }}</div>
+                    <div class="summary-face-value">${{ "{:,.0f}".format(risk_analysis.maturity_periods['6_plus_year'].face_value) }}</div>
                 </div>
             </div>
         </div>
@@ -485,25 +498,25 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Chart data from template
             const chartData = [
-                {{ risk_analysis.maturity_periods['1_year'].count }},
-                {{ risk_analysis.maturity_periods['2_year'].count }},
-                {{ risk_analysis.maturity_periods['3_year'].count }},
-                {{ risk_analysis.maturity_periods['4_year'].count }},
-                {{ risk_analysis.maturity_periods['5_year'].count }},
-                {{ risk_analysis.maturity_periods['6_plus_year'].count }}
+                {{ risk_analysis.maturity_periods['1_year'].face_value }},
+                {{ risk_analysis.maturity_periods['2_year'].face_value }},
+                {{ risk_analysis.maturity_periods['3_year'].face_value }},
+                {{ risk_analysis.maturity_periods['4_year'].face_value }},
+                {{ risk_analysis.maturity_periods['5_year'].face_value }},
+                {{ risk_analysis.maturity_periods['6_plus_year'].face_value }}
             ];
             
             const categories = ['1 Year', '2 Years', '3 Years', '4 Years', '5 Years', '6+ Years'];
             
             const options = {
                 series: [{
-                    name: 'Number of Bonds',
+                    name: 'Face Value',
                     data: chartData
                 }],
                 chart: {
-                    type: 'line',
+                    type: 'area',
                     height: 350,
-                    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                    fontFamily: 'Arial, sans-serif',
                     toolbar: {
                         show: false
                     },
@@ -511,24 +524,38 @@
                         enabled: true,
                         easing: 'easeinout',
                         speed: 800
-                    }
+                    },
+                    background: 'transparent'
                 },
+                colors: ['#5f76a1'],
                 stroke: {
                     curve: 'smooth',
-                    width: 3,
-                    colors: ['#2563eb']
+                    width: 3
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#dae1f3'],
+                        opacityFrom: 0.7,
+                        opacityTo: 0.1,
+                        stops: [0, 100]
+                    }
+                },
+                dataLabels: {
+                    enabled: false
                 },
                 markers: {
-                    size: 6,
-                    colors: ['#2563eb'],
-                    strokeColors: '#fff',
-                    strokeWidth: 2,
+                    size: 0,
                     hover: {
-                        size: 8
+                        size: 6,
+                        sizeOffset: 3
                     }
                 },
                 grid: {
-                    borderColor: '#f1f5f9',
+                    borderColor: '#e0e0e0',
                     strokeDashArray: 3,
                     xaxis: {
                         lines: {
@@ -539,6 +566,10 @@
                         lines: {
                             show: true
                         }
+                    },
+                    padding: {
+                        left: 20,
+                        right: 20
                     }
                 },
                 xaxis: {
@@ -551,28 +582,27 @@
                     },
                     labels: {
                         style: {
-                            colors: '#64748b',
-                            fontSize: '12px',
-                            fontWeight: 500
+                            colors: '#666',
+                            fontSize: '12px'
                         }
                     }
                 },
                 yaxis: {
                     title: {
-                        text: 'Number of Bonds',
+                        text: 'Face Value',
                         style: {
-                            color: '#64748b',
-                            fontSize: '12px',
+                            color: '#666',
+                            fontSize: '14px',
                             fontWeight: 500
                         }
                     },
                     labels: {
                         style: {
-                            colors: '#64748b',
+                            colors: '#666',
                             fontSize: '12px'
                         },
                         formatter: function (val) {
-                            return Math.floor(val);
+                            return '$' + val.toLocaleString();
                         }
                     },
                     min: 0
@@ -584,22 +614,8 @@
                     },
                     y: {
                         formatter: function (val) {
-                            return val + ' bonds';
+                            return '$' + val.toLocaleString();
                         }
-                    }
-                },
-                colors: ['#2563eb'],
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shade: 'light',
-                        type: 'vertical',
-                        shadeIntensity: 0.3,
-                        gradientToColors: ['#3b82f6'],
-                        inverseColors: false,
-                        opacityFrom: 0.7,
-                        opacityTo: 0.3,
-                        stops: [0, 100]
                     }
                 },
                 responsive: [{
