@@ -349,6 +349,12 @@ class UnifiedPreprocessor:
                 'output_dir': str(input_dir),
                 'check_path': input_dir / 'idb'
             },
+            'STDSZ': {
+                'script': 'portfolio/preprocessing/combiners/stdsz_enricher.py',
+                'input_dir': str(input_dir / 'santander_switzerland' / 'nonenriched_santander_switzerland'),
+                'output_dir': str(input_dir / 'santander_switzerland'),
+                'check_path': input_dir / 'santander_switzerland' / 'nonenriched_santander_switzerland'
+            },
         }
         
         for bank, config in enricher_configs.items():
@@ -433,6 +439,12 @@ class UnifiedPreprocessor:
                 'input_dir': str(input_dir / 'idb'),
                 'output_dir': str(input_dir),
                 'check_path': input_dir / 'idb'
+            },
+            'STDSZ': {
+                'script': 'portfolio/preprocessing/combiners/stdsz_combiner.py',
+                'input_dir': str(input_dir / 'santander_switzerland'),
+                'output_dir': str(input_dir),
+                'check_path': input_dir / 'santander_switzerland'
             }
         }
         
