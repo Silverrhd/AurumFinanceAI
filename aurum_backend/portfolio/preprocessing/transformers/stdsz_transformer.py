@@ -506,57 +506,353 @@ class STDSZTransformer:
         self.cost_calculator = STDSZCostBasisCalculator()
         self.logger.info("🏦 STDSZ Transformer initialized")
         
-    def transform_securities(self, input_file: str, output_file: str, mappings: dict = None):
+    def transform_securities(self, securities_file: str) -> pd.DataFrame:
         """
-        Complete STDSZ Securities transformation:
-        Step 1: Parse file into grouped DataFrames
-        Step 2: Map to unified schema  
-        Step 3: Calculate cost basis
-        Step 4: Generate final output file
+        Transform STDSZ securities file to standard format.
+        
+        Input: STDSZ enriched/combined securities file with columns:
+               ['Client', 'Account', 'Description', 'Security_Name', 'ISIN', 'Frequency', 
+                'Maturity_Date', 'Quantity', 'Unit_Cost', 'Current_Price', 'Market_Value', 
+                'Unrealized_Gains_Losses', 'Currency', 'Asset_Class', 'Bank_Code', 'Cost_Basis']
+                
+        Output: Standardized DataFrame with columns:
+                ['bank', 'client', 'account', 'asset_type', 'ticker', 'name', 'cusip', 
+                 'quantity', 'price', 'maturity_date', 'coupon_rate', 'market_value', 'cost_basis']
         """
         try:
-            self.logger.info(f"🚀 Starting STDSZ Securities transformation: {input_file}")
+            self.logger.info(f"🔄 Transforming STDSZ securities file: {securities_file}")
             
-            # Step 1: Parse file into grouped DataFrames
-            self.logger.info("📋 Step 1: Parsing securities file...")
-            parsed_dataframes = self.parser.parse_securities_file(input_file)
+            # Step 1: Read input file
+            df = pd.read_excel(securities_file)
+            self.logger.info(f"📊 Loaded {len(df)} securities records with {len(df.columns)} columns")
             
-            # Step 2: Map to unified schema
-            self.logger.info("🔄 Step 2: Mapping to unified schema...")
-            unified_df = self.mapper.map_to_unified_schema(parsed_dataframes)
+            # Step 2: Initialize output DataFrame with required columns
+            output_columns = ['bank', 'client', 'account', 'asset_type', 'ticker', 'name', 'cusip', 
+                             'quantity', 'price', 'maturity_date', 'coupon_rate', 'market_value', 'cost_basis']
+            result_df = pd.DataFrame()
             
-            # Step 3: Calculate cost basis
-            self.logger.info("💰 Step 3: Calculating cost basis...")
-            final_df = self.cost_calculator.calculate_cost_basis(unified_df)
+            # Step 3: Direct column mappings
+            self.logger.info("📋 Step 1: Basic column mappings...")
+            result_df['client'] = df['Client']
+            result_df['account'] = df['Account']
+            result_df['name'] = df['Security_Name']
+            result_df['cusip'] = df['ISIN']
+            result_df['quantity'] = df['Quantity']
+            result_df['market_value'] = df['Market_Value']
+            result_df['cost_basis'] = df['Cost_Basis']
+            result_df['bank'] = 'STDSZ'  # Hardcoded bank code
+            result_df['ticker'] = ''  # Leave empty as specified
             
-            # Step 4: Generate final output file
-            self.logger.info("💾 Step 4: Generating final output...")
-            final_df.to_excel(output_file, index=False)
-            self.logger.info(f"✅ Final unified file saved: {output_file}")
+            # Step 4: Coupon rate extraction (Frequency: "4.3750 SEMIANNUAL" → "4,3750")
+            self.logger.info("📋 Step 2: Extracting coupon rates...")
+            result_df['coupon_rate'] = df['Frequency'].apply(self._extract_coupon_rate)
             
-            # Also save intermediate files for debugging
-            base_name = os.path.splitext(output_file)[0]
-            for asset_type, df in parsed_dataframes.items():
-                if not df.empty:
-                    temp_output = f"{base_name}_{asset_type}_step1.xlsx"
-                    df.to_excel(temp_output, index=False)
+            # Step 5: Maturity date conversion (2027-11-15 → 11/15/2027)
+            self.logger.info("📋 Step 3: Converting maturity dates...")
+            result_df['maturity_date'] = df['Maturity_Date'].apply(self._convert_maturity_date)
             
-            self.logger.info(f"🎉 STDSZ Securities transformation completed successfully!")
-            self.logger.info(f"📊 Final result: {len(final_df)} assets with cost basis calculated")
+            # Step 6: Asset type mapping (complex logic with SHORT TERM split)
+            self.logger.info("📋 Step 4: Mapping asset types...")
+            result_df['asset_type'] = df.apply(lambda row: self._map_asset_type(
+                row['Asset_Class'], 
+                pd.notna(row['Maturity_Date'])
+            ), axis=1)
             
-            return True
+            # Step 7: Bond detection and price handling
+            self.logger.info("📋 Step 5: Applying bond price logic...")
+            bond_count = 0
+            for idx, row in df.iterrows():
+                is_bond = self._is_bond_by_description(row['Description'])
+                if is_bond:
+                    bond_count += 1
+                
+                # Apply price transformation with bond logic
+                formatted_price = self._apply_stdsz_bond_price_logic(row['Current_Price'], is_bond)
+                result_df.at[idx, 'price'] = formatted_price
+            
+            self.logger.info(f"  ✅ Identified {bond_count} bonds requiring special price handling")
+            
+            # Step 8: Apply European formatting to other numeric columns
+            self.logger.info("📋 Step 6: Applying European number formatting...")
+            numeric_columns = ['quantity', 'market_value', 'cost_basis']
+            for col in numeric_columns:
+                result_df[col] = result_df[col].apply(self._format_european_number)
+            
+            # Step 9: Reorder columns and validate
+            result_df = result_df[output_columns]
+            
+            # Step 10: Log transformation summary
+            self.logger.info(f"✅ STDSZ securities transformation completed:")
+            self.logger.info(f"   📈 Input records: {len(df)}")
+            self.logger.info(f"   📊 Output records: {len(result_df)}")
+            self.logger.info(f"   📋 Output columns: {list(result_df.columns)}")
+            
+            # Asset type distribution
+            asset_type_counts = result_df['asset_type'].value_counts()
+            for asset_type, count in asset_type_counts.items():
+                self.logger.info(f"   🏷️ {asset_type}: {count} records")
+            
+            return result_df
             
         except Exception as e:
-            self.logger.error(f"❌ STDSZ Securities transformation failed: {e}")
-            return False
+            self.logger.error(f"❌ STDSZ securities transformation failed: {e}")
+            # Return empty DataFrame with correct columns on error
+            return pd.DataFrame(columns=['bank', 'client', 'account', 'asset_type', 'ticker', 'name', 'cusip', 
+                                       'quantity', 'price', 'maturity_date', 'coupon_rate', 'market_value', 'cost_basis'])
         
-    def transform_transactions(self, input_file: str, output_file: str, mappings: dict = None):
+    def transform_transactions(self, transactions_file: str) -> pd.DataFrame:
         """
         Transform STDSZ transactions file to standard format.
-        TODO: Implement transactions transformation logic.
-        """
-        self.logger.info(f"🏦 STDSZ Transactions Transformer called: {input_file}")
-        self.logger.warning("⚠️  STDSZ transactions transformation not implemented yet")
         
-        # TODO: Implement actual transformation
-        return True
+        Input: STDSZ enriched/combined transactions file with columns:
+               ['Client', 'Account', 'PORTFOLIO', 'DETAIL', 'ISIN/IDENTIFIER', 
+                'VALUE DATE', 'BOOKING DATE', 'CREDITS/DEBITS', 'CURRENCY', 'BALANCE', 'CURRENCY.1']
+                
+        Output: Standardized DataFrame with columns:
+                ['bank', 'client', 'account', 'date', 'transaction_type', 'cusip', 'price', 'quantity', 'amount']
+        """
+        try:
+            self.logger.info(f"🔄 Transforming STDSZ transactions file: {transactions_file}")
+            
+            # Step 1: Read input file
+            df = pd.read_excel(transactions_file)
+            self.logger.info(f"📊 Loaded {len(df)} transaction records with {len(df.columns)} columns")
+            
+            # Step 2: Initialize output DataFrame with required columns
+            output_columns = ['bank', 'client', 'account', 'date', 'transaction_type', 'cusip', 'price', 'quantity', 'amount']
+            result_df = pd.DataFrame()
+            
+            # Step 3: Direct column mappings
+            self.logger.info("📋 Step 1: Copying basic identification columns...")
+            result_df['client'] = df['Client']
+            result_df['account'] = df['Account'] 
+            result_df['transaction_type'] = df['DETAIL']
+            result_df['cusip'] = df['ISIN/IDENTIFIER']
+            result_df['amount'] = df['CREDITS/DEBITS']
+            result_df['bank'] = 'STDSZ'  # Hardcoded bank code (must be after other columns)
+            
+            # Step 4: Date conversion (BOOKING DATE: "02 JUL 2025" → "07/02/2025")
+            self.logger.info("📋 Step 2: Converting BOOKING DATE from 'DD MON YYYY' to 'MM/DD/YYYY'...")
+            result_df['date'] = df['BOOKING DATE'].apply(self._convert_stdsz_date)
+            
+            converted_count = result_df['date'].dropna().shape[0]
+            self.logger.info(f"  ✅ Converted {converted_count} dates to MM/DD/YYYY format")
+            
+            # Step 5: Empty columns as specified
+            self.logger.info("📋 Step 3: Setting empty columns...")
+            result_df['price'] = ''
+            result_df['quantity'] = ''
+            
+            # Step 6: Reorder columns and validate
+            result_df = result_df[output_columns]
+            
+            self.logger.info(f"✅ STDSZ transactions transformation completed:")
+            self.logger.info(f"   📈 Input records: {len(df)}")
+            self.logger.info(f"   📊 Output records: {len(result_df)}")
+            self.logger.info(f"   📋 Output columns: {list(result_df.columns)}")
+            
+            return result_df
+            
+        except Exception as e:
+            self.logger.error(f"❌ STDSZ transactions transformation failed: {e}")
+            # Return empty DataFrame with correct columns on error
+            return pd.DataFrame(columns=['bank', 'client', 'account', 'date', 'transaction_type', 'cusip', 'price', 'quantity', 'amount'])
+    
+    def _convert_stdsz_date(self, date_str):
+        """
+        Convert STDSZ date format "DD MON YYYY" to MM/DD/YYYY
+        Example: "02 JUL 2025" → "07/02/2025"
+        """
+        if pd.isna(date_str) or str(date_str).strip() == '':
+            return None
+            
+        try:
+            date_str = str(date_str).strip()
+            
+            # Split date string: "02 JUL 2025" → ["02", "JUL", "2025"]
+            parts = date_str.split()
+            if len(parts) != 3:
+                self.logger.warning(f"Date format unexpected: '{date_str}' (expected 3 parts)")
+                return None
+                
+            day, month_abbr, year = parts
+            
+            # Month abbreviation to number mapping
+            month_mapping = {
+                'JAN': '01', 'FEB': '02', 'MAR': '03', 'APR': '04',
+                'MAY': '05', 'JUN': '06', 'JUL': '07', 'AUG': '08', 
+                'SEP': '09', 'OCT': '10', 'NOV': '11', 'DEC': '12'
+            }
+            
+            month_num = month_mapping.get(month_abbr.upper())
+            if not month_num:
+                self.logger.warning(f"Unknown month abbreviation: '{month_abbr}' in date '{date_str}'")
+                return None
+                
+            # Format as MM/DD/YYYY
+            formatted_date = f"{month_num}/{day.zfill(2)}/{year}"
+            return formatted_date
+            
+        except Exception as e:
+            self.logger.warning(f"Could not convert date '{date_str}': {e}")
+            return None
+    
+    def _extract_coupon_rate(self, frequency_str):
+        """
+        Extract coupon rate from frequency string and convert to European format.
+        Example: "4.3750 SEMIANNUAL" → "4,3750"
+        """
+        if pd.isna(frequency_str) or str(frequency_str).strip() == '':
+            return ''
+        
+        try:
+            # Split by space and take first part
+            parts = str(frequency_str).strip().split()
+            if parts:
+                number_str = parts[0]
+                # Convert decimal point to comma for European format
+                european_number = number_str.replace('.', ',')
+                return european_number
+            return ''
+        except Exception as e:
+            self.logger.warning(f"Could not extract coupon rate from '{frequency_str}': {e}")
+            return ''
+    
+    def _convert_maturity_date(self, date_str):
+        """
+        Convert STDSZ maturity date format from YYYY-MM-DD to MM/DD/YYYY.
+        Example: "2027-11-15" → "11/15/2027"
+        """
+        if pd.isna(date_str) or str(date_str).strip() == '':
+            return ''
+        
+        try:
+            from datetime import datetime
+            # Parse YYYY-MM-DD format
+            date_obj = datetime.strptime(str(date_str), '%Y-%m-%d')
+            # Format as MM/DD/YYYY
+            return date_obj.strftime('%m/%d/%Y')
+        except Exception as e:
+            self.logger.warning(f"Could not convert maturity date '{date_str}': {e}")
+            return ''
+    
+    def _map_asset_type(self, asset_class, has_maturity_date):
+        """
+        Map STDSZ Asset_Class to standard asset_type with special SHORT TERM logic.
+        
+        Rules:
+        - FIXED INCOME → Fixed Income
+        - SHORT TERM + has maturity → Fixed Income
+        - SHORT TERM + no maturity → Cash
+        - EQUITIES → Equity
+        - ALTERNATIVE INVESTMENTS → Alternatives
+        """
+        if pd.isna(asset_class):
+            return 'Unknown'
+        
+        asset_class_str = str(asset_class).strip()
+        
+        if asset_class_str == 'FIXED INCOME':
+            return 'Fixed Income'
+        elif asset_class_str == 'SHORT TERM':
+            if has_maturity_date:
+                return 'Fixed Income'  # SHORT TERM + maturity = Fixed Income
+            else:
+                return 'Cash'  # SHORT TERM + no maturity = Cash
+        elif asset_class_str == 'EQUITIES':
+            return 'Equity'
+        elif asset_class_str == 'ALTERNATIVE INVESTMENTS':
+            return 'Alternatives'
+        else:
+            self.logger.warning(f"Unknown asset class: '{asset_class_str}'")
+            return 'Unknown'
+    
+    def _is_bond_by_description(self, description):
+        """
+        Determine if asset is a bond based on Description column.
+        
+        Bond descriptions that require special price handling:
+        - GOVERNMENTS FIXED INCOME BONDS
+        - INVESTMENT GRADE FIXED INCOME BONDS
+        - HIGH YIELD FIXED INCOME BONDS
+        - COMMERCIAL PAPER
+        """
+        if pd.isna(description):
+            return False
+        
+        description_str = str(description).strip()
+        bond_descriptions = [
+            'GOVERNMENTS FIXED INCOME BONDS',
+            'INVESTMENT GRADE FIXED INCOME BONDS', 
+            'HIGH YIELD FIXED INCOME BONDS',
+            'COMMERCIAL PAPER',
+            'EMERGING FIXED INCOME BONDS'
+        ]
+        
+        return description_str in bond_descriptions
+    
+    def _apply_stdsz_bond_price_logic(self, price_str, is_bond):
+        """
+        Apply STDSZ-specific price formatting.
+        
+        For non-bonds: American → European formatting
+        For bonds: American → European → Bond price logic:
+        - If starts with 1: 101,234 → 1,01234
+        - If other number: 99,023 → 0,99023
+        """
+        if pd.isna(price_str) or str(price_str).strip() == '':
+            return ''
+        
+        try:
+            # Step 1: Convert to European format (replace . with ,)
+            european_price = str(price_str).replace('.', ',')
+            
+            # Step 2: If not a bond, return European format
+            if not is_bond:
+                return european_price
+            
+            # Step 3: Bond-specific price logic
+            # Split by comma to get integer and decimal parts
+            if ',' in european_price:
+                parts = european_price.split(',')
+                integer_part = parts[0]
+                decimal_part = parts[1] if len(parts) > 1 else ''
+                
+                if integer_part.startswith('1') and len(integer_part) > 1:
+                    # 101,234 → 1,01234 (move digits after 1 to decimal)
+                    remaining_digits = integer_part[1:]  # Remove the leading 1
+                    return f"1,{remaining_digits}{decimal_part}"
+                elif integer_part == '1':
+                    # Edge case: exactly 1,xxx → 1,xxx (no change needed)
+                    return european_price
+                else:
+                    # 99,023 → 0,99023 (put 0 before all digits)
+                    return f"0,{integer_part}{decimal_part}"
+            else:
+                # No decimal part, handle integer only
+                if price_str.startswith('1') and len(str(price_str)) > 1:
+                    # 123 → 1,23
+                    remaining = str(price_str)[1:]
+                    return f"1,{remaining}"
+                else:
+                    # 99 → 0,99
+                    return f"0,{price_str}"
+                    
+        except Exception as e:
+            self.logger.warning(f"Could not apply bond price logic to '{price_str}': {e}")
+            # Fallback to European formatting
+            return str(price_str).replace('.', ',')
+    
+    def _format_european_number(self, value):
+        """
+        Convert number to European format (comma as decimal separator).
+        """
+        if pd.isna(value) or str(value).strip() == '':
+            return ''
+        
+        try:
+            # Convert to string and replace decimal point with comma
+            return str(value).replace('.', ',')
+        except Exception as e:
+            self.logger.warning(f"Could not format number '{value}': {e}")
+            return str(value)

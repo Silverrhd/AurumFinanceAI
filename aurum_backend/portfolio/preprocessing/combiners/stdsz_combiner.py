@@ -185,8 +185,15 @@ class STDSZCombiner:
         try:
             logger.info(f"🚀 Starting STDSZ combination for date: {date}")
             
-            # Set up output directory (input_files/)
-            output_dir = input_dir.parent / 'input_files'
+            # Set up output directory (navigate up to find the main input_files directory)
+            output_dir = input_dir
+            while output_dir.name != 'input_files' and output_dir.parent != output_dir:
+                output_dir = output_dir.parent
+            
+            if output_dir.name != 'input_files':
+                # Fallback: assume we're in input_files and go up one level
+                output_dir = input_dir.parent
+            
             output_dir.mkdir(parents=True, exist_ok=True)
             
             # Discover enriched files
@@ -221,13 +228,23 @@ class STDSZCombiner:
 
 def main():
     """Main function for running STDSZ combination from command line."""
-    if len(sys.argv) != 3:
-        print("Usage: python stdsz_combiner.py <date> <input_dir>")
-        print("Example: python stdsz_combiner.py 31_07_2025 /path/to/santander_switzerland")
-        sys.exit(1)
+    import argparse
     
-    date = sys.argv[1]
-    input_dir = Path(sys.argv[2])
+    parser = argparse.ArgumentParser(description='STDSZ File Combiner')
+    parser.add_argument('--date', required=True, help='Date in DD_MM_YYYY format')
+    parser.add_argument('--input-dir', required=True, help='Input directory containing enriched STDSZ files')
+    parser.add_argument('--output-dir', help='Output directory (optional, defaults to input_files)')
+    
+    # Support both named arguments (from webapp) and positional arguments (backwards compatibility)
+    if len(sys.argv) == 3 and not sys.argv[1].startswith('--'):
+        # Legacy positional arguments: python stdsz_combiner.py 31_07_2025 /path/to/santander_switzerland
+        date = sys.argv[1]
+        input_dir = Path(sys.argv[2])
+    else:
+        # Named arguments: python stdsz_combiner.py --date 31_07_2025 --input-dir /path/to/santander_switzerland
+        args = parser.parse_args()
+        date = args.date
+        input_dir = Path(args.input_dir)
     
     # Set up logging
     logging.basicConfig(
