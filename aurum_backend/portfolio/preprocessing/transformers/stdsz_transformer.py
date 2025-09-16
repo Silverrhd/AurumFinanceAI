@@ -323,6 +323,11 @@ class STDSZUnifiedMapper:
                 'EQUITIES': 'MARKET VALUE',
                 'CASH': 'MARKET VALUE'
             },
+            'Unrealized_Gains_Losses': {
+                'BONDS': 'UNREALIZED GAINS / LOSSES',
+                'EQUITIES': 'UNREALIZED GAINS / LOSSES',
+                'CASH': ''
+            },
             'Currency': {
                 'BONDS': 'CURRENCY',
                 'EQUITIES': 'CURRENCY',
@@ -416,6 +421,81 @@ class STDSZUnifiedMapper:
             raise
 
 
+class STDSZCostBasisCalculator:
+    """Step 3: Calculate cost basis using Market Value - Unrealized Gains/Losses"""
+    
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("💰 STDSZ Cost Basis Calculator initialized")
+    
+    def calculate_cost_basis(self, unified_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add Cost_Basis column to unified DataFrame
+        
+        Formula: Cost_Basis = Market_Value - Unrealized_Gains_Losses
+        
+        For assets without Unrealized_Gains_Losses (like cash):
+        Cost_Basis = Market_Value
+        
+        Args:
+            unified_df: DataFrame with Market_Value and Unrealized_Gains_Losses columns
+            
+        Returns:
+            DataFrame with added Cost_Basis column
+        """
+        try:
+            self.logger.info("💰 Step 3: Calculating cost basis...")
+            
+            # Create a copy to avoid modifying original
+            result_df = unified_df.copy()
+            
+            # Initialize Cost_Basis column
+            result_df['Cost_Basis'] = 0.0
+            
+            for idx, row in result_df.iterrows():
+                market_value = row.get('Market_Value', 0)
+                unrealized_gl = row.get('Unrealized_Gains_Losses', None)
+                
+                # Calculate cost basis
+                if pd.notna(unrealized_gl) and unrealized_gl != '':
+                    # Cost Basis = Market Value - Unrealized Gains/Losses
+                    cost_basis = float(market_value) - float(unrealized_gl)
+                    self.logger.debug(f"📊 {row.get('Security_Name', 'Unknown')}: "
+                                    f"Market Value {market_value} - Unrealized G/L {unrealized_gl} = Cost Basis {cost_basis}")
+                else:
+                    # If no unrealized G/L, cost basis = market value (typically cash/liquidity)
+                    cost_basis = float(market_value)
+                    self.logger.debug(f"💵 {row.get('Security_Name', 'Unknown')}: "
+                                    f"Cost Basis = Market Value {cost_basis} (no unrealized G/L)")
+                
+                result_df.loc[idx, 'Cost_Basis'] = cost_basis
+            
+            # Log summary
+            bonds_count = len(result_df[result_df['Asset_Class'] == 'BONDS'])
+            equities_count = len(result_df[result_df['Asset_Class'] == 'EQUITIES'])
+            cash_count = len(result_df[result_df['Asset_Class'] == 'CASH'])
+            
+            self.logger.info(f"✅ Cost basis calculated for {len(result_df)} assets:")
+            self.logger.info(f"   📈 {bonds_count} bonds")
+            self.logger.info(f"   📊 {equities_count} equities")
+            self.logger.info(f"   💵 {cash_count} cash/liquidity")
+            
+            # Validate the example from user
+            treasury_rows = result_df[result_df['Security_Name'].str.contains('US TREASURY', na=False)]
+            if len(treasury_rows) > 0:
+                treasury = treasury_rows.iloc[0]
+                self.logger.info(f"🔍 Validation - US TREASURY:")
+                self.logger.info(f"   Market Value: {treasury['Market_Value']}")
+                self.logger.info(f"   Unrealized G/L: {treasury['Unrealized_Gains_Losses']}")
+                self.logger.info(f"   Cost Basis: {treasury['Cost_Basis']}")
+            
+            return result_df
+            
+        except Exception as e:
+            self.logger.error(f"❌ Cost basis calculation failed: {e}")
+            raise
+
+
 class STDSZTransformer:
     """Main STDSZ Transformer - orchestrates all transformation steps"""
     
@@ -423,6 +503,7 @@ class STDSZTransformer:
         self.logger = logging.getLogger(__name__)
         self.parser = STDSZSecuritiesParser()
         self.mapper = STDSZUnifiedMapper()
+        self.cost_calculator = STDSZCostBasisCalculator()
         self.logger.info("🏦 STDSZ Transformer initialized")
         
     def transform_securities(self, input_file: str, output_file: str, mappings: dict = None):
@@ -430,7 +511,8 @@ class STDSZTransformer:
         Complete STDSZ Securities transformation:
         Step 1: Parse file into grouped DataFrames
         Step 2: Map to unified schema  
-        Step 3: Generate final output file
+        Step 3: Calculate cost basis
+        Step 4: Generate final output file
         """
         try:
             self.logger.info(f"🚀 Starting STDSZ Securities transformation: {input_file}")
@@ -443,9 +525,13 @@ class STDSZTransformer:
             self.logger.info("🔄 Step 2: Mapping to unified schema...")
             unified_df = self.mapper.map_to_unified_schema(parsed_dataframes)
             
-            # Step 3: Generate final output file
-            self.logger.info("💾 Step 3: Generating final output...")
-            unified_df.to_excel(output_file, index=False)
+            # Step 3: Calculate cost basis
+            self.logger.info("💰 Step 3: Calculating cost basis...")
+            final_df = self.cost_calculator.calculate_cost_basis(unified_df)
+            
+            # Step 4: Generate final output file
+            self.logger.info("💾 Step 4: Generating final output...")
+            final_df.to_excel(output_file, index=False)
             self.logger.info(f"✅ Final unified file saved: {output_file}")
             
             # Also save intermediate files for debugging
@@ -456,7 +542,7 @@ class STDSZTransformer:
                     df.to_excel(temp_output, index=False)
             
             self.logger.info(f"🎉 STDSZ Securities transformation completed successfully!")
-            self.logger.info(f"📊 Final result: {len(unified_df)} assets in unified format")
+            self.logger.info(f"📊 Final result: {len(final_df)} assets with cost basis calculated")
             
             return True
             
