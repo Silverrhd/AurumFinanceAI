@@ -1023,6 +1023,73 @@ class STDSZEnricher:
             logger.error(f"❌ Error enriching transactions files: {e}")
             raise
     
+    def enrich_cashmovements_standalone(self, cashmovements_file: Path, client: str, account: str, output_dir: Path):
+        """
+        Enrich STDSZ cashmovements file standalone (when no transactions file is available).
+        
+        Args:
+            cashmovements_file: Path to cashmovements file
+            client: Client name
+            account: Account name
+            output_dir: Output directory for enriched file
+            
+        Returns:
+            Path to enriched output file
+        """
+        try:
+            logger.info(f"🔄 Enriching STDSZ cashmovements file standalone")
+            logger.info(f"   Client: {client}, Account: {account}")
+            logger.info(f"   Cashmovements: {cashmovements_file.name}")
+            logger.info(f"   Note: No transactions file available - processing without ISIN enrichment")
+            
+            # Create output filename based on cashmovements file (but call it transactions)
+            date_match = re.search(r'(\d{2}_\d{2}_\d{4})', cashmovements_file.name)
+            if date_match:
+                date_str = date_match.group(1)
+                output_filename = f"STDSZ_{client}_{account}_transactions_{date_str}.xlsx"
+            else:
+                output_filename = f"STDSZ_{client}_{account}_transactions.xlsx"
+            
+            output_path = output_dir / output_filename
+            
+            # Read cashmovements file
+            cash_raw = pd.read_excel(cashmovements_file, header=None)
+            
+            # Find headers dynamically
+            cash_header_row = self.transactions_enricher.find_header_row(cash_raw)
+            
+            logger.info(f"📍 Cash header row: {cash_header_row}, file has {len(cash_raw)} rows")
+            
+            # Read with proper headers (but ensure we don't exceed file bounds)
+            if cash_header_row >= len(cash_raw) - 1:
+                logger.warning(f"⚠️ Cash header row {cash_header_row} too close to end, adjusting")
+                cash_header_row = max(0, len(cash_raw) - 5)
+            
+            cash_df = pd.read_excel(cashmovements_file, header=cash_header_row)
+            
+            logger.info(f"📊 Loaded cashmovements: {len(cash_df)} rows")
+            
+            # Process standalone (no ISIN enrichment - just pass through)
+            # Check for transactions that would normally need ISIN enrichment
+            needs_isin_count = 0
+            for idx, row in cash_df.iterrows():
+                if self.transactions_enricher.classify_transaction(row.get('DETAIL')) == 'NEEDS_ISIN':
+                    needs_isin_count += 1
+            
+            # Save processed file (pass-through with warning about missing ISINs)
+            cash_df.to_excel(output_path, index=False, engine='openpyxl')
+            
+            logger.info(f"✅ Cashmovements standalone processing completed:")
+            logger.info(f"   📊 Total transactions: {len(cash_df)}")
+            logger.info(f"   ⚠️ Transactions needing ISIN enrichment: {needs_isin_count} (processed without enrichment)")
+            logger.info(f"   💾 Saved: {output_path}")
+            
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"❌ Cashmovements standalone enrichment failed: {e}")
+            raise
+    
     def enrich_stdsz_files(self, input_dir: Path, date: str) -> Dict[str, Path]:
         """
         Main enrichment function for STDSZ files.
@@ -1067,10 +1134,10 @@ class STDSZEnricher:
                     result[f'securities_{client_account}'] = enriched_securities_path
                     processed_count += 1
                 
-                # Enrich transactions files (requires both transactions and cashmovements)
+                # Enrich transactions files
                 if (files['transactions'] and files['transactions'].exists() and 
                     files['cashmovements'] and files['cashmovements'].exists()):
-                    
+                    # Both files available - enrich cashmovements with transactions data
                     enriched_transactions_path = self.enrich_transactions_files(
                         files['transactions'],
                         files['cashmovements'], 
@@ -1081,10 +1148,21 @@ class STDSZEnricher:
                     result[f'transactions_{client_account}'] = enriched_transactions_path
                     processed_count += 1
                 
+                elif files['cashmovements'] and files['cashmovements'].exists():
+                    # Only cashmovements available - process standalone
+                    logger.info(f"   📝 Processing cashmovements standalone for {client_account} (no transactions file)")
+                    enriched_cashmovements_path = self.enrich_cashmovements_standalone(
+                        files['cashmovements'], 
+                        client, 
+                        account, 
+                        output_dir
+                    )
+                    result[f'transactions_{client_account}'] = enriched_cashmovements_path
+                    processed_count += 1
+                
                 elif files['transactions'] and files['transactions'].exists():
                     logger.warning(f"   ⚠️ Found transactions file but missing cashmovements file for {client_account}")
-                elif files['cashmovements'] and files['cashmovements'].exists():
-                    logger.warning(f"   ⚠️ Found cashmovements file but missing transactions file for {client_account}")
+                    # Note: Don't process transactions alone as they need cashmovements context
             
             logger.info(f"🎉 STDSZ enrichment completed! Processed {processed_count} files")
             
