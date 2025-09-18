@@ -74,7 +74,7 @@ class UnifiedPreprocessor:
     def __init__(self):
         """Initialize the unified preprocessor."""
         self.project_root = Path(__file__).parent.parent.parent
-        self.supported_banks = ['JPM', 'MS', 'CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT', 'Citi']
+        self.supported_banks = ['JPM', 'MS', 'CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT', 'Citi', 'STDSZ']
         self.transformer_registry = {
             'JPM': 'preprocessing.transformers.jpm_transformer.JPMorganTransformer',
             'MS': 'preprocessing.transformers.ms_transformer.MorganStanleyTransformer',
@@ -88,7 +88,8 @@ class UnifiedPreprocessor:
             'LO': 'preprocessing.transformers.lombard_transformer.LombardTransformer',
             'IDB': 'preprocessing.transformers.idb_transformer.IDBTransformer',
             'Banchile': 'preprocessing.transformers.banchile_transformer.BanchileTransformer',
-            'Citi': 'preprocessing.transformers.citi_transformer.CitiTransformer'
+            'Citi': 'preprocessing.transformers.citi_transformer.CitiTransformer',
+            'STDSZ': 'preprocessing.transformers.stdsz_transformer.STDSZTransformer'
         }
         self.loaded_transformers = {}
         self.progress_tracker = ProgressTracker()
@@ -347,7 +348,13 @@ class UnifiedPreprocessor:
                 'input_dir': str(input_dir / 'idb'),
                 'output_dir': str(input_dir),
                 'check_path': input_dir / 'idb'
-            }
+            },
+            'STDSZ': {
+                'script': 'portfolio/preprocessing/combiners/stdsz_enricher.py',
+                'input_dir': str(input_dir / 'santander_switzerland' / 'nonenriched_santander_switzerland'),
+                'output_dir': str(input_dir / 'santander_switzerland'),
+                'check_path': input_dir / 'santander_switzerland' / 'nonenriched_santander_switzerland'
+            },
         }
         
         for bank, config in enricher_configs.items():
@@ -432,6 +439,12 @@ class UnifiedPreprocessor:
                 'input_dir': str(input_dir / 'idb'),
                 'output_dir': str(input_dir),
                 'check_path': input_dir / 'idb'
+            },
+            'STDSZ': {
+                'script': 'portfolio/preprocessing/combiners/stdsz_combiner.py',
+                'input_dir': str(input_dir / 'santander_switzerland'),
+                'output_dir': str(input_dir),
+                'check_path': input_dir / 'santander_switzerland'
             }
         }
         
@@ -626,7 +639,7 @@ class UnifiedPreprocessor:
         
         # Banks that need mappings file vs those that already have bank/client/account columns
         banks_needing_mappings = ['JPM', 'MS', 'Safra', 'Citi']
-        banks_with_embedded_data = ['CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'LO', 'IDB', 'Banchile']
+        banks_with_embedded_data = ['CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'LO', 'IDB', 'Banchile', 'STDSZ']
         
         mappings_file = None
         if bank_code in banks_needing_mappings:

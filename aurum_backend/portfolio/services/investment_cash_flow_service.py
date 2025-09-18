@@ -172,6 +172,34 @@ class InvestmentCashFlowService:
                 'Cost Adjustment', 'Dividend Reinvestment', 'Accrued Int Pd', 
                 'Accrued Int Rcv', 'OUTGOING'
             ]
+        },
+        'STDSZ': {
+            'INTEREST_INCOME': [
+                'COUPON ADVICE',        # Bond coupon payments (main income source)
+                'EXCHANGE'              # Corporate actions related to bonds
+            ],
+            'DIVIDEND_INCOME': [
+                'DIVIDEND ADVICE'       # ETF dividend payments
+            ],
+            'TAX_FEES': [
+                'WITHHOLDING TAX'       # Tax deductions on bond income
+            ],
+            'SERVICE_FEES': [
+                'SAFECUSTODY FEES',     # Custody/safekeeping fees
+                'TRANSACTION'           # Account maintenance fees (MANTENIMIENTO)
+            ],
+            'TRADING_BUY': [
+                'SECURITIES PURCHASE'   # All purchases (excluded from cash flow)
+            ],
+            'TRADING_SELL': [
+                'SECURITIES SALE',      # Stock/ETF sales (excluded from cash flow)
+                'REDEMPTION SALE'       # Bond redemptions (excluded from cash flow)
+            ],
+            'EXTERNAL_FLOWS': [],      # None identified yet
+            'OTHER_EXCLUDED': [
+                'CURRENCY PURCHASE',    # FX operations (not investment activity)
+                'CURRENCY SALE'         # FX operations (not investment activity)
+            ]
         }
     }
     
@@ -350,6 +378,70 @@ class InvestmentCashFlowService:
         logger.debug(f"Pershing no pattern match: '{transaction_type}' -> '{transaction_type}'")
         return transaction_type.strip()
     
+    def _extract_stdsz_transaction_type(self, transaction_type: str) -> str:
+        """
+        Extract clean transaction type from STDSZ bank complex descriptions.
+        
+        STDSZ patterns identified:
+        - "CORPORATE ACTIVITY / DIARSC... \n COUPON ADVICE - ..." -> "COUPON ADVICE"
+        - "CORPORATE ACTIVITY / DIARSC... \n EXCHANGE - ..." -> "EXCHANGE"  
+        - "SECURITIES PURCHASE / SCTRSC... \n ..." -> "SECURITIES PURCHASE"
+        - "SECURITIES SALE / SCTRSC... \n ..." -> "SECURITIES SALE"
+        - "REDEMPTION SALE / DIARSC... \n REDEMPTION - ..." -> "REDEMPTION SALE"
+        - "COUPONS / DIARSC... \n DIVIDEND ADVICE - ..." -> "DIVIDEND ADVICE"
+        - "WITHHOLDING TAX / DIARSC... \n TAX APPLIED - ..." -> "WITHHOLDING TAX"
+        - "SAFECUSTODY FEES / ... \n FEE POSTED ..." -> "SAFECUSTODY FEES"
+        - "TRANSACTION / DC... \n MANTENIMIENTO ..." -> "TRANSACTION"
+        - "CURRENCY PURCHASE / FX... - ..." -> "CURRENCY PURCHASE"
+        - "CURRENCY SALE / FX... - ..." -> "CURRENCY SALE"
+        
+        Args:
+            transaction_type: Raw STDSZ transaction description
+            
+        Returns:
+            Extracted transaction type
+        """
+        # Split by newline and analyze first part for main activity type
+        parts = transaction_type.split('\n')
+        main_part = parts[0].strip()
+        detail_part = parts[1].strip() if len(parts) > 1 else ""
+        
+        # Extract main transaction category and specific action
+        if main_part.startswith('CORPORATE ACTIVITY'):
+            if 'COUPON ADVICE' in detail_part:
+                extracted = 'COUPON ADVICE'
+            elif 'EXCHANGE' in detail_part:
+                extracted = 'EXCHANGE'
+            else:
+                extracted = 'CORPORATE ACTIVITY'
+        elif main_part.startswith('SECURITIES PURCHASE'):
+            extracted = 'SECURITIES PURCHASE'
+        elif main_part.startswith('SECURITIES SALE'):
+            extracted = 'SECURITIES SALE'
+        elif main_part.startswith('REDEMPTION SALE'):
+            extracted = 'REDEMPTION SALE'
+        elif main_part.startswith('COUPONS'):
+            if 'DIVIDEND ADVICE' in detail_part:
+                extracted = 'DIVIDEND ADVICE'
+            else:
+                extracted = 'COUPONS'
+        elif main_part.startswith('WITHHOLDING TAX'):
+            extracted = 'WITHHOLDING TAX'
+        elif main_part.startswith('SAFECUSTODY FEES'):
+            extracted = 'SAFECUSTODY FEES'
+        elif main_part.startswith('TRANSACTION'):
+            extracted = 'TRANSACTION'
+        elif main_part.startswith('CURRENCY PURCHASE'):
+            extracted = 'CURRENCY PURCHASE'
+        elif main_part.startswith('CURRENCY SALE'):
+            extracted = 'CURRENCY SALE'
+        else:
+            # If no pattern matches, return the main part
+            extracted = main_part
+        
+        logger.debug(f"STDSZ extraction: '{transaction_type}' -> '{extracted}'")
+        return extracted
+    
     def _categorize_transaction(self, transaction_type: str, bank: str) -> Optional[str]:
         """
         Categorize transaction type based on bank mappings.
@@ -371,6 +463,8 @@ class InvestmentCashFlowService:
             transaction_type = self._extract_idb_transaction_type(transaction_type)
         elif bank == 'Pershing' or bank == 'PERSHING':
             transaction_type = self._extract_pershing_transaction_type(transaction_type)
+        elif bank == 'STDSZ':
+            transaction_type = self._extract_stdsz_transaction_type(transaction_type)
         
         # Handle unknown/missing bank with generic fallback categorization
         if bank not in self.TRANSACTION_MAPPINGS or bank == 'UNKNOWN':

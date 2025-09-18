@@ -23,11 +23,12 @@ class BankDetector:
         'IDB': r'^IDB_',
         'Banchile': r'^Banchile_',
         'ALT': r'^alt_',
-        'Citi': r'^Citi_'
+        'Citi': r'^Citi_',
+        'STDSZ': r'^STDSZ_'
     }
     
     # Banks that use individual files per client/account
-    INDIVIDUAL_FILE_BANKS = {'Valley', 'CS', 'CSC', 'JB', 'Pershing', 'HSBC', 'LO', 'IDB'}
+    INDIVIDUAL_FILE_BANKS = {'Valley', 'CS', 'CSC', 'JB', 'Pershing', 'HSBC', 'LO', 'IDB', 'STDSZ'}
     
     @classmethod
     def detect_bank(cls, filename: str) -> Optional[str]:
@@ -96,8 +97,8 @@ class BankDetector:
             Tuple of (bank, client, account) or None if pattern doesn't match
         """
         # Pattern: Bank_Client_Account_Type_DD_MM_YYYY.xlsx
-        # Example: Valley_HZ_Greige_Securities_27_05_2025.xlsx
-        pattern = r'^([A-Za-z]+)_([A-Za-z0-9]+)_([A-Za-z0-9]+)_(?:[Ss]ecurities|transactions|unitcost)_\d{2}_\d{2}_\d{4}\.xlsx?$'
+        # Example: Valley_HZ_Greige_Securities_27_05_2025.xlsx, STDSZ_EI_Mazal_cashmovements_04_09_2025.xlsx
+        pattern = r'^([A-Za-z]+)_([A-Za-z0-9]+)_([A-Za-z0-9]+)_(?:[Ss]ecurities|transactions|cashmovements|unitcost)_\d{2}_\d{2}_\d{4}\.xlsx?$'
         
         match = re.match(pattern, filename, re.IGNORECASE)
         if match:

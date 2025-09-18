@@ -2786,6 +2786,7 @@ def organize_uploaded_file(uploaded_file, bank_code, extracted_date):
             # Special processing banks (enrichment + combination)
             'Pershing': base_processing_dir / 'pershing' / 'nonenriched_pershing',
             'LO': base_processing_dir / 'lombard' / 'nonenriched_lombard',
+            'STDSZ': base_processing_dir / 'santander_switzerland' / 'nonenriched_santander_switzerland',
             
             # Combination processing banks
             'Banchile': base_processing_dir / 'banchile',
@@ -3243,6 +3244,11 @@ def scan_bank_files(bank_code, base_processing_dir, target_date=None):
             base_processing_dir / 'lombard',  # Post-processing location 
             base_processing_dir  # Final processing location
         ],
+        'STDSZ': [
+            base_processing_dir / 'santander_switzerland' / 'nonenriched_santander_switzerland',  # Upload location
+            base_processing_dir / 'santander_switzerland',  # Post-processing location
+            base_processing_dir  # Final processing location
+        ],
         
         # Combination processing banks
         'Banchile': [
@@ -3418,7 +3424,8 @@ def get_bank_status(request):
             {'code': 'Pershing', 'name': 'Pershing', 'type': 'enrichment_combination'},
             {'code': 'LO', 'name': 'Lombard', 'type': 'enrichment_combination'},
             {'code': 'ALT', 'name': 'Alternative Assets', 'type': 'combination'},
-            {'code': 'Citi', 'name': 'Citi Bank', 'type': 'simple'}
+            {'code': 'Citi', 'name': 'Citi Bank', 'type': 'simple'},
+            {'code': 'STDSZ', 'name': 'Santander Switzerland', 'type': 'enrichment_combination'}
         ]
         
         def get_next_steps(processing_type):

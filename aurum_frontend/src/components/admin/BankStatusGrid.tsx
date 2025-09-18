@@ -31,7 +31,8 @@ const SUPPORTED_BANKS = [
   { code: 'Fidelity', name: 'Fidelity', color: 'bg-pink-500' },
   { code: 'Vanguard', name: 'Vanguard', color: 'bg-cyan-500' },
   { code: 'Schwab', name: 'Charles Schwab', color: 'bg-emerald-500' },
-  { code: 'ALT', name: 'Alternative Assets', color: 'bg-amber-500' }
+  { code: 'ALT', name: 'Alternative Assets', color: 'bg-amber-500' },
+  { code: 'STDSZ', name: 'Santander Switzerland', color: 'bg-red-600' }
 ]
 
 export interface BankStatus {
