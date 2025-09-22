@@ -658,6 +658,16 @@ class EnhancedReportService:
             'monetaryValues': [data['market_value'] for data in custody_allocation_data.values()]
         }
         
+        # 3. Bank Allocation Chart
+        bank_allocation_data = self._calculate_bank_allocation(positions)
+        bank_allocation_chart = {
+            'hasData': bool(bank_allocation_data),
+            'message': 'Bank allocation data' if bank_allocation_data else 'No bank allocation data',
+            'series': [data['percentage'] for data in bank_allocation_data.values()],
+            'labels': list(bank_allocation_data.keys()),
+            'monetaryValues': [data['market_value'] for data in bank_allocation_data.values()]
+        }
+        
         # 3. Portfolio History Chart - FIXED to use current_date and show actual values
         portfolio_history_chart = self._generate_portfolio_history_chart(client, current_date)
         
@@ -722,7 +732,8 @@ class EnhancedReportService:
         
         return {
             'asset_allocation': asset_allocation_chart,
-            'custody_allocation': custody_allocation_chart, 
+            'custody_allocation': custody_allocation_chart,
+            'bank_allocation': bank_allocation_chart,
             'portfolio_history': portfolio_history_chart,
             'cumulative_return': cumulative_return_chart,
             'benchmark_comparison': benchmark_comparison_chart,
@@ -779,6 +790,27 @@ class EnhancedReportService:
                 custody = 'Unknown'
                 
             allocation[custody] += float(position.market_value)
+        
+        # Return objects with market_value and percentage
+        return {
+            k: {
+                'market_value': v, 
+                'percentage': round(v / float(total_value) * 100, 2)
+            } 
+            for k, v in allocation.items()
+        }
+    
+    def _calculate_bank_allocation(self, positions) -> dict:
+        """Calculate bank allocation with market_value and percentage using bank field."""
+        allocation = defaultdict(float)
+        total_value = sum(pos.market_value for pos in positions)
+        
+        if total_value == 0:
+            return {}
+        
+        for position in positions:
+            bank_name = position.bank if position.bank else 'Unknown'
+            allocation[bank_name] += float(position.market_value)
         
         # Return objects with market_value and percentage
         return {

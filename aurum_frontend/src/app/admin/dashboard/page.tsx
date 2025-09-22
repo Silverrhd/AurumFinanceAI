@@ -29,6 +29,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { DashboardAssetAllocationChart } from '@/components/charts/DashboardAssetAllocationChart';
+import { DashboardBankAllocationChart } from '@/components/charts/DashboardBankAllocationChart';
 import { DashboardPortfolioValueChart } from '@/components/charts/DashboardPortfolioValueChart';
 import { DashboardCumulativeReturnChart } from '@/components/charts/DashboardCumulativeReturnChart';
 import { DashboardPortfolioMetricsChart } from '@/components/charts/DashboardPortfolioMetricsChart';
@@ -309,7 +310,7 @@ export default function AdminDashboardPage() {
                   </Card>
                 </div>
 
-                {/* Charts Grid (2x2) */}
+                {/* Charts Grid (2x3) */}
                 <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${filterLoading ? 'opacity-75' : ''}`}>
                   <Card className="p-6">
                     <CardTitle className="text-lg font-semibold aurum-text-dark mb-4">Asset Allocation</CardTitle>
@@ -381,6 +382,36 @@ export default function AdminDashboardPage() {
                         Loading chart data...
                       </div>
                     )}
+                  </Card>
+                  
+                  {/* Row 3 - Bank Allocation */}
+                  <Card className="p-6">
+                    <CardTitle className="text-lg font-semibold aurum-text-dark mb-4">Bank Allocation</CardTitle>
+                    {filterLoading ? (
+                      <div className="h-64 flex items-center justify-center text-gray-500">
+                        <div className="flex flex-col items-center">
+                          <div className="loading-spinner mb-2"></div>
+                          <span>Updating chart...</span>
+                        </div>
+                      </div>
+                    ) : chartData?.bank_allocation ? (
+                      <DashboardBankAllocationChart data={chartData.bank_allocation} />
+                    ) : (
+                      <div className="h-64 flex items-center justify-center text-gray-500">
+                        Loading chart data...
+                      </div>
+                    )}
+                  </Card>
+                  
+                  {/* Row 3 - Future Chart Space */}
+                  <Card className="p-6">
+                    <CardTitle className="text-lg font-semibold aurum-text-dark mb-4">Future Chart</CardTitle>
+                    <div className="h-64 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 rounded-lg">
+                      <div className="text-center">
+                        <div className="text-2xl mb-2">📊</div>
+                        <div>Future Chart Space</div>
+                      </div>
+                    </div>
                   </Card>
                 </div>
               </TabsContent>

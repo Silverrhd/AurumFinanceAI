@@ -23,6 +23,14 @@ export interface AssetAllocation {
   count: number;
 }
 
+export interface BankAllocationData {
+  hasData: boolean;
+  series: number[];
+  labels: string[];
+  monetaryValues: number[];
+  colors: string[];
+}
+
 export interface PortfolioMetric {
   client_code?: string;
   metric_name: string;

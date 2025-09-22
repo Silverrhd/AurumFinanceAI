@@ -52,6 +52,9 @@ class PortfolioCalculationService:
         # Custody allocation
         metrics['custody_allocation'] = self._calculate_custody_allocation(positions, metrics['total_value'])
         
+        # Bank allocation
+        metrics['bank_allocation'] = self._calculate_bank_allocation(positions, metrics['total_value'])
+        
         # Annual income calculations
         metrics['estimated_annual_income'] = self._calculate_annual_income(positions)
         
@@ -135,6 +138,26 @@ class PortfolioCalculationService:
                     (allocation[custody]['value'] / Decimal(str(total_value))) * 100
                 )
             allocation[custody]['value'] = float(allocation[custody]['value'])
+        
+        return allocation
+    
+    def _calculate_bank_allocation(self, positions, total_value: float) -> dict:
+        """Calculate bank allocation by bank field."""
+        allocation = {}
+        
+        for position in positions:
+            bank_name = position.bank
+            if bank_name not in allocation:
+                allocation[bank_name] = {'value': Decimal('0'), 'percentage': 0}
+            allocation[bank_name]['value'] += position.market_value
+        
+        # Calculate percentages
+        for bank_name in allocation:
+            if total_value > 0:
+                allocation[bank_name]['percentage'] = float(
+                    (allocation[bank_name]['value'] / Decimal(str(total_value))) * 100
+                )
+            allocation[bank_name]['value'] = float(allocation[bank_name]['value'])
         
         return allocation
     
@@ -372,6 +395,10 @@ class PortfolioCalculationService:
             'custody_allocation': {
                 'labels': list(metrics['custody_allocation'].keys()),
                 'series': [metrics['custody_allocation'][k]['value'] for k in metrics['custody_allocation'].keys()]
+            },
+            'bank_allocation': {
+                'labels': list(metrics['bank_allocation'].keys()),
+                'series': [metrics['bank_allocation'][k]['value'] for k in metrics['bank_allocation'].keys()]
             },
             'portfolio_value': {
                 'current_value': metrics['total_value'],
