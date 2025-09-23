@@ -33,6 +33,33 @@ class CorrectDashboardCacheService:
     def __init__(self):
         self.logger = logger
     
+    def _consolidate_bank_allocation(self, bank_allocation_data: dict, max_banks: int = 5) -> dict:
+        """
+        Consolidate bank allocation to show top N banks + Others category.
+        
+        Args:
+            bank_allocation_data: Dict of {bank_name: value}
+            max_banks: Number of top banks to show individually (default 5)
+        
+        Returns:
+            Dict with top banks + 'Others' if applicable
+        """
+        if not bank_allocation_data or len(bank_allocation_data) <= max_banks:
+            return bank_allocation_data
+        
+        # Sort by value (descending)
+        sorted_banks = sorted(bank_allocation_data.items(), key=lambda x: x[1], reverse=True)
+        
+        # Take top N banks
+        top_banks = dict(sorted_banks[:max_banks])
+        
+        # Sum remaining banks into "Others"
+        others_total = sum(value for _, value in sorted_banks[max_banks:])
+        if others_total > 0:
+            top_banks['Others'] = others_total
+        
+        return top_banks
+    
     def aggregate_date_data(self, snapshot_date: str) -> Dict:
         """
         For a specific date, aggregate data across all clients.
@@ -218,15 +245,18 @@ class CorrectDashboardCacheService:
             # Bank allocation chart from latest date
             bank_allocation = latest_cache.bank_allocation_data
             
+            # Consolidate to top 5 + Others for better readability
+            consolidated_bank_allocation = self._consolidate_bank_allocation(bank_allocation)
+            
             bank_allocation_chart = {
-                'hasData': bool(bank_allocation),
+                'hasData': bool(consolidated_bank_allocation),
                 'series': [
                     round((value / total_aum) * 100, 2) 
-                    for value in bank_allocation.values()
+                    for value in consolidated_bank_allocation.values()
                 ] if total_aum > 0 else [],
-                'labels': list(bank_allocation.keys()),
-                'monetaryValues': list(bank_allocation.values()),
-                'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658', '#FF8042']
+                'labels': list(consolidated_bank_allocation.keys()),
+                'monetaryValues': list(consolidated_bank_allocation.values()),
+                'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658']
             }
             
             # Portfolio evolution chart (across multiple cached dates)

@@ -813,13 +813,27 @@ class EnhancedReportService:
             allocation[bank_name] += float(position.market_value)
         
         # Return objects with market_value and percentage
-        return {
+        result = {
             k: {
                 'market_value': v, 
                 'percentage': round(v / float(total_value) * 100, 2)
             } 
             for k, v in allocation.items()
         }
+        
+        # Consolidate to top 5 + Others for better readability
+        if len(result) > 5:
+            sorted_banks = sorted(result.items(), key=lambda x: x[1]['market_value'], reverse=True)
+            top_5 = dict(sorted_banks[:5])
+            others_total = sum(data['market_value'] for _, data in sorted_banks[5:])
+            others_pct = sum(data['percentage'] for _, data in sorted_banks[5:])
+            
+            if others_total > 0:
+                top_5['Others'] = {'market_value': others_total, 'percentage': others_pct}
+            
+            return top_5
+        
+        return result
     
     def _group_positions_by_type(self, positions) -> dict:
         """Group positions by asset type with summary stats using normalized asset types."""
