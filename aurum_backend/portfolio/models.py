@@ -367,6 +367,7 @@ class DateAggregatedMetrics(models.Model):
     
     # Pre-computed chart data (to eliminate expensive chart generation)
     asset_allocation_data = models.JSONField(help_text="Aggregated asset allocation for this date")
+    bank_allocation_data = models.JSONField(default=dict, help_text='Aggregated bank allocation for this date')
     
     # Metadata
     last_updated = models.DateTimeField(auto_now=True)

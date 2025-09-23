@@ -33,6 +33,33 @@ class CorrectDashboardCacheService:
     def __init__(self):
         self.logger = logger
     
+    def _consolidate_bank_allocation(self, bank_allocation_data: dict, max_banks: int = 5) -> dict:
+        """
+        Consolidate bank allocation to show top N banks + Others category.
+        
+        Args:
+            bank_allocation_data: Dict of {bank_name: value}
+            max_banks: Number of top banks to show individually (default 5)
+        
+        Returns:
+            Dict with top banks + 'Others' if applicable
+        """
+        if not bank_allocation_data or len(bank_allocation_data) <= max_banks:
+            return bank_allocation_data
+        
+        # Sort by value (descending)
+        sorted_banks = sorted(bank_allocation_data.items(), key=lambda x: x[1], reverse=True)
+        
+        # Take top N banks
+        top_banks = dict(sorted_banks[:max_banks])
+        
+        # Sum remaining banks into "Others"
+        others_total = sum(value for _, value in sorted_banks[max_banks:])
+        if others_total > 0:
+            top_banks['Others'] = others_total
+        
+        return top_banks
+    
     def aggregate_date_data(self, snapshot_date: str) -> Dict:
         """
         For a specific date, aggregate data across all clients.
@@ -67,6 +94,7 @@ class CorrectDashboardCacheService:
             weighted_inception_percent = Decimal('0')
             total_annual_income = Decimal('0')
             asset_allocation_aggregated = {}
+            bank_allocation_aggregated = {}
             client_count = 0
             
             # Aggregate across all clients for this specific date
@@ -96,6 +124,14 @@ class CorrectDashboardCacheService:
                             asset_allocation_aggregated[asset_type] = Decimal('0')
                         asset_allocation_aggregated[asset_type] += Decimal(str(allocation_data['value']))
                 
+                # Aggregate bank allocation
+                client_bank_allocation = metrics.get('bank_allocation', {})
+                for bank_name, allocation_data in client_bank_allocation.items():
+                    if isinstance(allocation_data, dict) and 'value' in allocation_data:
+                        if bank_name not in bank_allocation_aggregated:
+                            bank_allocation_aggregated[bank_name] = Decimal('0')
+                        bank_allocation_aggregated[bank_name] += Decimal(str(allocation_data['value']))
+                
                 client_count += 1
             
             # Calculate final weighted percentage
@@ -117,6 +153,12 @@ class CorrectDashboardCacheService:
                 for asset_type, value in consolidated_allocation.items()
             }
             
+            # Convert bank allocation to regular dict for JSON storage
+            bank_allocation_json = {
+                bank_name: float(value) 
+                for bank_name, value in bank_allocation_aggregated.items()
+            }
+            
             # Store in cache using database transaction for consistency
             with transaction.atomic():
                 cache_entry, created = DateAggregatedMetrics.objects.update_or_create(
@@ -129,6 +171,7 @@ class CorrectDashboardCacheService:
                         'total_annual_income': total_annual_income,
                         'client_count': client_count,
                         'asset_allocation_data': asset_allocation_json,
+                        'bank_allocation_data': bank_allocation_json,
                     }
                 )
             
@@ -197,6 +240,23 @@ class CorrectDashboardCacheService:
                 'labels': list(asset_allocation.keys()),
                 'monetaryValues': list(asset_allocation.values()),
                 'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3']
+            }
+            
+            # Bank allocation chart from latest date
+            bank_allocation = latest_cache.bank_allocation_data
+            
+            # Consolidate to top 5 + Others for better readability
+            consolidated_bank_allocation = self._consolidate_bank_allocation(bank_allocation)
+            
+            bank_allocation_chart = {
+                'hasData': bool(consolidated_bank_allocation),
+                'series': [
+                    round((value / total_aum) * 100, 2) 
+                    for value in consolidated_bank_allocation.values()
+                ] if total_aum > 0 else [],
+                'labels': list(consolidated_bank_allocation.keys()),
+                'monetaryValues': list(consolidated_bank_allocation.values()),
+                'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658']
             }
             
             # Portfolio evolution chart (across multiple cached dates)
@@ -321,6 +381,7 @@ class CorrectDashboardCacheService:
                 'summary': summary,
                 'charts': {
                     'asset_allocation': asset_allocation_chart,
+                    'bank_allocation': bank_allocation_chart,
                     'portfolio_evolution': portfolio_evolution,
                     'cumulative_return': cumulative_return,
                     'portfolio_metrics': portfolio_metrics,

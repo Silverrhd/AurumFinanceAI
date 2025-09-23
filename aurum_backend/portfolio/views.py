@@ -1975,6 +1975,7 @@ def admin_dashboard_data_original(request, client_filter=None):
         total_annual_income = 0
         clients_data = []
         asset_allocation_aggregated = {}
+        bank_allocation_aggregated = {}
         
         # Calculate aggregated metrics from each client
         for client in clients:
@@ -2008,6 +2009,14 @@ def admin_dashboard_data_original(request, client_filter=None):
                             asset_allocation_aggregated[asset_type] = 0
                         asset_allocation_aggregated[asset_type] += float(allocation_data['value'])
                 
+                # Aggregate bank allocation
+                client_bank_allocation = metrics.get('bank_allocation', {})
+                for bank_name, allocation_data in client_bank_allocation.items():
+                    if isinstance(allocation_data, dict) and 'value' in allocation_data:
+                        if bank_name not in bank_allocation_aggregated:
+                            bank_allocation_aggregated[bank_name] = 0
+                        bank_allocation_aggregated[bank_name] += float(allocation_data['value'])
+                
                 clients_data.append({
                     'client_code': client.code,
                     'client_name': client.name,
@@ -2016,6 +2025,7 @@ def admin_dashboard_data_original(request, client_filter=None):
                     'inception_percent': client_inception_percent,
                     'annual_income': client_annual_income,
                     'asset_allocation': client_asset_allocation,
+                    'bank_allocation': client_bank_allocation,
                     'last_updated': latest_snapshot.updated_at.isoformat(),
                     'snapshot_date': latest_snapshot.snapshot_date.isoformat()
                 })
@@ -2192,6 +2202,16 @@ def _generate_single_client_charts(client_code, report_service):
             'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3']
         }
         
+        # 2. Bank Allocation - REUSE existing method
+        bank_allocation_data = report_service._calculate_bank_allocation(positions)
+        bank_allocation_chart = {
+            'hasData': bool(bank_allocation_data),
+            'series': [data['percentage'] for data in bank_allocation_data.values()],
+            'labels': list(bank_allocation_data.keys()),
+            'monetaryValues': [data['market_value'] for data in bank_allocation_data.values()],
+            'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658', '#FF8042']
+        }
+        
         # 2. Portfolio Evolution - REUSE existing method
         portfolio_history = report_service._generate_portfolio_history_chart(client, current_date)
         
@@ -2203,6 +2223,7 @@ def _generate_single_client_charts(client_code, report_service):
         
         return {
             'asset_allocation': asset_allocation_chart,
+            'bank_allocation': bank_allocation_chart,
             'portfolio_evolution': portfolio_history,
             'cumulative_return': cumulative_return,
             'portfolio_metrics': portfolio_metrics
@@ -2649,6 +2670,7 @@ def _generate_multi_client_metrics_comparison(clients_data):
 def _get_empty_chart_data():
     return {
         'asset_allocation': _get_empty_asset_allocation(),
+        'bank_allocation': _get_empty_bank_allocation(),
         'portfolio_evolution': _get_empty_portfolio_evolution(),
         'cumulative_return': _get_empty_cumulative_return(),
         'portfolio_metrics': _get_empty_portfolio_metrics()
@@ -2662,6 +2684,16 @@ def _get_empty_asset_allocation():
         'labels': [],
         'monetaryValues': [],
         'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3']
+    }
+
+
+def _get_empty_bank_allocation():
+    return {
+        'hasData': False,
+        'series': [],
+        'labels': [],
+        'monetaryValues': [],
+        'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658', '#FF8042']
     }
 
 
@@ -2742,6 +2774,7 @@ def client_dashboard_data(request, client_code=None):
             'position_count': metrics.get('position_count', 0),
             'asset_allocation': metrics.get('asset_allocation', {}),
             'custody_allocation': metrics.get('custody_allocation', {}),
+            'bank_allocation': metrics.get('bank_allocation', {}),
             'chart_data': metrics.get('chart_data', {}),
             'last_updated': latest_snapshot.updated_at.isoformat()
         })
