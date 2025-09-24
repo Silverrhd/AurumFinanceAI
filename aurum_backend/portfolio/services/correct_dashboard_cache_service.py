@@ -95,6 +95,7 @@ class CorrectDashboardCacheService:
             total_annual_income = Decimal('0')
             asset_allocation_aggregated = {}
             bank_allocation_aggregated = {}
+            bond_maturity_aggregated = {}
             client_count = 0
             
             # Aggregate across all clients for this specific date
@@ -132,6 +133,14 @@ class CorrectDashboardCacheService:
                             bank_allocation_aggregated[bank_name] = Decimal('0')
                         bank_allocation_aggregated[bank_name] += Decimal(str(allocation_data['value']))
                 
+                # Aggregate bond maturity distribution
+                client_bond_maturity = metrics.get('bond_maturity_distribution', {})
+                for period, allocation_data in client_bond_maturity.items():
+                    if isinstance(allocation_data, dict) and 'value' in allocation_data:
+                        if period not in bond_maturity_aggregated:
+                            bond_maturity_aggregated[period] = Decimal('0')
+                        bond_maturity_aggregated[period] += Decimal(str(allocation_data['value']))
+                
                 client_count += 1
             
             # Calculate final weighted percentage
@@ -159,6 +168,12 @@ class CorrectDashboardCacheService:
                 for bank_name, value in bank_allocation_aggregated.items()
             }
             
+            # Convert bond maturity distribution to regular dict for JSON storage
+            bond_maturity_json = {
+                period: float(value) 
+                for period, value in bond_maturity_aggregated.items()
+            }
+            
             # Store in cache using database transaction for consistency
             with transaction.atomic():
                 cache_entry, created = DateAggregatedMetrics.objects.update_or_create(
@@ -172,6 +187,7 @@ class CorrectDashboardCacheService:
                         'client_count': client_count,
                         'asset_allocation_data': asset_allocation_json,
                         'bank_allocation_data': bank_allocation_json,
+                        'bond_maturity_data': bond_maturity_json,
                     }
                 )
             
@@ -257,6 +273,16 @@ class CorrectDashboardCacheService:
                 'labels': list(consolidated_bank_allocation.keys()),
                 'monetaryValues': list(consolidated_bank_allocation.values()),
                 'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658']
+            }
+            
+            # Bond maturity distribution chart from latest date
+            bond_maturity = latest_cache.bond_maturity_data
+            total_bonds_value = sum(bond_maturity.values()) if bond_maturity else 0
+            
+            bond_maturity_chart = {
+                'hasData': bool(bond_maturity and total_bonds_value > 0),
+                'data': list(bond_maturity.values()) if total_bonds_value > 0 else [],
+                'categories': list(bond_maturity.keys()) if total_bonds_value > 0 else []
             }
             
             # Portfolio evolution chart (across multiple cached dates)
@@ -382,6 +408,7 @@ class CorrectDashboardCacheService:
                 'charts': {
                     'asset_allocation': asset_allocation_chart,
                     'bank_allocation': bank_allocation_chart,
+                    'bond_maturity_distribution': bond_maturity_chart,
                     'portfolio_evolution': portfolio_evolution,
                     'cumulative_return': cumulative_return,
                     'portfolio_metrics': portfolio_metrics,

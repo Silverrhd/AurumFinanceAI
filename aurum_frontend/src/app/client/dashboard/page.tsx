@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { DashboardAssetAllocationChart } from '@/components/charts/DashboardAssetAllocationChart';
 import { DashboardBankAllocationChart } from '@/components/charts/DashboardBankAllocationChart';
+import { DashboardBondMaturityChart } from '@/components/charts/DashboardBondMaturityChart';
 import { DashboardPortfolioValueChart } from '@/components/charts/DashboardPortfolioValueChart';
 import { DashboardCumulativeReturnChart } from '@/components/charts/DashboardCumulativeReturnChart';
 import { DashboardPortfolioMetricsChart } from '@/components/charts/DashboardPortfolioMetricsChart';
@@ -456,13 +457,21 @@ export default function ClientDashboardPage() {
                   </Card>
 
                   <Card className="p-6">
-                    <div className="h-64 flex items-center justify-center text-gray-400">
-                      <div className="text-center">
-                        <div className="text-2xl mb-2">📊</div>
-                        <div className="text-sm">Additional Chart Space</div>
-                        <div className="text-xs opacity-75">Future Enhancement</div>
+                    <CardTitle className="text-lg font-semibold aurum-text-dark mb-4">Bond Maturity Distribution Chart</CardTitle>
+                    {loading ? (
+                      <div className="h-64 flex items-center justify-center text-gray-500">
+                        <div className="flex flex-col items-center">
+                          <div className="loading-spinner mb-2"></div>
+                          <span>Loading chart...</span>
+                        </div>
                       </div>
-                    </div>
+                    ) : chartData?.bond_maturity_distribution ? (
+                      <DashboardBondMaturityChart data={chartData.bond_maturity_distribution} />
+                    ) : (
+                      <div className="h-64 flex items-center justify-center text-gray-500">
+                        Loading chart data...
+                      </div>
+                    )}
                   </Card>
                 </div>
               </TabsContent>

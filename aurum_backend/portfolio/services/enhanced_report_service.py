@@ -677,7 +677,10 @@ class EnhancedReportService:
         # 5. Benchmark Comparison Chart - NEW: Portfolio vs VOO vs AGG
         benchmark_comparison_chart = self._generate_benchmark_comparison_chart(client, current_date)
         
-        # 6. Portfolio Comparison Chart - FIXED with actual 4-metric data
+        # 6. Bond Maturity Distribution Chart - NEW: Same chart as bond maturity report
+        bond_maturity_chart = self._generate_bond_maturity_distribution_chart(positions)
+        
+        # 7. Portfolio Comparison Chart - FIXED with actual 4-metric data
         if comparison_snapshot != current_snapshot:
             # Calculate the 4 required metrics
             current_metrics = self._calculate_enhanced_metrics(current_snapshot)
@@ -737,6 +740,7 @@ class EnhancedReportService:
             'portfolio_history': portfolio_history_chart,
             'cumulative_return': cumulative_return_chart,
             'benchmark_comparison': benchmark_comparison_chart,
+            'bond_maturity_distribution': bond_maturity_chart,
             'portfolio_comparison': portfolio_comparison_chart
         }
     
@@ -1174,6 +1178,65 @@ class EnhancedReportService:
             'benchmark_count': len([s for s in series if 'VOO' in s['name'] or 'AGG' in s['name']])
         }
     
+    def _generate_bond_maturity_distribution_chart(self, positions) -> dict:
+        """Generate exact same chart as bond maturity report."""
+        from datetime import date
+        
+        # Use exact same logic as bond maturity report
+        maturity_periods = {
+            '1_year': {'face_value': 0.0},
+            '2_year': {'face_value': 0.0},
+            '3_year': {'face_value': 0.0},
+            '4_year': {'face_value': 0.0},
+            '5_year': {'face_value': 0.0},
+            '6_plus_year': {'face_value': 0.0}
+        }
+        
+        # Filter bonds (same as bond maturity report)
+        bond_positions = [p for p in positions if 
+                         p.asset.asset_type == 'Fixed Income' and 
+                         p.asset.maturity_date is not None]
+        
+        if not bond_positions:
+            return {'hasData': False, 'message': 'No bonds found'}
+        
+        today = date.today()
+        
+        for position in bond_positions:
+            days_to_maturity = (position.asset.maturity_date - today).days
+            face_value = float(position.quantity)
+            
+            if days_to_maturity <= 365:
+                period = '1_year'
+            elif days_to_maturity <= 730:
+                period = '2_year'
+            elif days_to_maturity <= 1095:
+                period = '3_year'
+            elif days_to_maturity <= 1460:
+                period = '4_year'
+            elif days_to_maturity <= 1825:
+                period = '5_year'
+            else:
+                period = '6_plus_year'
+            
+            maturity_periods[period]['face_value'] += face_value
+        
+        # Return exact same data structure as bond maturity report chart
+        face_values = [
+            maturity_periods['1_year']['face_value'],
+            maturity_periods['2_year']['face_value'],
+            maturity_periods['3_year']['face_value'],
+            maturity_periods['4_year']['face_value'],
+            maturity_periods['5_year']['face_value'],
+            maturity_periods['6_plus_year']['face_value']
+        ]
+        
+        return {
+            'hasData': True,
+            'data': face_values,
+            'categories': ['1 Year', '2 Years', '3 Years', '4 Years', '5 Years', '6+ Years']
+        }
+    
     def _prepare_enhanced_template_context(self, client: Client, current_date: str, 
                                          comparison_date: str, current_metrics: dict, 
                                          comparison_metrics: dict, position_tables: dict,
@@ -1287,6 +1350,7 @@ class EnhancedReportService:
             'custody_allocation_chart': charts_data.get('custody_allocation', {'hasData': False, 'message': 'No data available'}),
             'portfolio_comparison_chart': charts_data.get('portfolio_comparison', {'hasData': False, 'message': 'No data available'}),
             'benchmark_comparison_chart': charts_data.get('benchmark_comparison', {'hasData': False, 'message': 'No data available'}),
+            'bond_maturity_distribution_chart': charts_data.get('bond_maturity_distribution', {'hasData': False, 'message': 'No data available'}),
             
             # Enhanced flags
             'has_bonds': 'bonds' in position_tables,
@@ -1329,6 +1393,7 @@ class EnhancedReportService:
             'cumulative_return_chart': charts_data.get('cumulative_return', {'hasData': False}),
             'portfolio_comparison_chart': charts_data.get('portfolio_comparison', {'hasData': False}),
             'benchmark_comparison_chart': charts_data.get('benchmark_comparison', {'hasData': False}),
+            'bond_maturity_distribution_chart': charts_data.get('bond_maturity_distribution', {'hasData': False}),
             
             # FIXED: Add missing template variables for conditional rendering
             'is_first_report': comparison_date == current_date,

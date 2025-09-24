@@ -55,6 +55,9 @@ class PortfolioCalculationService:
         # Bank allocation
         metrics['bank_allocation'] = self._calculate_bank_allocation(positions, metrics['total_value'])
         
+        # Bond maturity distribution
+        metrics['bond_maturity_distribution'] = self._calculate_bond_maturity_distribution(positions, metrics['total_value'])
+        
         # Annual income calculations
         metrics['estimated_annual_income'] = self._calculate_annual_income(positions)
         
@@ -158,6 +161,59 @@ class PortfolioCalculationService:
                     (allocation[bank_name]['value'] / Decimal(str(total_value))) * 100
                 )
             allocation[bank_name]['value'] = float(allocation[bank_name]['value'])
+        
+        return allocation
+    
+    def _calculate_bond_maturity_distribution(self, positions, total_value: float) -> dict:
+        """Calculate bond maturity distribution by maturity periods (1Y, 2Y, etc.)."""
+        from datetime import date
+        
+        allocation = {
+            '1 Year': {'value': Decimal('0'), 'percentage': 0},
+            '2 Years': {'value': Decimal('0'), 'percentage': 0}, 
+            '3 Years': {'value': Decimal('0'), 'percentage': 0},
+            '4 Years': {'value': Decimal('0'), 'percentage': 0},
+            '5 Years': {'value': Decimal('0'), 'percentage': 0},
+            '6+ Years': {'value': Decimal('0'), 'percentage': 0}
+        }
+        
+        today = date.today()
+        bond_positions = positions.filter(
+            asset__asset_type='Fixed Income',
+            asset__maturity_date__isnull=False
+        )
+        
+        for position in bond_positions:
+            days_to_maturity = (position.asset.maturity_date - today).days
+            face_value = position.quantity  # Use face value like bond maturity report
+            
+            if days_to_maturity <= 365:
+                period = '1 Year'
+            elif days_to_maturity <= 730:
+                period = '2 Years'
+            elif days_to_maturity <= 1095:
+                period = '3 Years'
+            elif days_to_maturity <= 1460:
+                period = '4 Years'
+            elif days_to_maturity <= 1825:
+                period = '5 Years'
+            else:
+                period = '6+ Years'
+                
+            allocation[period]['value'] += face_value
+        
+        # Calculate percentages
+        total_bonds_value = sum(d['value'] for d in allocation.values())
+        if total_bonds_value > 0:
+            for period in allocation:
+                allocation[period]['percentage'] = float(
+                    (allocation[period]['value'] / total_bonds_value) * 100
+                )
+                allocation[period]['value'] = float(allocation[period]['value'])
+        else:
+            # If no bonds, convert Decimal to float for JSON serialization
+            for period in allocation:
+                allocation[period]['value'] = float(allocation[period]['value'])
         
         return allocation
     
