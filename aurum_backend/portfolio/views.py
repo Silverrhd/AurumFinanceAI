@@ -2212,7 +2212,10 @@ def _generate_single_client_charts(client_code, report_service):
             'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658', '#FF8042']
         }
         
-        # 2. Portfolio Evolution - REUSE existing method
+        # 3. Bond Maturity Distribution - REUSE existing method (exact same data format)
+        bond_maturity_chart = report_service._generate_bond_maturity_distribution_chart(positions)
+        
+        # 4. Portfolio Evolution - REUSE existing method
         portfolio_history = report_service._generate_portfolio_history_chart(client, current_date)
         
         # 3. Cumulative Return - REUSE existing method  
@@ -2224,6 +2227,7 @@ def _generate_single_client_charts(client_code, report_service):
         return {
             'asset_allocation': asset_allocation_chart,
             'bank_allocation': bank_allocation_chart,
+            'bond_maturity_distribution': bond_maturity_chart,
             'portfolio_evolution': portfolio_history,
             'cumulative_return': cumulative_return,
             'portfolio_metrics': portfolio_metrics
@@ -2256,7 +2260,25 @@ def _generate_aggregated_charts(clients_data, asset_allocation_aggregated, repor
             'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3']
         }
         
-        # 2. AGGREGATED PORTFOLIO EVOLUTION
+        # 2. AGGREGATED BOND MATURITY DISTRIBUTION
+        # Get from clients_data - aggregate bond maturity across all clients
+        bond_maturity_aggregated = {}
+        for client_data in clients_data:
+            client_bond_maturity = client_data.get('bond_maturity_distribution', {})
+            for period, allocation_data in client_bond_maturity.items():
+                if isinstance(allocation_data, dict) and 'value' in allocation_data:
+                    if period not in bond_maturity_aggregated:
+                        bond_maturity_aggregated[period] = 0
+                    bond_maturity_aggregated[period] += float(allocation_data['value'])
+
+        total_bonds_value = sum(bond_maturity_aggregated.values())
+        bond_maturity_chart = {
+            'hasData': total_bonds_value > 0,
+            'data': list(bond_maturity_aggregated.values()) if total_bonds_value > 0 else [],
+            'categories': list(bond_maturity_aggregated.keys()) if total_bonds_value > 0 else []
+        }
+        
+        # 3. AGGREGATED PORTFOLIO EVOLUTION
         portfolio_evolution = _generate_aggregated_portfolio_evolution(clients_data, report_service)
         
         # 3. AGGREGATED CUMULATIVE RETURN (weighted by AUM)
@@ -2267,6 +2289,7 @@ def _generate_aggregated_charts(clients_data, asset_allocation_aggregated, repor
         
         return {
             'asset_allocation': asset_allocation_chart,
+            'bond_maturity_distribution': bond_maturity_chart,
             'portfolio_evolution': portfolio_evolution,
             'cumulative_return': cumulative_return,
             'portfolio_metrics': portfolio_metrics
@@ -2671,6 +2694,7 @@ def _get_empty_chart_data():
     return {
         'asset_allocation': _get_empty_asset_allocation(),
         'bank_allocation': _get_empty_bank_allocation(),
+        'bond_maturity_distribution': _get_empty_bond_maturity_distribution(),
         'portfolio_evolution': _get_empty_portfolio_evolution(),
         'cumulative_return': _get_empty_cumulative_return(),
         'portfolio_metrics': _get_empty_portfolio_metrics()
@@ -2694,6 +2718,14 @@ def _get_empty_bank_allocation():
         'labels': [],
         'monetaryValues': [],
         'colors': ['#5f76a1', '#072061', '#b7babe', '#dae1f3', '#82CA9D', '#FFC658', '#FF8042']
+    }
+
+
+def _get_empty_bond_maturity_distribution():
+    return {
+        'hasData': False,
+        'data': [],
+        'categories': []
     }
 
 
