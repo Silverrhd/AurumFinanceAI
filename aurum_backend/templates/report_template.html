@@ -1240,6 +1240,20 @@
             </div>
         </section>
         
+        <!-- Bond Maturity Distribution Chart -->
+        <section class="chart-section">
+            <h2>Bond Maturity Distribution</h2>
+            <div class="chart-container">
+                {% if bond_maturity_distribution_chart.hasData %}
+                    <div id="maturityChart" style="height: 350px;"></div>
+                {% else %}
+                    <div class="no-data-message" style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                        {{ bond_maturity_distribution_chart.message }}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        
         <!-- Weekly Comparison Summary Section -->
         {% if not is_first_report and comparison %}
         <section class="comparison-section">
@@ -1959,6 +1973,66 @@
             portfolioComparisonOptions
         );
         portfolioComparisonChart.render();
+        {% endif %}
+
+        // Bond Maturity Distribution Chart (copied from bond_maturity_individual.html)
+        {% if bond_maturity_distribution_chart.hasData %}
+        const chartData = {{ bond_maturity_distribution_chart.data | tojson }};
+        const categories = {{ bond_maturity_distribution_chart.categories | tojson }};
+
+        const options = {
+            series: [{
+                name: 'Face Value',
+                data: chartData
+            }],
+            chart: {
+                type: 'area',
+                height: 350,
+                fontFamily: 'Arial, sans-serif',
+                toolbar: { show: false },
+                animations: { enabled: true, easing: 'easeinout', speed: 800 }
+            },
+            colors: ['#5f76a1'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'light',
+                    type: 'vertical',
+                    shadeIntensity: 0.5,
+                    gradientToColors: ['#a1b8d4'],
+                    opacityFrom: 0.7,
+                    opacityTo: 0.1,
+                    stops: [0, 100]
+                }
+            },
+            stroke: { curve: 'smooth', width: 3 },
+            dataLabels: { enabled: false },
+            grid: {
+                borderColor: '#e0e0e0',
+                strokeDashArray: 3,
+                xaxis: { lines: { show: false } },
+                yaxis: { lines: { show: true } },
+                padding: { left: 20, right: 20 }
+            },
+            xaxis: {
+                categories: categories,
+                labels: { style: { colors: '#666', fontSize: '12px' } }
+            },
+            yaxis: {
+                title: { text: 'Face Value ($)', style: { color: '#666', fontSize: '12px' } },
+                labels: { 
+                    formatter: function(val) { return '$' + val.toLocaleString(); },
+                    style: { colors: '#666', fontSize: '12px' }
+                }
+            },
+            tooltip: {
+                theme: 'light',
+                y: { formatter: function(val) { return '$' + val.toLocaleString(); } }
+            }
+        };
+
+        const chart = new ApexCharts(document.querySelector("#maturityChart"), options);
+        chart.render();
         {% endif %}
 
         // Interactive Bond Maturity Timeline Functionality
