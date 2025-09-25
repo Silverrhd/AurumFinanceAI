@@ -16,10 +16,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
-# Add the project root to Python path
-project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
+# Add the project root to Python path  
+aurum_backend_root = Path(__file__).parent.parent.parent  # Gets to aurum_backend
+sys.path.insert(0, str(aurum_backend_root))
 
+from portfolio.services.mappings_encryption_service import MappingsEncryptionService
 from preprocessing.bank_detector import BankDetector
 from preprocessing.combiners.header_detector import HeaderDetector
 
@@ -47,7 +48,8 @@ class HSBCEnricher:
         logger.info(f"Loading HSBC account mappings from {mappings_file}")
         
         try:
-            df = pd.read_excel(mappings_file, sheet_name='HSBC')
+            encryption_service = MappingsEncryptionService()
+            df = encryption_service.read_encrypted_excel(mappings_file + '.encrypted', sheet_name='HSBC')
             
             # Validate required columns
             required_cols = ['Account Number', 'client', 'account']

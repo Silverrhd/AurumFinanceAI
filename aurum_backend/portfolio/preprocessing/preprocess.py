@@ -121,7 +121,7 @@ class UnifiedPreprocessor:
         )
         
         for file in excel_files:
-            if file.name == "Mappings.xlsx":
+            if file.name == "Mappings.xlsx" or file.name == "Mappings.xlsx.encrypted":
                 file_progress.update(1)
                 continue
                 
@@ -170,7 +170,7 @@ class UnifiedPreprocessor:
         
         # Scan main input_files directory
         for file in input_dir.glob("*.xlsx"):
-            if file.name == "Mappings.xlsx":
+            if file.name == "Mappings.xlsx" or file.name == "Mappings.xlsx.encrypted":
                 continue
             date = BankDetector.extract_date_from_filename(file.name)
             if date:
@@ -644,9 +644,12 @@ class UnifiedPreprocessor:
         mappings_file = None
         if bank_code in banks_needing_mappings:
             mappings_file = input_dir / "Mappings.xlsx"
-            # Check if mappings file exists
-            if not mappings_file.exists():
-                raise FileNotFoundError(f"Required Mappings.xlsx file not found in {input_dir}")
+            # Check for encrypted mappings file first, then regular
+            encrypted_mappings_file = input_dir / "Mappings.xlsx.encrypted"
+            if encrypted_mappings_file.exists():
+                mappings_file = input_dir / "Mappings.xlsx"  # Keep original path for compatibility
+            elif not mappings_file.exists():
+                raise FileNotFoundError(f"Required Mappings.xlsx or Mappings.xlsx.encrypted file not found in {input_dir}")
         
         # Handle IDB special case - process from subdirectory
         if bank_code == 'IDB':
@@ -1192,7 +1195,7 @@ class UnifiedPreprocessor:
             logger.info("   - Safra_transactions_DD_MM_YYYY.xlsx")
             logger.info("   - LO_transactions_DD_MM_YYYY.xlsx")  # Added Lombard
             logger.info("   - Citi_transactions_DD_MM_YYYY.xlsx")
-            logger.info("   - Mappings.xlsx")
+            logger.info("   - Mappings.xlsx (or Mappings.xlsx.encrypted)")
             return False
         
         logger.info(f"📋 Banks ready for processing: {', '.join(discovered_banks.keys())}")

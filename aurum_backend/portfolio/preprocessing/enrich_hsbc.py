@@ -11,11 +11,15 @@ import sys
 import logging
 from pathlib import Path
 
-# Add the project root to Python path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+# Load environment variables from .env file
+from dotenv import load_dotenv
+aurum_backend_root = Path(__file__).parent.parent.parent  # Gets to aurum_backend
+load_dotenv(aurum_backend_root / '.env')
 
-from preprocessing.combiners.hsbc_enricher import HSBCEnricher
+# Add the project root to Python path  
+sys.path.insert(0, str(aurum_backend_root))
+
+from portfolio.preprocessing.combiners.hsbc_enricher import HSBCEnricher
 
 # Configure logging
 logging.basicConfig(
@@ -66,20 +70,29 @@ Examples:
         input_dir = Path(args.input_dir)
         output_dir = Path(args.output_dir)
         
-        # Find Mappings.xlsx file (should be in parent of input directory or input directory itself)
+        # Find Mappings.xlsx or Mappings.xlsx.encrypted file
         mappings_file = None
         for search_path in [input_dir.parent, input_dir, input_dir.parent.parent]:
-            potential_mappings = search_path / "Mappings.xlsx"
-            if potential_mappings.exists():
-                mappings_file = str(potential_mappings)
+            # Check for encrypted version first
+            potential_encrypted = search_path / "Mappings.xlsx.encrypted" 
+            potential_regular = search_path / "Mappings.xlsx"
+            
+            if potential_encrypted.exists():
+                mappings_file = str(search_path / "Mappings.xlsx")  # Keep original path for compatibility
+                break
+            elif potential_regular.exists():
+                mappings_file = str(potential_regular)
                 break
         
         if not mappings_file:
-            logger.error("❌ Could not find Mappings.xlsx file")
+            logger.error("❌ Could not find Mappings.xlsx or Mappings.xlsx.encrypted file")
             logger.error("   Searched in:")
             logger.error(f"   - {input_dir.parent / 'Mappings.xlsx'}")
             logger.error(f"   - {input_dir / 'Mappings.xlsx'}")
             logger.error(f"   - {input_dir.parent.parent / 'Mappings.xlsx'}")
+            logger.error(f"   - {input_dir.parent / 'Mappings.xlsx.encrypted'}")
+            logger.error(f"   - {input_dir / 'Mappings.xlsx.encrypted'}")
+            logger.error(f"   - {input_dir.parent.parent / 'Mappings.xlsx.encrypted'}")
             return 1
         
         logger.info(f"🚀 Starting HSBC enrichment")
