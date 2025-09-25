@@ -2,6 +2,7 @@
 
 import pandas as pd
 import logging
+from portfolio.services.mappings_encryption_service import MappingsEncryptionService
 import os
 import re
 from typing import Dict, Tuple, Optional
@@ -56,7 +57,8 @@ class CitiTransformer:
         logger.info(f"Loading account mappings from {mappings_file}, sheet: {sheet_name}")
         
         try:
-            df = pd.read_excel(mappings_file, sheet_name=sheet_name)
+            encryption_service = MappingsEncryptionService()
+            df = encryption_service.read_encrypted_excel(mappings_file + '.encrypted', sheet_name=sheet_name)
             
             # Validate required columns
             required_cols = ['account number', 'client', 'account', 'account name']
@@ -467,7 +469,7 @@ class CitiTransformer:
             
             # Load mappings if provided
             account_mappings = {}
-            if mappings_file and os.path.exists(mappings_file):
+            if mappings_file:
                 account_mappings = self.load_account_mappings(mappings_file)
             
             # Get column mappings
@@ -595,7 +597,7 @@ class CitiTransformer:
             
             # Load mappings if provided
             account_mappings = {}
-            if mappings_file and os.path.exists(mappings_file):
+            if mappings_file:
                 account_mappings = self.load_account_mappings(mappings_file)
             
             # Get column mappings
@@ -638,7 +640,8 @@ class CitiTransformer:
                         if not mapping_found:
                             # Try to match against transactions_account_number by reloading mappings
                             try:
-                                mappings_df = pd.read_excel(mappings_file, sheet_name='Citi')
+                                encryption_service = MappingsEncryptionService()
+                                mappings_df = encryption_service.read_encrypted_excel(mappings_file + '.encrypted', sheet_name='Citi')
                                 for _, mapping_row in mappings_df.iterrows():
                                     tx_acc_num = mapping_row.get('transactions_account_number')
                                     if pd.notna(tx_acc_num) and str(tx_acc_num).strip() == account_num:

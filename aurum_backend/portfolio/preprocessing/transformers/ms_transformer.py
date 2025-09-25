@@ -2,6 +2,7 @@
 
 import pandas as pd
 import logging
+from portfolio.services.mappings_encryption_service import MappingsEncryptionService
 import os
 import re
 from typing import Dict, Tuple, Optional
@@ -60,7 +61,8 @@ class MorganStanleyTransformer:
         logger.info(f"Loading account mappings from {mappings_file}, sheet: {sheet_name}")
         
         try:
-            df = pd.read_excel(mappings_file, sheet_name=sheet_name)
+            encryption_service = MappingsEncryptionService()
+            df = encryption_service.read_encrypted_excel(mappings_file + '.encrypted', sheet_name=sheet_name)
             
             # Validate required columns
             required_cols = ['account number', 'client', 'account', 'account name']
