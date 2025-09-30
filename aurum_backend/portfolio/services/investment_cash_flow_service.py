@@ -42,7 +42,9 @@ class InvestmentCashFlowService:
             'INTEREST_INCOME': ['Bond Interest Recieved', 'Bond Interest Received'],
             'TAX_FEES': ['Fee On Foreign Dividend   Withheld At The Source', 
                          'Foreign Tax Withheld At   The Source'],
-            'TRADING_SELL': ['Security Redeemed']  # Bond maturity = trading
+            'TRADING_SELL': ['Security Redeemed', 'Sell', 'Sale'],  # Keep old + add new
+            'EXTERNAL_INFLOWS': ['Wire Transfer Credit', 'Deposit'],
+            'EXTERNAL_OUTFLOWS': ['Wire Transfer Debit', 'Withdrawal', 'Wire Out']
         },
         'JB': {
             'OTHER_INCOME': ['Income'],  # General income for JB
@@ -378,6 +380,39 @@ class InvestmentCashFlowService:
         logger.debug(f"Pershing no pattern match: '{transaction_type}' -> '{transaction_type}'")
         return transaction_type.strip()
     
+    def _extract_hsbc_transaction_type(self, transaction_type: str) -> str:
+        """
+        Extract clean transaction type from HSBC bank complex descriptions.
+        
+        HSBC patterns:
+        - "Sell -250000.00000 Parvalue Of Tsrys5668797 At 100.0625" -> "Sell"
+        - "Buy 150000.00000 Parvalue Of Orcl5903544 At 97.0000" -> "Buy"
+        - "Purchase 161 Shares of SPDR Gold Shares @ 308.8199" -> "Purchase"
+        
+        Args:
+            transaction_type: Raw HSBC transaction description
+            
+        Returns:
+            Extracted transaction type
+        """
+        patterns = [
+            (r'^(Sell)\s+[-]?[\d,]+\.?\d*\s+Parvalue\s+Of\s+\w+\s+At\s+[\d.]+', r'\1'),
+            (r'^(Buy)\s+[-]?[\d,]+\.?\d*\s+Parvalue\s+Of\s+\w+\s+At\s+[\d.]+', r'\1'),
+            (r'^(Purchase)\s+[-]?\d+\s+Shares\s+of', r'\1'),
+            (r'^(Sale)\s+[-]?[\d,]+\.?\d*\s+Parvalue\s+Of', r'\1'),
+        ]
+        
+        for pattern, replacement in patterns:
+            match = re.match(pattern, transaction_type, re.IGNORECASE)
+            if match:
+                extracted = match.group(1)
+                logger.debug(f"HSBC extraction: '{transaction_type}' -> '{extracted}'")
+                return extracted
+        
+        # If no pattern matches, return original
+        logger.debug(f"HSBC no pattern match: '{transaction_type}' -> '{transaction_type}'")
+        return transaction_type.strip()
+    
     def _extract_stdsz_transaction_type(self, transaction_type: str) -> str:
         """
         Extract clean transaction type from STDSZ bank complex descriptions.
@@ -463,6 +498,8 @@ class InvestmentCashFlowService:
             transaction_type = self._extract_idb_transaction_type(transaction_type)
         elif bank == 'Pershing' or bank == 'PERSHING':
             transaction_type = self._extract_pershing_transaction_type(transaction_type)
+        elif bank == 'HSBC':
+            transaction_type = self._extract_hsbc_transaction_type(transaction_type)
         elif bank == 'STDSZ':
             transaction_type = self._extract_stdsz_transaction_type(transaction_type)
         
