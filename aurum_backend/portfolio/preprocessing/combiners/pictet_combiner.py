@@ -183,6 +183,104 @@ class PictetCombiner:
         
         return discovered_files
     
+    def _find_securities_header_row(self, file_path: Path, max_search_rows: int = 15) -> int:
+        """
+        Dynamically find header row in Pictet securities file.
+        
+        Args:
+            file_path: Path to securities file
+            max_search_rows: Maximum rows to search for headers
+            
+        Returns:
+            Row index (0-based) where headers are found
+        """
+        logger.debug(f"🔍 Searching for securities headers in: {file_path.name}")
+        
+        try:
+            # Read first N rows without header to search for "Quantity" column
+            df_preview = pd.read_excel(file_path, header=None, nrows=max_search_rows)
+            
+            for row_idx in range(len(df_preview)):
+                row_values = df_preview.iloc[row_idx].astype(str)
+                
+                # Look for "Quantity" column which indicates header row
+                for cell_value in row_values:
+                    if pd.notna(cell_value) and 'Quantity' in str(cell_value):
+                        logger.debug(f"✅ Found securities headers at row {row_idx + 1}")
+                        return row_idx
+            
+            # Fallback to row 9 if no header found
+            logger.warning(f"⚠️ Header detection failed, using fallback row 10 (0-based: 9)")
+            return 9
+            
+        except Exception as e:
+            logger.error(f"❌ Error during header detection: {str(e)}")
+            logger.warning(f"⚠️ Using fallback row 10 (0-based: 9)")
+            return 9
+    
+    def _process_single_securities_file(self, file_path: Path, client: str, account: str) -> pd.DataFrame:
+        """
+        Process single Pictet securities file with dynamic header detection,
+        data filtering, and column renaming.
+        
+        Args:
+            file_path: Path to securities file
+            client: Client code from filename
+            account: Account code from filename
+            
+        Returns:
+            Processed DataFrame with securities data
+        """
+        logger.info(f"  📄 Processing: {client}_{account} -> {file_path.name}")
+        
+        try:
+            # STEP 1: DYNAMIC HEADER DETECTION
+            header_row = self._find_securities_header_row(file_path)
+            
+            # STEP 2: READ WITH DETECTED HEADER
+            logger.debug(f"📖 Reading file with header at row {header_row + 1}")
+            df = pd.read_excel(file_path, header=header_row)
+            
+            if df.empty:
+                logger.warning(f"⚠️ Empty file after reading: {file_path.name}")
+                return pd.DataFrame()
+            
+            logger.debug(f"📊 Loaded {len(df)} total rows from file")
+            
+            # STEP 3: RENAME COLUMN 3 TO "name"
+            if len(df.columns) > 3:
+                old_col_name = df.columns[3]
+                df = df.rename(columns={old_col_name: 'name'})
+                logger.debug(f"📝 Renamed column 3 from '{old_col_name}' to 'name'")
+            else:
+                logger.error(f"❌ File has insufficient columns: {len(df.columns)}")
+                return pd.DataFrame()
+            
+            # STEP 4: FILTER VALID SECURITIES (Col[0]==2 AND name is not NaN)
+            df_securities = df[(df.iloc[:, 0] == 2) & df['name'].notna()].copy()
+            logger.debug(f"🔍 Filtered to {len(df_securities)} valid securities (from {len(df)} total rows)")
+            
+            # STEP 5: REMOVE DISCLAIMER ROWS
+            df_clean = df_securities[
+                ~df_securities.iloc[:, 0].astype(str).str.contains('Data exported from Pictet', na=False)
+            ].copy()
+            
+            if len(df_clean) != len(df_securities):
+                removed = len(df_securities) - len(df_clean)
+                logger.debug(f"🧹 Removed {removed} disclaimer rows")
+            
+            # STEP 6: ADD SYSTEM COLUMNS
+            df_clean.insert(0, 'bank', 'Pictet')
+            df_clean.insert(1, 'client', client)
+            df_clean.insert(2, 'account', account)
+            
+            logger.info(f"  ✅ Processed {len(df_clean)} securities from {client}_{account}")
+            return df_clean
+            
+        except Exception as e:
+            logger.error(f"  ❌ Error processing {file_path.name}: {str(e)}")
+            return pd.DataFrame()
+    
     def combine_securities_files(self, files: List[Dict], output_path: Path) -> bool:
         """
         Combine individual securities files into unified file.
@@ -198,43 +296,29 @@ class PictetCombiner:
             logger.warning("⚠️ No securities files to combine")
             return False
         
-        logger.info(f"🔗 Combining {len(files)} securities files...")
+        logger.info(f"🔗 Combining {len(files)} Pictet securities files...")
         
         combined_data = []
         successful_files = 0
         failed_files = 0
+        total_securities = 0
         
         for file_info in files:
             file_path = file_info['file']
-            bank = file_info['bank']
             client = file_info['client']
             account = file_info['account']
             
-            try:
-                logger.info(f"  📄 Processing: {client}_{account} -> {file_path.name}")
-                
-                # Read the Excel file
-                # TODO: Add specific header detection logic for Pictet securities files
-                df = pd.read_excel(file_path)
-                
-                if df.empty:
-                    logger.warning(f"  ⚠️ Empty file: {file_path.name}")
-                    continue
-                
-                # Add bank, client, account columns at the beginning
-                df.insert(0, 'bank', bank)
-                df.insert(1, 'client', client)
-                df.insert(2, 'account', account)
-                
-                combined_data.append(df)
-                successful_files += 1
-                logger.info(f"  ✅ Added {len(df)} records from {client}_{account}")
-                
-            except Exception as e:
-                logger.error(f"  ❌ Error processing {file_path.name}: {str(e)}")
-                logger.error(f"  💡 Skipping corrupted file and continuing...")
+            # Process single securities file
+            df_processed = self._process_single_securities_file(file_path, client, account)
+            
+            if df_processed.empty:
+                logger.warning(f"  ⚠️ No securities data from: {client}_{account}")
                 failed_files += 1
                 continue
+            
+            combined_data.append(df_processed)
+            successful_files += 1
+            total_securities += len(df_processed)
         
         if not combined_data:
             logger.error("❌ No valid securities data to combine")
@@ -248,7 +332,8 @@ class PictetCombiner:
             final_df.to_excel(output_path, index=False)
             
             logger.info(f"✅ Securities combination completed!")
-            logger.info(f"  📊 Total records: {len(final_df)}")
+            logger.info(f"  📊 Total securities: {total_securities}")
+            logger.info(f"  📁 Total columns: {len(final_df.columns)}")
             logger.info(f"  ✅ Successful files: {successful_files}")
             if failed_files > 0:
                 logger.warning(f"  ❌ Failed files: {failed_files}")

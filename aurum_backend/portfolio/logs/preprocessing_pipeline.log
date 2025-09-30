@@ -2725,3 +2725,7 @@ The information contained on this website is designed solely for your individual
 2025-09-15 12:48:57,880 - portfolio.preprocessing.transformers.stdsz_transformer - INFO - 🏦 STDSZ Transformer initialized (skeleton)
 2025-09-15 12:54:50,794 - portfolio.preprocessing.preprocess - INFO - 🚀 Unified preprocessor initialized
 2025-09-15 12:54:50,795 - portfolio.preprocessing.preprocess - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ
+2025-09-30 15:34:51,488 - portfolio.preprocessing.preprocess - INFO - 🚀 Unified preprocessor initialized
+2025-09-30 15:34:51,489 - portfolio.preprocessing.preprocess - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ, Pictet
+2025-09-30 15:35:58,199 - portfolio.preprocessing.preprocess - INFO - 🚀 Unified preprocessor initialized
+2025-09-30 15:35:58,200 - portfolio.preprocessing.preprocess - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ, Pictet

@@ -214,18 +214,56 @@ class PictetTransformer:
             df: DataFrame containing raw Pictet transactions data
             
         Returns:
-            DataFrame with transformed transactions data
+            DataFrame with transformed transactions data in standard format
         """
-        logger.info("🔄 Transforming transactions data...")
+        logger.info("🔄 Transforming Pictet transactions data...")
         
-        # TODO: Implement Pictet-specific transactions transformation logic
-        # This will be customized based on the actual Pictet Excel structure
+        if df.empty:
+            logger.warning("⚠️ Empty transactions DataFrame provided")
+            return pd.DataFrame(columns=['bank', 'client', 'account', 'date', 'transaction_type', 
+                                       'amount', 'price', 'quantity', 'cusip'])
         
-        # For now, return the dataframe as-is (skeleton implementation)
-        logger.info("ℹ️ Transactions transformation skeleton - returning data as-is")
-        logger.info("🚧 TODO: Implement Pictet-specific transactions transformation logic")
+        logger.info(f"📊 Input: {len(df)} transactions with {len(df.columns)} columns")
         
-        return df.copy()
+        try:
+            # Create output DataFrame with standard columns
+            output_columns = ['bank', 'client', 'account', 'date', 'transaction_type', 
+                            'amount', 'price', 'quantity', 'cusip']
+            result_df = pd.DataFrame()
+            
+            # Step 1: Direct mappings (transfer as-is)
+            logger.debug("📋 Step 1: Direct column mappings")
+            result_df['bank'] = df['bank']
+            result_df['client'] = df['client']
+            result_df['account'] = df['account']
+            result_df['transaction_type'] = df['Order type']
+            result_df['amount'] = df['Amount\n(net)']  # European formatting preserved as-is
+            
+            # Step 2: Date transformation (Timestamp → MM/DD/YYYY)
+            logger.debug("📅 Step 2: Date format transformation")
+            result_df['date'] = df['Value date'].dt.strftime('%m/%d/%Y')
+            
+            # Step 3: Empty columns (system handles these)
+            logger.debug("⭕ Step 3: Setting empty columns")
+            result_df['price'] = None
+            result_df['quantity'] = None  
+            result_df['cusip'] = None
+            
+            # Ensure column order
+            result_df = result_df[output_columns]
+            
+            logger.info(f"✅ Transformation completed: {len(result_df)} transactions")
+            logger.info(f"📊 Output columns: {list(result_df.columns)}")
+            logger.info(f"🔢 Amount format preserved (European): {type(result_df['amount'].iloc[0]) if len(result_df) > 0 else 'N/A'}")
+            
+            return result_df
+            
+        except Exception as e:
+            logger.error(f"❌ Error during transactions transformation: {str(e)}")
+            logger.error(f"💡 Available columns: {list(df.columns)}")
+            # Return empty DataFrame with correct structure on error
+            return pd.DataFrame(columns=['bank', 'client', 'account', 'date', 'transaction_type',
+                                       'amount', 'price', 'quantity', 'cusip'])
     
     def _standardize_date_format(self, date_str: str) -> Optional[str]:
         """
