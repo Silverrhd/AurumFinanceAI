@@ -21,7 +21,10 @@ sys.path.insert(0, str(aurum_backend_root))
 from dotenv import load_dotenv
 load_dotenv(aurum_backend_root / '.env')
 
-from portfolio.services.mappings_encryption_service import MappingsEncryptionService
+try:
+    from portfolio.services.mappings_encryption_service import MappingsEncryptionService
+except ImportError:
+    from services.mappings_encryption_service import MappingsEncryptionService
 from preprocessing.bank_detector import BankDetector
 
 logger = logging.getLogger(__name__)

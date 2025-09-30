@@ -646,7 +646,7 @@ class UnifiedPreprocessor:
         
         # Banks that need mappings file vs those that already have bank/client/account columns
         banks_needing_mappings = ['JPM', 'MS', 'Safra', 'Citi']
-        banks_with_embedded_data = ['CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'LO', 'IDB', 'Banchile', 'STDSZ']
+        banks_with_embedded_data = ['CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'LO', 'IDB', 'Banchile', 'STDSZ', 'Pictet']
         
         mappings_file = None
         if bank_code in banks_needing_mappings:

@@ -15,6 +15,11 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+# Load environment variables
+from dotenv import load_dotenv
+env_path = project_root / '.env'
+load_dotenv(env_path)
+
 from preprocessing.combiners.pictet_combiner import PictetCombiner
 
 # Configure logging

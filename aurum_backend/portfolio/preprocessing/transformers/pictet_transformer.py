@@ -23,209 +23,63 @@ class PictetTransformer:
         self.bank_name = 'Pictet'
         logger.info(f"🏦 Initialized {self.bank_name} transformer")
     
-    def process_files(self, input_dir: Path, date: str) -> Dict[str, Any]:
-        """
-        Main processing method called by UnifiedPreprocessor.
-        
-        Args:
-            input_dir: Directory containing combined Pictet files
-            date: Date string in DD_MM_YYYY format
-            
-        Returns:
-            Dictionary with processing results
-        """
-        logger.info(f"🚀 Starting {self.bank_name} file processing for date: {date}")
-        logger.info(f"📁 Input directory: {input_dir}")
-        
-        results = {
-            'bank': self.bank_name,
-            'date': date,
-            'success': True,
-            'securities_processed': 0,
-            'transactions_processed': 0,
-            'errors': []
-        }
-        
-        try:
-            # Process securities file
-            securities_file = input_dir / f"Pictet_securities_{date}.xlsx"
-            if securities_file.exists():
-                logger.info(f"📄 Processing securities file: {securities_file.name}")
-                securities_result = self._process_securities_file(securities_file, date)
-                results['securities_processed'] = securities_result.get('records_processed', 0)
-                if not securities_result['success']:
-                    results['errors'].extend(securities_result.get('errors', []))
-            else:
-                logger.warning(f"⚠️ Securities file not found: {securities_file}")
-            
-            # Process transactions file
-            transactions_file = input_dir / f"Pictet_transactions_{date}.xlsx"
-            if transactions_file.exists():
-                logger.info(f"💰 Processing transactions file: {transactions_file.name}")
-                transactions_result = self._process_transactions_file(transactions_file, date)
-                results['transactions_processed'] = transactions_result.get('records_processed', 0)
-                if not transactions_result['success']:
-                    results['errors'].extend(transactions_result.get('errors', []))
-            else:
-                logger.warning(f"⚠️ Transactions file not found: {transactions_file}")
-            
-            # Check overall success
-            if results['errors']:
-                results['success'] = False
-                logger.error(f"❌ {self.bank_name} processing completed with {len(results['errors'])} errors")
-            else:
-                logger.info(f"✅ {self.bank_name} processing completed successfully")
-                logger.info(f"  📄 Securities records processed: {results['securities_processed']}")
-                logger.info(f"  💰 Transactions records processed: {results['transactions_processed']}")
-            
-            return results
-            
-        except Exception as e:
-            error_msg = f"Error during {self.bank_name} file processing: {str(e)}"
-            logger.error(f"❌ {error_msg}")
-            results['success'] = False
-            results['errors'].append(error_msg)
-            return results
     
-    def _process_securities_file(self, file_path: Path, date: str) -> Dict[str, Any]:
-        """
-        Process combined securities file.
-        
-        Args:
-            file_path: Path to combined securities file
-            date: Date string in DD_MM_YYYY format
-            
-        Returns:
-            Dictionary with processing results
-        """
-        result = {
-            'success': True,
-            'records_processed': 0,
-            'errors': []
-        }
-        
-        try:
-            logger.info(f"📖 Reading securities file: {file_path.name}")
-            
-            # Read the combined securities file
-            df = pd.read_excel(file_path)
-            
-            if df.empty:
-                logger.warning("⚠️ Securities file is empty")
-                return result
-            
-            logger.info(f"📊 Found {len(df)} securities records")
-            
-            # Transform securities data
-            transformed_df = self.transform_securities(df)
-            
-            # Save transformed file
-            output_path = file_path.parent / f"transformed_Pictet_securities_{date}.xlsx"
-            transformed_df.to_excel(output_path, index=False)
-            
-            result['records_processed'] = len(transformed_df)
-            logger.info(f"✅ Securities transformation completed: {len(transformed_df)} records")
-            logger.info(f"💾 Saved to: {output_path.name}")
-            
-            return result
-            
-        except Exception as e:
-            error_msg = f"Error processing securities file {file_path.name}: {str(e)}"
-            logger.error(f"❌ {error_msg}")
-            result['success'] = False
-            result['errors'].append(error_msg)
-            return result
-    
-    def _process_transactions_file(self, file_path: Path, date: str) -> Dict[str, Any]:
-        """
-        Process combined transactions file.
-        
-        Args:
-            file_path: Path to combined transactions file
-            date: Date string in DD_MM_YYYY format
-            
-        Returns:
-            Dictionary with processing results
-        """
-        result = {
-            'success': True,
-            'records_processed': 0,
-            'errors': []
-        }
-        
-        try:
-            logger.info(f"📖 Reading transactions file: {file_path.name}")
-            
-            # Read the combined transactions file
-            df = pd.read_excel(file_path)
-            
-            if df.empty:
-                logger.warning("⚠️ Transactions file is empty")
-                return result
-            
-            logger.info(f"📊 Found {len(df)} transaction records")
-            
-            # Transform transactions data
-            transformed_df = self.transform_transactions(df)
-            
-            # Save transformed file
-            output_path = file_path.parent / f"transformed_Pictet_transactions_{date}.xlsx"
-            transformed_df.to_excel(output_path, index=False)
-            
-            result['records_processed'] = len(transformed_df)
-            logger.info(f"✅ Transactions transformation completed: {len(transformed_df)} records")
-            logger.info(f"💾 Saved to: {output_path.name}")
-            
-            return result
-            
-        except Exception as e:
-            error_msg = f"Error processing transactions file {file_path.name}: {str(e)}"
-            logger.error(f"❌ {error_msg}")
-            result['success'] = False
-            result['errors'].append(error_msg)
-            return result
-    
-    def transform_securities(self, df: pd.DataFrame) -> pd.DataFrame:
+    def transform_securities(self, securities_file: str) -> pd.DataFrame:
         """
         Transform Pictet securities data to standard format.
         
         Args:
-            df: DataFrame containing raw Pictet securities data
+            securities_file: Path to combined Pictet securities Excel file
             
         Returns:
             DataFrame with transformed securities data
         """
-        logger.info("🔄 Transforming securities data...")
+        logger.info(f"🔄 Transforming Pictet securities file: {securities_file}")
         
-        # TODO: Implement Pictet-specific securities transformation logic
-        # This will be customized based on the actual Pictet Excel structure
-        
-        # For now, return the dataframe as-is (skeleton implementation)
-        logger.info("ℹ️ Securities transformation skeleton - returning data as-is")
-        logger.info("🚧 TODO: Implement Pictet-specific securities transformation logic")
-        
-        return df.copy()
+        try:
+            # Read the combined securities file
+            df = pd.read_excel(securities_file)
+            
+            if df.empty:
+                logger.warning("⚠️ Securities file is empty")
+                return pd.DataFrame()
+            
+            logger.info(f"📊 Loaded {len(df)} securities records")
+            
+            # For now, return the dataframe as-is (skeleton implementation)
+            # TODO: Implement Pictet-specific securities transformation logic when needed
+            logger.info("ℹ️ Securities transformation skeleton - returning data as-is")
+            logger.info(f"✅ Securities transformation completed: {len(df)} records")
+            
+            return df.copy()
+            
+        except Exception as e:
+            logger.error(f"❌ Error transforming securities file {securities_file}: {str(e)}")
+            return pd.DataFrame()
     
-    def transform_transactions(self, df: pd.DataFrame) -> pd.DataFrame:
+    def transform_transactions(self, transactions_file: str) -> pd.DataFrame:
         """
         Transform Pictet transactions data to standard format.
         
         Args:
-            df: DataFrame containing raw Pictet transactions data
+            transactions_file: Path to combined Pictet transactions Excel file
             
         Returns:
             DataFrame with transformed transactions data in standard format
         """
-        logger.info("🔄 Transforming Pictet transactions data...")
-        
-        if df.empty:
-            logger.warning("⚠️ Empty transactions DataFrame provided")
-            return pd.DataFrame(columns=['bank', 'client', 'account', 'date', 'transaction_type', 
-                                       'amount', 'price', 'quantity', 'cusip'])
-        
-        logger.info(f"📊 Input: {len(df)} transactions with {len(df.columns)} columns")
+        logger.info(f"🔄 Transforming Pictet transactions file: {transactions_file}")
         
         try:
+            # Read the combined transactions file
+            df = pd.read_excel(transactions_file)
+            
+            if df.empty:
+                logger.warning("⚠️ Transactions file is empty")
+                return pd.DataFrame(columns=['bank', 'client', 'account', 'date', 'transaction_type', 
+                                           'amount', 'price', 'quantity', 'cusip'])
+            
+            logger.info(f"📊 Loaded {len(df)} transactions with {len(df.columns)} columns")
+            
             # Create output DataFrame with standard columns
             output_columns = ['bank', 'client', 'account', 'date', 'transaction_type', 
                             'amount', 'price', 'quantity', 'cusip']
@@ -254,13 +108,11 @@ class PictetTransformer:
             
             logger.info(f"✅ Transformation completed: {len(result_df)} transactions")
             logger.info(f"📊 Output columns: {list(result_df.columns)}")
-            logger.info(f"🔢 Amount format preserved (European): {type(result_df['amount'].iloc[0]) if len(result_df) > 0 else 'N/A'}")
             
             return result_df
             
         except Exception as e:
-            logger.error(f"❌ Error during transactions transformation: {str(e)}")
-            logger.error(f"💡 Available columns: {list(df.columns)}")
+            logger.error(f"❌ Error transforming transactions file {transactions_file}: {str(e)}")
             # Return empty DataFrame with correct structure on error
             return pd.DataFrame(columns=['bank', 'client', 'account', 'date', 'transaction_type',
                                        'amount', 'price', 'quantity', 'cusip'])
