@@ -3797,3 +3797,776 @@ EUR 6071.66 AT 1.194... | -7250,95
 2025-09-30 16:21:50,824 - __main__ - INFO -   📊 Adding Pictet: 53 securities, 34 transactions
 2025-09-30 16:21:50,824 - __main__ - INFO - ✅ Combined totals: 53 securities, 34 transactions
 2025-09-30 16:21:50,954 - __main__ - INFO - 🎉 All done! Check the output directory for your combined files.
+2025-09-30 16:53:12,071 - __main__ - INFO - 🚀 Unified preprocessor initialized
+2025-09-30 16:53:12,072 - __main__ - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ, Pictet
+2025-09-30 16:53:12,072 - __main__ - INFO - 🚀 Starting unified bank preprocessing...
+2025-09-30 16:53:12,072 - __main__ - INFO - 📁 Input directory: data/excel/input_files
+2025-09-30 16:53:12,072 - __main__ - INFO - 📁 Output directory: data/excel
+2025-09-30 16:53:12,072 - __main__ - INFO - 🎯 Using specified date: 30_09_2025
+2025-09-30 16:53:12,072 - __main__ - INFO - 🔄 Starting pre-processing phase (enrichers + combiners)
+2025-09-30 16:53:12,072 - __main__ - INFO - 🚀 Starting pre-processing phase (enrichers + combiners)
+2025-09-30 16:53:12,072 - __main__ - INFO - 📋 Phase 1: Running Enrichers
+2025-09-30 16:53:12,073 - __main__ - INFO -   ⚠️ HSBC: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:53:12,074 - __main__ - INFO -   ⚠️ Lombard: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:53:12,074 - __main__ - INFO -   ⚠️ Pershing: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:53:12,074 - __main__ - INFO -   ⚠️ IDB: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:53:12,075 - __main__ - INFO -   ⚠️ STDSZ: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:53:12,075 - __main__ - INFO - 📋 Phase 2: Running Combiners
+2025-09-30 16:53:12,075 - __main__ - INFO -   ⚠️ CS: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,075 - __main__ - INFO -   ⚠️ CSC: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,075 - __main__ - INFO -   ⚠️ JB: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,076 - __main__ - INFO -   ⚠️ Valley: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,076 - __main__ - INFO -   ⚠️ Banchile: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,076 - __main__ - INFO -   ⚠️ Pershing: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,076 - __main__ - INFO -   ⚠️ Lombard: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,076 - __main__ - INFO -   ⚠️ IDB: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,076 - __main__ - INFO -   ⚠️ STDSZ: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:53:12,077 - __main__ - INFO -   🔄 Running Pictet combiner...
+2025-09-30 16:53:12,077 - __main__ - INFO -   🔄 Running: python3 portfolio/preprocessing/combine_pictet.py --date 30_09_2025 --input-dir data/excel/input_files/pictet --output-dir data/excel/input_files
+2025-09-30 16:53:13,965 - __main__ - INFO -   ✅ Script completed successfully in 1.9s
+2025-09-30 16:53:13,965 - __main__ - INFO -   ✅ Pictet combination completed
+2025-09-30 16:53:13,965 - __main__ - INFO - 📊 Pre-processing phase summary:
+2025-09-30 16:53:13,966 - __main__ - INFO -   ✅ Successful: 1/15
+2025-09-30 16:53:13,966 - __main__ - INFO -   ⚠️ Skipped: 14
+2025-09-30 16:53:13,966 - __main__ - INFO -   ❌ Errors: 0
+2025-09-30 16:53:13,966 - __main__ - INFO -   📋 Skipped operations:
+2025-09-30 16:53:13,966 - __main__ - INFO -     - HSBC enricher - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - Lombard enricher - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - Pershing enricher - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - IDB enricher - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - STDSZ enricher - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - CS combiner - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - CSC combiner - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - JB combiner - no files for date
+2025-09-30 16:53:13,966 - __main__ - INFO -     - Valley combiner - no files for date
+2025-09-30 16:53:13,967 - __main__ - INFO -     - Banchile combiner - no files for date
+2025-09-30 16:53:13,967 - __main__ - INFO -     - Pershing combiner - no files for date
+2025-09-30 16:53:13,967 - __main__ - INFO -     - Lombard combiner - no files for date
+2025-09-30 16:53:13,967 - __main__ - INFO -     - IDB combiner - no files for date
+2025-09-30 16:53:13,967 - __main__ - INFO -     - STDSZ combiner - no files for date
+2025-09-30 16:53:13,967 - __main__ - INFO - 📊 Pre-processing phase completed:
+2025-09-30 16:53:13,967 - __main__ - INFO -   ✅ Successful operations: 1
+2025-09-30 16:53:13,967 - __main__ - INFO -   ⚠️ Skipped operations: 14
+2025-09-30 16:53:13,967 - __main__ - INFO -   ❌ Failed operations: 0
+2025-09-30 16:53:13,967 - __main__ - INFO - 🔍 Discovering banks ready for main preprocessing...
+2025-09-30 16:53:13,968 - __main__ - INFO - Checking files for bank: JPM
+2025-09-30 16:53:13,968 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,968 - __main__ - INFO - Looking for securities patterns: ['JPM_Securities_30_09_2025.xlsx', 'JPM_securities_30_09_2025.xlsx', 'Jpm_Securities_30_09_2025.xlsx', 'Jpm_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,968 - __main__ - INFO - Looking for transactions patterns: ['JPM_transactions_30_09_2025.xlsx', 'Jpm_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,968 - __main__ - INFO - Checking data/excel/input_files/JPM_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,968 - __main__ - INFO - Checking data/excel/input_files/JPM_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,968 - __main__ - INFO - Checking data/excel/input_files/Jpm_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,969 - __main__ - INFO - Checking data/excel/input_files/Jpm_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,969 - __main__ - INFO - Checking data/excel/input_files/JPM_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,969 - __main__ - INFO - Checking data/excel/input_files/Jpm_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,969 - __main__ - INFO - Final result for JPM: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,969 - __main__ - WARNING - ⚠️ JPM has no files for date 30_09_2025
+2025-09-30 16:53:13,969 - __main__ - INFO - Checking files for bank: MS
+2025-09-30 16:53:13,969 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,969 - __main__ - INFO - Looking for securities patterns: ['MS_Securities_30_09_2025.xlsx', 'MS_securities_30_09_2025.xlsx', 'Ms_Securities_30_09_2025.xlsx', 'Ms_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,970 - __main__ - INFO - Looking for transactions patterns: ['MS_transactions_30_09_2025.xlsx', 'Ms_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,970 - __main__ - INFO - Checking data/excel/input_files/MS_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,970 - __main__ - INFO - Checking data/excel/input_files/MS_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,970 - __main__ - INFO - Checking data/excel/input_files/Ms_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,970 - __main__ - INFO - Checking data/excel/input_files/Ms_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,970 - __main__ - INFO - Checking data/excel/input_files/MS_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,970 - __main__ - INFO - Checking data/excel/input_files/Ms_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,970 - __main__ - INFO - Final result for MS: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,970 - __main__ - WARNING - ⚠️ MS has no files for date 30_09_2025
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking files for bank: CSC
+2025-09-30 16:53:13,971 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,971 - __main__ - INFO - Looking for securities patterns: ['CSC_Securities_30_09_2025.xlsx', 'CSC_securities_30_09_2025.xlsx', 'Csc_Securities_30_09_2025.xlsx', 'Csc_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,971 - __main__ - INFO - Looking for transactions patterns: ['CSC_transactions_30_09_2025.xlsx', 'Csc_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking data/excel/input_files/CSC_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking data/excel/input_files/CSC_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking data/excel/input_files/Csc_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking data/excel/input_files/Csc_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking data/excel/input_files/CSC_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking data/excel/input_files/Csc_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,971 - __main__ - INFO - Final result for CSC: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,971 - __main__ - WARNING - ⚠️ CSC has no files for date 30_09_2025
+2025-09-30 16:53:13,971 - __main__ - INFO - Checking files for bank: Pershing
+2025-09-30 16:53:13,972 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,972 - __main__ - INFO - Looking for securities patterns: ['Pershing_Securities_30_09_2025.xlsx', 'Pershing_securities_30_09_2025.xlsx', 'Pershing_Securities_30_09_2025.xlsx', 'Pershing_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,972 - __main__ - INFO - Looking for transactions patterns: ['Pershing_transactions_30_09_2025.xlsx', 'Pershing_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,972 - __main__ - INFO - Checking data/excel/input_files/Pershing_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,972 - __main__ - INFO - Checking data/excel/input_files/Pershing_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,972 - __main__ - INFO - Checking data/excel/input_files/Pershing_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,972 - __main__ - INFO - Checking data/excel/input_files/Pershing_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,972 - __main__ - INFO - Checking data/excel/input_files/Pershing_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,972 - __main__ - INFO - Checking data/excel/input_files/Pershing_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,972 - __main__ - INFO - Final result for Pershing: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,972 - __main__ - WARNING - ⚠️ Pershing has no files for date 30_09_2025
+2025-09-30 16:53:13,973 - __main__ - INFO - Checking files for bank: CS
+2025-09-30 16:53:13,973 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,973 - __main__ - INFO - Looking for securities patterns: ['CS_Securities_30_09_2025.xlsx', 'CS_securities_30_09_2025.xlsx', 'Cs_Securities_30_09_2025.xlsx', 'Cs_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,973 - __main__ - INFO - Looking for transactions patterns: ['CS_transactions_30_09_2025.xlsx', 'Cs_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,973 - __main__ - INFO - Checking data/excel/input_files/CS_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,973 - __main__ - INFO - Checking data/excel/input_files/CS_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,973 - __main__ - INFO - Checking data/excel/input_files/Cs_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,973 - __main__ - INFO - Checking data/excel/input_files/Cs_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,973 - __main__ - INFO - Checking data/excel/input_files/CS_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,974 - __main__ - INFO - Checking data/excel/input_files/Cs_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,974 - __main__ - INFO - Final result for CS: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,974 - __main__ - WARNING - ⚠️ CS has no files for date 30_09_2025
+2025-09-30 16:53:13,974 - __main__ - INFO - Checking files for bank: JB
+2025-09-30 16:53:13,974 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,974 - __main__ - INFO - Looking for securities patterns: ['JB_Securities_30_09_2025.xlsx', 'JB_securities_30_09_2025.xlsx', 'Jb_Securities_30_09_2025.xlsx', 'Jb_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,974 - __main__ - INFO - Looking for transactions patterns: ['JB_transactions_30_09_2025.xlsx', 'Jb_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,974 - __main__ - INFO - Checking data/excel/input_files/JB_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,974 - __main__ - INFO - Checking data/excel/input_files/JB_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,974 - __main__ - INFO - Checking data/excel/input_files/Jb_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,975 - __main__ - INFO - Checking data/excel/input_files/Jb_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,975 - __main__ - INFO - Checking data/excel/input_files/JB_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,975 - __main__ - INFO - Checking data/excel/input_files/Jb_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,975 - __main__ - INFO - Final result for JB: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,975 - __main__ - WARNING - ⚠️ JB has no files for date 30_09_2025
+2025-09-30 16:53:13,975 - __main__ - INFO - Checking files for bank: HSBC
+2025-09-30 16:53:13,976 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,976 - __main__ - INFO - Looking for securities patterns: ['HSBC_Securities_30_09_2025.xlsx', 'HSBC_securities_30_09_2025.xlsx', 'Hsbc_Securities_30_09_2025.xlsx', 'Hsbc_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,976 - __main__ - INFO - Looking for transactions patterns: ['HSBC_transactions_30_09_2025.xlsx', 'Hsbc_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,976 - __main__ - INFO - Checking data/excel/input_files/HSBC_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,976 - __main__ - INFO - Checking data/excel/input_files/HSBC_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,976 - __main__ - INFO - Checking data/excel/input_files/Hsbc_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,976 - __main__ - INFO - Checking data/excel/input_files/Hsbc_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,976 - __main__ - INFO - Checking data/excel/input_files/HSBC_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,976 - __main__ - INFO - Checking data/excel/input_files/Hsbc_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,976 - __main__ - INFO - Final result for HSBC: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,976 - __main__ - WARNING - ⚠️ HSBC has no files for date 30_09_2025
+2025-09-30 16:53:13,976 - __main__ - INFO - Checking files for bank: Valley
+2025-09-30 16:53:13,976 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,976 - __main__ - INFO - Looking for securities patterns: ['Valley_Securities_30_09_2025.xlsx', 'Valley_securities_30_09_2025.xlsx', 'Valley_Securities_30_09_2025.xlsx', 'Valley_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,977 - __main__ - INFO - Looking for transactions patterns: ['Valley_transactions_30_09_2025.xlsx', 'Valley_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Valley_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Valley_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Valley_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Valley_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Valley_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Valley_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,977 - __main__ - INFO - Final result for Valley: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,977 - __main__ - WARNING - ⚠️ Valley has no files for date 30_09_2025
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking files for bank: Safra
+2025-09-30 16:53:13,977 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,977 - __main__ - INFO - Looking for securities patterns: ['Safra_Securities_30_09_2025.xlsx', 'Safra_securities_30_09_2025.xlsx', 'Safra_Securities_30_09_2025.xlsx', 'Safra_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,977 - __main__ - INFO - Looking for transactions patterns: ['Safra_transactions_30_09_2025.xlsx', 'Safra_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Safra_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,977 - __main__ - INFO - Checking data/excel/input_files/Safra_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/Safra_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/Safra_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/Safra_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/Safra_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Final result for Safra: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,978 - __main__ - WARNING - ⚠️ Safra has no files for date 30_09_2025
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking files for bank: LO
+2025-09-30 16:53:13,978 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,978 - __main__ - INFO - Looking for securities patterns: ['LO_Securities_30_09_2025.xlsx', 'LO_securities_30_09_2025.xlsx', 'Lo_Securities_30_09_2025.xlsx', 'Lo_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,978 - __main__ - INFO - Looking for transactions patterns: ['LO_transactions_30_09_2025.xlsx', 'Lo_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/LO_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/LO_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/Lo_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/Lo_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,978 - __main__ - INFO - Checking data/excel/input_files/LO_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,979 - __main__ - INFO - Checking data/excel/input_files/Lo_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,979 - __main__ - INFO - Final result for LO: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,979 - __main__ - WARNING - ⚠️ LO has no files for date 30_09_2025
+2025-09-30 16:53:13,979 - __main__ - INFO - Checking files for bank: IDB
+2025-09-30 16:53:13,979 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,979 - __main__ - INFO - IDB files found for 30_09_2025: []
+2025-09-30 16:53:13,979 - __main__ - WARNING - ⚠️ IDB has no files for date 30_09_2025
+2025-09-30 16:53:13,979 - __main__ - INFO - Checking files for bank: Banchile
+2025-09-30 16:53:13,979 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,979 - __main__ - INFO - Banchile files found for 30_09_2025: []
+2025-09-30 16:53:13,979 - __main__ - WARNING - ⚠️ Banchile has no files for date 30_09_2025
+2025-09-30 16:53:13,980 - __main__ - INFO - Checking files for bank: ALT
+2025-09-30 16:53:13,980 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,980 - __main__ - INFO - Looking for securities patterns: ['ALT_Securities_30_09_2025.xlsx', 'ALT_securities_30_09_2025.xlsx', 'Alt_Securities_30_09_2025.xlsx', 'Alt_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,980 - __main__ - INFO - Looking for transactions patterns: ['ALT_transactions_30_09_2025.xlsx', 'Alt_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,980 - __main__ - INFO - Checking data/excel/input_files/ALT_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,980 - __main__ - INFO - Checking data/excel/input_files/ALT_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,980 - __main__ - INFO - Checking data/excel/input_files/Alt_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,980 - __main__ - INFO - Checking data/excel/input_files/Alt_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,980 - __main__ - INFO - Checking data/excel/input_files/ALT_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,981 - __main__ - INFO - Checking data/excel/input_files/Alt_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,981 - __main__ - INFO - Final result for ALT: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,981 - __main__ - WARNING - ⚠️ ALT has no files for date 30_09_2025
+2025-09-30 16:53:13,981 - __main__ - INFO - Checking files for bank: Citi
+2025-09-30 16:53:13,981 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,981 - __main__ - INFO - Looking for securities patterns: ['Citi_Securities_30_09_2025.xlsx', 'Citi_securities_30_09_2025.xlsx', 'Citi_Securities_30_09_2025.xlsx', 'Citi_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,981 - __main__ - INFO - Looking for transactions patterns: ['Citi_transactions_30_09_2025.xlsx', 'Citi_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,981 - __main__ - INFO - Checking data/excel/input_files/Citi_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,982 - __main__ - INFO - Checking data/excel/input_files/Citi_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,982 - __main__ - INFO - Checking data/excel/input_files/Citi_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,982 - __main__ - INFO - Checking data/excel/input_files/Citi_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,982 - __main__ - INFO - Checking data/excel/input_files/Citi_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,982 - __main__ - INFO - Checking data/excel/input_files/Citi_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,982 - __main__ - INFO - Final result for Citi: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,982 - __main__ - WARNING - ⚠️ Citi has no files for date 30_09_2025
+2025-09-30 16:53:13,982 - __main__ - INFO - Checking files for bank: STDSZ
+2025-09-30 16:53:13,982 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,983 - __main__ - INFO - Looking for securities patterns: ['STDSZ_Securities_30_09_2025.xlsx', 'STDSZ_securities_30_09_2025.xlsx', 'Stdsz_Securities_30_09_2025.xlsx', 'Stdsz_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,983 - __main__ - INFO - Looking for transactions patterns: ['STDSZ_transactions_30_09_2025.xlsx', 'Stdsz_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,983 - __main__ - INFO - Checking data/excel/input_files/STDSZ_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,983 - __main__ - INFO - Checking data/excel/input_files/STDSZ_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,983 - __main__ - INFO - Checking data/excel/input_files/Stdsz_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,983 - __main__ - INFO - Checking data/excel/input_files/Stdsz_securities_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,983 - __main__ - INFO - Checking data/excel/input_files/STDSZ_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,983 - __main__ - INFO - Checking data/excel/input_files/Stdsz_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:53:13,983 - __main__ - INFO - Final result for STDSZ: securities_exists=False, transactions_exists=False
+2025-09-30 16:53:13,983 - __main__ - WARNING - ⚠️ STDSZ has no files for date 30_09_2025
+2025-09-30 16:53:13,983 - __main__ - INFO - Checking files for bank: Pictet
+2025-09-30 16:53:13,983 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:53:13,984 - __main__ - INFO - Looking for securities patterns: ['Pictet_Securities_30_09_2025.xlsx', 'Pictet_securities_30_09_2025.xlsx', 'Pictet_Securities_30_09_2025.xlsx', 'Pictet_securities_30_09_2025.xlsx']
+2025-09-30 16:53:13,984 - __main__ - INFO - Looking for transactions patterns: ['Pictet_transactions_30_09_2025.xlsx', 'Pictet_transactions_30_09_2025.xlsx']
+2025-09-30 16:53:13,984 - __main__ - INFO - Checking data/excel/input_files/Pictet_Securities_30_09_2025.xlsx: exists
+2025-09-30 16:53:13,984 - __main__ - INFO - Checking data/excel/input_files/Pictet_securities_30_09_2025.xlsx: exists
+2025-09-30 16:53:13,984 - __main__ - INFO - Checking data/excel/input_files/Pictet_Securities_30_09_2025.xlsx: exists
+2025-09-30 16:53:13,984 - __main__ - INFO - Checking data/excel/input_files/Pictet_securities_30_09_2025.xlsx: exists
+2025-09-30 16:53:13,984 - __main__ - INFO - Checking data/excel/input_files/Pictet_transactions_30_09_2025.xlsx: exists
+2025-09-30 16:53:13,984 - __main__ - INFO - Final result for Pictet: securities_exists=True, transactions_exists=True
+2025-09-30 16:53:13,984 - __main__ - INFO - ✅ Pictet has files for date 30_09_2025
+2025-09-30 16:53:13,984 - __main__ - INFO - 📋 Banks ready for processing: Pictet
+2025-09-30 16:53:14,025 - __main__ - INFO -   🔄 Loading Pictet transformer...
+2025-09-30 16:53:14,035 - preprocessing.transformers.pictet_transformer - INFO - 🏦 Initialized Pictet transformer
+2025-09-30 16:53:14,038 - __main__ - INFO -   📄 Processing Pictet securities file: Pictet_Securities_30_09_2025.xlsx
+2025-09-30 16:53:14,039 - preprocessing.transformers.pictet_transformer - INFO - 🔄 Transforming Pictet securities file: data/excel/input_files/Pictet_Securities_30_09_2025.xlsx
+2025-09-30 16:53:14,379 - preprocessing.transformers.pictet_transformer - INFO - 📊 Loaded 53 securities with 78 columns
+2025-09-30 16:53:14,380 - preprocessing.transformers.pictet_transformer - INFO - 📋 Available columns: ['bank', 'client', 'account', 'Unnamed: 0', 'Unnamed: 1', 'Unnamed: 2', 'name', 'Quantity', 'Position\ncurrency', 'Market \nprice', 'Gross unit \ncost', '% G/L gross\non position currency', 'Valuation\n(USD)', '% Total', '% asset\nclass', '% G/L net', '% G/L net\non market', '% G/L net\non currency', 'Accr.\ninterest', 'Pictet\ncode', 'ISIN', 'CUSIP', 'Bloomberg', 'Face\nvalue', 'Coupon\npay\nday', 'Coupon\npay\nfrequency', 'Issue date', 'Probable\nmaturity', "Moody's\nrating", 'SBI®\nComposite-\nRating ', 'Combined\nrating', 'Duration', 'Modified\nduration', 'Weight\nmodified\nduration', 'Yield to\nmaturity', 'Coupon', 'Delta', 'Economic\nvaluation', 'Economic\nvaluation\nweight', 'Marked-to-\nmarket', 'Weighted\nmarked-to-\nmarket', 'Delta\nexposure', 'Delta\nexposure\nweight', 'Liquidity', 'Gamma\nexposure', 'Minimum\nexposure', 'LPP\nexposure', 'Company\nmarket cap\nin company ccy.', 'Company\nmarket cap.\nUSD', 'Security\nmarket cap.\nin security ccy.', 'Security\nmarket cap.\nUSD', 'Cash-flow\nby security', 'Dividend\nyield', 'Last\nprice', 'Actual P/E ratio\n(FY0)', 'Price to\nbook\nratio', 'Issuer', 'Company', 'Bond Issuer Type', 'Risk country', 'Price date', 'Mkt. Price type', 'Subscription\nPeriodicity', 'Subscription\nLimit day', 'No. of days\nbefore NAV for sending\nsubscription orders', 'Subscription\nCalendar/business day', 'Subscription\nBusiness day\ncalcualtion', 'Subscription\nLimit hour', 'Subscription\nSettlement cycle', 'Redemption\nPeriodicity', 'Redemption\nLimit day', 'No. of days\nbefore NAV for sending\nredemption orders', 'Redemption\nCalendar/business day', 'Redemption\nBusiness day\ncalculation', 'Redemption\nLimit hour', 'Redemption\nSettlement cycle', 'ISIN.1', 'Unnamed: 74']
+2025-09-30 16:53:14,380 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 1: Direct column mappings
+2025-09-30 16:53:14,382 - preprocessing.transformers.pictet_transformer - ERROR - ❌ Error transforming securities file data/excel/input_files/Pictet_Securities_30_09_2025.xlsx: 'Valuation(USD)'
+2025-09-30 16:53:14,384 - __main__ - INFO -   ✅ Pictet securities: 0 records processed
+2025-09-30 16:53:14,384 - __main__ - INFO -   📄 Processing Pictet transactions file: Pictet_transactions_30_09_2025.xlsx
+2025-09-30 16:53:14,384 - preprocessing.transformers.pictet_transformer - INFO - 🔄 Transforming Pictet transactions file: data/excel/input_files/Pictet_transactions_30_09_2025.xlsx
+2025-09-30 16:53:14,401 - preprocessing.transformers.pictet_transformer - INFO - 📊 Loaded 34 transactions with 15 columns
+2025-09-30 16:53:14,408 - preprocessing.transformers.pictet_transformer - INFO - ✅ Transformation completed: 34 transactions
+2025-09-30 16:53:14,408 - preprocessing.transformers.pictet_transformer - INFO - 📊 Output columns: ['bank', 'client', 'account', 'date', 'transaction_type', 'amount', 'price', 'quantity', 'cusip']
+2025-09-30 16:53:14,408 - __main__ - INFO -   ✅ Pictet transactions: 34 records processed
+2025-09-30 16:53:14,408 - __main__ - INFO - 🔗 Combining data from all banks...
+2025-09-30 16:53:14,408 - __main__ - INFO -   📊 Adding Pictet: 0 securities, 34 transactions
+2025-09-30 16:53:14,410 - __main__ - INFO - ✅ Combined totals: 0 securities, 34 transactions
+2025-09-30 16:53:14,436 - __main__ - INFO - 🎉 All done! Check the output directory for your combined files.
+2025-09-30 16:54:28,456 - __main__ - INFO - 🚀 Unified preprocessor initialized
+2025-09-30 16:54:28,457 - __main__ - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ, Pictet
+2025-09-30 16:54:28,457 - __main__ - INFO - 🚀 Starting unified bank preprocessing...
+2025-09-30 16:54:28,457 - __main__ - INFO - 📁 Input directory: data/excel/input_files
+2025-09-30 16:54:28,457 - __main__ - INFO - 📁 Output directory: data/excel
+2025-09-30 16:54:28,457 - __main__ - INFO - 🎯 Using specified date: 30_09_2025
+2025-09-30 16:54:28,457 - __main__ - INFO - 🔄 Starting pre-processing phase (enrichers + combiners)
+2025-09-30 16:54:28,457 - __main__ - INFO - 🚀 Starting pre-processing phase (enrichers + combiners)
+2025-09-30 16:54:28,457 - __main__ - INFO - 📋 Phase 1: Running Enrichers
+2025-09-30 16:54:28,458 - __main__ - INFO -   ⚠️ HSBC: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:54:28,459 - __main__ - INFO -   ⚠️ Lombard: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:54:28,459 - __main__ - INFO -   ⚠️ Pershing: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:54:28,460 - __main__ - INFO -   ⚠️ IDB: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:54:28,461 - __main__ - INFO -   ⚠️ STDSZ: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:54:28,461 - __main__ - INFO - 📋 Phase 2: Running Combiners
+2025-09-30 16:54:28,462 - __main__ - INFO -   ⚠️ CS: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,462 - __main__ - INFO -   ⚠️ CSC: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,462 - __main__ - INFO -   ⚠️ JB: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,462 - __main__ - INFO -   ⚠️ Valley: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,462 - __main__ - INFO -   ⚠️ Banchile: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,463 - __main__ - INFO -   ⚠️ Pershing: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,463 - __main__ - INFO -   ⚠️ Lombard: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,463 - __main__ - INFO -   ⚠️ IDB: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,463 - __main__ - INFO -   ⚠️ STDSZ: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:54:28,464 - __main__ - INFO -   🔄 Running Pictet combiner...
+2025-09-30 16:54:28,464 - __main__ - INFO -   🔄 Running: python3 portfolio/preprocessing/combine_pictet.py --date 30_09_2025 --input-dir data/excel/input_files/pictet --output-dir data/excel/input_files
+2025-09-30 16:54:30,096 - __main__ - INFO -   ✅ Script completed successfully in 1.6s
+2025-09-30 16:54:30,097 - __main__ - INFO -   ✅ Pictet combination completed
+2025-09-30 16:54:30,097 - __main__ - INFO - 📊 Pre-processing phase summary:
+2025-09-30 16:54:30,097 - __main__ - INFO -   ✅ Successful: 1/15
+2025-09-30 16:54:30,097 - __main__ - INFO -   ⚠️ Skipped: 14
+2025-09-30 16:54:30,097 - __main__ - INFO -   ❌ Errors: 0
+2025-09-30 16:54:30,097 - __main__ - INFO -   📋 Skipped operations:
+2025-09-30 16:54:30,098 - __main__ - INFO -     - HSBC enricher - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - Lombard enricher - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - Pershing enricher - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - IDB enricher - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - STDSZ enricher - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - CS combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - CSC combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - JB combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - Valley combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - Banchile combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - Pershing combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - Lombard combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - IDB combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO -     - STDSZ combiner - no files for date
+2025-09-30 16:54:30,098 - __main__ - INFO - 📊 Pre-processing phase completed:
+2025-09-30 16:54:30,099 - __main__ - INFO -   ✅ Successful operations: 1
+2025-09-30 16:54:30,099 - __main__ - INFO -   ⚠️ Skipped operations: 14
+2025-09-30 16:54:30,099 - __main__ - INFO -   ❌ Failed operations: 0
+2025-09-30 16:54:30,099 - __main__ - INFO - 🔍 Discovering banks ready for main preprocessing...
+2025-09-30 16:54:30,099 - __main__ - INFO - Checking files for bank: JPM
+2025-09-30 16:54:30,099 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,099 - __main__ - INFO - Looking for securities patterns: ['JPM_Securities_30_09_2025.xlsx', 'JPM_securities_30_09_2025.xlsx', 'Jpm_Securities_30_09_2025.xlsx', 'Jpm_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,099 - __main__ - INFO - Looking for transactions patterns: ['JPM_transactions_30_09_2025.xlsx', 'Jpm_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,099 - __main__ - INFO - Checking data/excel/input_files/JPM_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,099 - __main__ - INFO - Checking data/excel/input_files/JPM_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,100 - __main__ - INFO - Checking data/excel/input_files/Jpm_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,100 - __main__ - INFO - Checking data/excel/input_files/Jpm_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,100 - __main__ - INFO - Checking data/excel/input_files/JPM_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,100 - __main__ - INFO - Checking data/excel/input_files/Jpm_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,100 - __main__ - INFO - Final result for JPM: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,100 - __main__ - WARNING - ⚠️ JPM has no files for date 30_09_2025
+2025-09-30 16:54:30,100 - __main__ - INFO - Checking files for bank: MS
+2025-09-30 16:54:30,100 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,100 - __main__ - INFO - Looking for securities patterns: ['MS_Securities_30_09_2025.xlsx', 'MS_securities_30_09_2025.xlsx', 'Ms_Securities_30_09_2025.xlsx', 'Ms_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,100 - __main__ - INFO - Looking for transactions patterns: ['MS_transactions_30_09_2025.xlsx', 'Ms_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,101 - __main__ - INFO - Checking data/excel/input_files/MS_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,101 - __main__ - INFO - Checking data/excel/input_files/MS_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,101 - __main__ - INFO - Checking data/excel/input_files/Ms_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,101 - __main__ - INFO - Checking data/excel/input_files/Ms_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,101 - __main__ - INFO - Checking data/excel/input_files/MS_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,101 - __main__ - INFO - Checking data/excel/input_files/Ms_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,101 - __main__ - INFO - Final result for MS: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,101 - __main__ - WARNING - ⚠️ MS has no files for date 30_09_2025
+2025-09-30 16:54:30,102 - __main__ - INFO - Checking files for bank: CSC
+2025-09-30 16:54:30,102 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,102 - __main__ - INFO - Looking for securities patterns: ['CSC_Securities_30_09_2025.xlsx', 'CSC_securities_30_09_2025.xlsx', 'Csc_Securities_30_09_2025.xlsx', 'Csc_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,102 - __main__ - INFO - Looking for transactions patterns: ['CSC_transactions_30_09_2025.xlsx', 'Csc_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,102 - __main__ - INFO - Checking data/excel/input_files/CSC_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,102 - __main__ - INFO - Checking data/excel/input_files/CSC_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,102 - __main__ - INFO - Checking data/excel/input_files/Csc_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,102 - __main__ - INFO - Checking data/excel/input_files/Csc_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,102 - __main__ - INFO - Checking data/excel/input_files/CSC_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,102 - __main__ - INFO - Checking data/excel/input_files/Csc_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,102 - __main__ - INFO - Final result for CSC: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,103 - __main__ - WARNING - ⚠️ CSC has no files for date 30_09_2025
+2025-09-30 16:54:30,103 - __main__ - INFO - Checking files for bank: Pershing
+2025-09-30 16:54:30,103 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,103 - __main__ - INFO - Looking for securities patterns: ['Pershing_Securities_30_09_2025.xlsx', 'Pershing_securities_30_09_2025.xlsx', 'Pershing_Securities_30_09_2025.xlsx', 'Pershing_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,103 - __main__ - INFO - Looking for transactions patterns: ['Pershing_transactions_30_09_2025.xlsx', 'Pershing_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,103 - __main__ - INFO - Checking data/excel/input_files/Pershing_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,103 - __main__ - INFO - Checking data/excel/input_files/Pershing_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,103 - __main__ - INFO - Checking data/excel/input_files/Pershing_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,103 - __main__ - INFO - Checking data/excel/input_files/Pershing_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,103 - __main__ - INFO - Checking data/excel/input_files/Pershing_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,104 - __main__ - INFO - Checking data/excel/input_files/Pershing_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,104 - __main__ - INFO - Final result for Pershing: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,104 - __main__ - WARNING - ⚠️ Pershing has no files for date 30_09_2025
+2025-09-30 16:54:30,104 - __main__ - INFO - Checking files for bank: CS
+2025-09-30 16:54:30,104 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,104 - __main__ - INFO - Looking for securities patterns: ['CS_Securities_30_09_2025.xlsx', 'CS_securities_30_09_2025.xlsx', 'Cs_Securities_30_09_2025.xlsx', 'Cs_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,104 - __main__ - INFO - Looking for transactions patterns: ['CS_transactions_30_09_2025.xlsx', 'Cs_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,104 - __main__ - INFO - Checking data/excel/input_files/CS_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,104 - __main__ - INFO - Checking data/excel/input_files/CS_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,104 - __main__ - INFO - Checking data/excel/input_files/Cs_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,104 - __main__ - INFO - Checking data/excel/input_files/Cs_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,105 - __main__ - INFO - Checking data/excel/input_files/CS_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,105 - __main__ - INFO - Checking data/excel/input_files/Cs_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,105 - __main__ - INFO - Final result for CS: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,105 - __main__ - WARNING - ⚠️ CS has no files for date 30_09_2025
+2025-09-30 16:54:30,105 - __main__ - INFO - Checking files for bank: JB
+2025-09-30 16:54:30,105 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,105 - __main__ - INFO - Looking for securities patterns: ['JB_Securities_30_09_2025.xlsx', 'JB_securities_30_09_2025.xlsx', 'Jb_Securities_30_09_2025.xlsx', 'Jb_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,105 - __main__ - INFO - Looking for transactions patterns: ['JB_transactions_30_09_2025.xlsx', 'Jb_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,105 - __main__ - INFO - Checking data/excel/input_files/JB_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,105 - __main__ - INFO - Checking data/excel/input_files/JB_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,106 - __main__ - INFO - Checking data/excel/input_files/Jb_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,106 - __main__ - INFO - Checking data/excel/input_files/Jb_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,106 - __main__ - INFO - Checking data/excel/input_files/JB_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,106 - __main__ - INFO - Checking data/excel/input_files/Jb_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,106 - __main__ - INFO - Final result for JB: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,106 - __main__ - WARNING - ⚠️ JB has no files for date 30_09_2025
+2025-09-30 16:54:30,106 - __main__ - INFO - Checking files for bank: HSBC
+2025-09-30 16:54:30,106 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,106 - __main__ - INFO - Looking for securities patterns: ['HSBC_Securities_30_09_2025.xlsx', 'HSBC_securities_30_09_2025.xlsx', 'Hsbc_Securities_30_09_2025.xlsx', 'Hsbc_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,106 - __main__ - INFO - Looking for transactions patterns: ['HSBC_transactions_30_09_2025.xlsx', 'Hsbc_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,106 - __main__ - INFO - Checking data/excel/input_files/HSBC_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,107 - __main__ - INFO - Checking data/excel/input_files/HSBC_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,107 - __main__ - INFO - Checking data/excel/input_files/Hsbc_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,107 - __main__ - INFO - Checking data/excel/input_files/Hsbc_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,107 - __main__ - INFO - Checking data/excel/input_files/HSBC_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,107 - __main__ - INFO - Checking data/excel/input_files/Hsbc_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,107 - __main__ - INFO - Final result for HSBC: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,107 - __main__ - WARNING - ⚠️ HSBC has no files for date 30_09_2025
+2025-09-30 16:54:30,107 - __main__ - INFO - Checking files for bank: Valley
+2025-09-30 16:54:30,107 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,107 - __main__ - INFO - Looking for securities patterns: ['Valley_Securities_30_09_2025.xlsx', 'Valley_securities_30_09_2025.xlsx', 'Valley_Securities_30_09_2025.xlsx', 'Valley_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,108 - __main__ - INFO - Looking for transactions patterns: ['Valley_transactions_30_09_2025.xlsx', 'Valley_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,108 - __main__ - INFO - Checking data/excel/input_files/Valley_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,108 - __main__ - INFO - Checking data/excel/input_files/Valley_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,108 - __main__ - INFO - Checking data/excel/input_files/Valley_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,108 - __main__ - INFO - Checking data/excel/input_files/Valley_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,108 - __main__ - INFO - Checking data/excel/input_files/Valley_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,108 - __main__ - INFO - Checking data/excel/input_files/Valley_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,108 - __main__ - INFO - Final result for Valley: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,108 - __main__ - WARNING - ⚠️ Valley has no files for date 30_09_2025
+2025-09-30 16:54:30,108 - __main__ - INFO - Checking files for bank: Safra
+2025-09-30 16:54:30,108 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,108 - __main__ - INFO - Looking for securities patterns: ['Safra_Securities_30_09_2025.xlsx', 'Safra_securities_30_09_2025.xlsx', 'Safra_Securities_30_09_2025.xlsx', 'Safra_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,109 - __main__ - INFO - Looking for transactions patterns: ['Safra_transactions_30_09_2025.xlsx', 'Safra_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,109 - __main__ - INFO - Checking data/excel/input_files/Safra_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,109 - __main__ - INFO - Checking data/excel/input_files/Safra_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,109 - __main__ - INFO - Checking data/excel/input_files/Safra_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,109 - __main__ - INFO - Checking data/excel/input_files/Safra_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,109 - __main__ - INFO - Checking data/excel/input_files/Safra_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,109 - __main__ - INFO - Checking data/excel/input_files/Safra_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,109 - __main__ - INFO - Final result for Safra: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,109 - __main__ - WARNING - ⚠️ Safra has no files for date 30_09_2025
+2025-09-30 16:54:30,109 - __main__ - INFO - Checking files for bank: LO
+2025-09-30 16:54:30,110 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,110 - __main__ - INFO - Looking for securities patterns: ['LO_Securities_30_09_2025.xlsx', 'LO_securities_30_09_2025.xlsx', 'Lo_Securities_30_09_2025.xlsx', 'Lo_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,110 - __main__ - INFO - Looking for transactions patterns: ['LO_transactions_30_09_2025.xlsx', 'Lo_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,110 - __main__ - INFO - Checking data/excel/input_files/LO_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,110 - __main__ - INFO - Checking data/excel/input_files/LO_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,110 - __main__ - INFO - Checking data/excel/input_files/Lo_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,110 - __main__ - INFO - Checking data/excel/input_files/Lo_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,110 - __main__ - INFO - Checking data/excel/input_files/LO_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,110 - __main__ - INFO - Checking data/excel/input_files/Lo_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,110 - __main__ - INFO - Final result for LO: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,110 - __main__ - WARNING - ⚠️ LO has no files for date 30_09_2025
+2025-09-30 16:54:30,110 - __main__ - INFO - Checking files for bank: IDB
+2025-09-30 16:54:30,111 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,111 - __main__ - INFO - IDB files found for 30_09_2025: []
+2025-09-30 16:54:30,111 - __main__ - WARNING - ⚠️ IDB has no files for date 30_09_2025
+2025-09-30 16:54:30,111 - __main__ - INFO - Checking files for bank: Banchile
+2025-09-30 16:54:30,111 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,111 - __main__ - INFO - Banchile files found for 30_09_2025: []
+2025-09-30 16:54:30,111 - __main__ - WARNING - ⚠️ Banchile has no files for date 30_09_2025
+2025-09-30 16:54:30,111 - __main__ - INFO - Checking files for bank: ALT
+2025-09-30 16:54:30,111 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,111 - __main__ - INFO - Looking for securities patterns: ['ALT_Securities_30_09_2025.xlsx', 'ALT_securities_30_09_2025.xlsx', 'Alt_Securities_30_09_2025.xlsx', 'Alt_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,111 - __main__ - INFO - Looking for transactions patterns: ['ALT_transactions_30_09_2025.xlsx', 'Alt_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,112 - __main__ - INFO - Checking data/excel/input_files/ALT_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,112 - __main__ - INFO - Checking data/excel/input_files/ALT_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,112 - __main__ - INFO - Checking data/excel/input_files/Alt_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,112 - __main__ - INFO - Checking data/excel/input_files/Alt_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,112 - __main__ - INFO - Checking data/excel/input_files/ALT_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,112 - __main__ - INFO - Checking data/excel/input_files/Alt_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,112 - __main__ - INFO - Final result for ALT: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,112 - __main__ - WARNING - ⚠️ ALT has no files for date 30_09_2025
+2025-09-30 16:54:30,112 - __main__ - INFO - Checking files for bank: Citi
+2025-09-30 16:54:30,112 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,112 - __main__ - INFO - Looking for securities patterns: ['Citi_Securities_30_09_2025.xlsx', 'Citi_securities_30_09_2025.xlsx', 'Citi_Securities_30_09_2025.xlsx', 'Citi_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,112 - __main__ - INFO - Looking for transactions patterns: ['Citi_transactions_30_09_2025.xlsx', 'Citi_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,113 - __main__ - INFO - Checking data/excel/input_files/Citi_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,113 - __main__ - INFO - Checking data/excel/input_files/Citi_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,113 - __main__ - INFO - Checking data/excel/input_files/Citi_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,113 - __main__ - INFO - Checking data/excel/input_files/Citi_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,113 - __main__ - INFO - Checking data/excel/input_files/Citi_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,113 - __main__ - INFO - Checking data/excel/input_files/Citi_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,113 - __main__ - INFO - Final result for Citi: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,113 - __main__ - WARNING - ⚠️ Citi has no files for date 30_09_2025
+2025-09-30 16:54:30,113 - __main__ - INFO - Checking files for bank: STDSZ
+2025-09-30 16:54:30,113 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,113 - __main__ - INFO - Looking for securities patterns: ['STDSZ_Securities_30_09_2025.xlsx', 'STDSZ_securities_30_09_2025.xlsx', 'Stdsz_Securities_30_09_2025.xlsx', 'Stdsz_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,113 - __main__ - INFO - Looking for transactions patterns: ['STDSZ_transactions_30_09_2025.xlsx', 'Stdsz_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking data/excel/input_files/STDSZ_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking data/excel/input_files/STDSZ_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking data/excel/input_files/Stdsz_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking data/excel/input_files/Stdsz_securities_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking data/excel/input_files/STDSZ_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking data/excel/input_files/Stdsz_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:54:30,114 - __main__ - INFO - Final result for STDSZ: securities_exists=False, transactions_exists=False
+2025-09-30 16:54:30,114 - __main__ - WARNING - ⚠️ STDSZ has no files for date 30_09_2025
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking files for bank: Pictet
+2025-09-30 16:54:30,114 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:54:30,114 - __main__ - INFO - Looking for securities patterns: ['Pictet_Securities_30_09_2025.xlsx', 'Pictet_securities_30_09_2025.xlsx', 'Pictet_Securities_30_09_2025.xlsx', 'Pictet_securities_30_09_2025.xlsx']
+2025-09-30 16:54:30,114 - __main__ - INFO - Looking for transactions patterns: ['Pictet_transactions_30_09_2025.xlsx', 'Pictet_transactions_30_09_2025.xlsx']
+2025-09-30 16:54:30,114 - __main__ - INFO - Checking data/excel/input_files/Pictet_Securities_30_09_2025.xlsx: exists
+2025-09-30 16:54:30,115 - __main__ - INFO - Checking data/excel/input_files/Pictet_securities_30_09_2025.xlsx: exists
+2025-09-30 16:54:30,115 - __main__ - INFO - Checking data/excel/input_files/Pictet_Securities_30_09_2025.xlsx: exists
+2025-09-30 16:54:30,115 - __main__ - INFO - Checking data/excel/input_files/Pictet_securities_30_09_2025.xlsx: exists
+2025-09-30 16:54:30,115 - __main__ - INFO - Checking data/excel/input_files/Pictet_transactions_30_09_2025.xlsx: exists
+2025-09-30 16:54:30,115 - __main__ - INFO - Final result for Pictet: securities_exists=True, transactions_exists=True
+2025-09-30 16:54:30,115 - __main__ - INFO - ✅ Pictet has files for date 30_09_2025
+2025-09-30 16:54:30,115 - __main__ - INFO - 📋 Banks ready for processing: Pictet
+2025-09-30 16:54:30,154 - __main__ - INFO -   🔄 Loading Pictet transformer...
+2025-09-30 16:54:30,162 - preprocessing.transformers.pictet_transformer - INFO - 🏦 Initialized Pictet transformer
+2025-09-30 16:54:30,164 - __main__ - INFO -   📄 Processing Pictet securities file: Pictet_Securities_30_09_2025.xlsx
+2025-09-30 16:54:30,164 - preprocessing.transformers.pictet_transformer - INFO - 🔄 Transforming Pictet securities file: data/excel/input_files/Pictet_Securities_30_09_2025.xlsx
+2025-09-30 16:54:30,503 - preprocessing.transformers.pictet_transformer - INFO - 📊 Loaded 53 securities with 78 columns
+2025-09-30 16:54:30,503 - preprocessing.transformers.pictet_transformer - INFO - 📋 Available columns: ['bank', 'client', 'account', 'Unnamed: 0', 'Unnamed: 1', 'Unnamed: 2', 'name', 'Quantity', 'Position\ncurrency', 'Market \nprice', 'Gross unit \ncost', '% G/L gross\non position currency', 'Valuation\n(USD)', '% Total', '% asset\nclass', '% G/L net', '% G/L net\non market', '% G/L net\non currency', 'Accr.\ninterest', 'Pictet\ncode', 'ISIN', 'CUSIP', 'Bloomberg', 'Face\nvalue', 'Coupon\npay\nday', 'Coupon\npay\nfrequency', 'Issue date', 'Probable\nmaturity', "Moody's\nrating", 'SBI®\nComposite-\nRating ', 'Combined\nrating', 'Duration', 'Modified\nduration', 'Weight\nmodified\nduration', 'Yield to\nmaturity', 'Coupon', 'Delta', 'Economic\nvaluation', 'Economic\nvaluation\nweight', 'Marked-to-\nmarket', 'Weighted\nmarked-to-\nmarket', 'Delta\nexposure', 'Delta\nexposure\nweight', 'Liquidity', 'Gamma\nexposure', 'Minimum\nexposure', 'LPP\nexposure', 'Company\nmarket cap\nin company ccy.', 'Company\nmarket cap.\nUSD', 'Security\nmarket cap.\nin security ccy.', 'Security\nmarket cap.\nUSD', 'Cash-flow\nby security', 'Dividend\nyield', 'Last\nprice', 'Actual P/E ratio\n(FY0)', 'Price to\nbook\nratio', 'Issuer', 'Company', 'Bond Issuer Type', 'Risk country', 'Price date', 'Mkt. Price type', 'Subscription\nPeriodicity', 'Subscription\nLimit day', 'No. of days\nbefore NAV for sending\nsubscription orders', 'Subscription\nCalendar/business day', 'Subscription\nBusiness day\ncalcualtion', 'Subscription\nLimit hour', 'Subscription\nSettlement cycle', 'Redemption\nPeriodicity', 'Redemption\nLimit day', 'No. of days\nbefore NAV for sending\nredemption orders', 'Redemption\nCalendar/business day', 'Redemption\nBusiness day\ncalculation', 'Redemption\nLimit hour', 'Redemption\nSettlement cycle', 'ISIN.1', 'Unnamed: 74']
+2025-09-30 16:54:30,504 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 1: Direct column mappings
+2025-09-30 16:54:30,506 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 2: Asset type detection from Bloomberg codes
+2025-09-30 16:54:30,511 - preprocessing.transformers.pictet_transformer - INFO -   📊 Fixed Income: 36 securities
+2025-09-30 16:54:30,511 - preprocessing.transformers.pictet_transformer - INFO -   📊 Equity: 14 securities
+2025-09-30 16:54:30,511 - preprocessing.transformers.pictet_transformer - INFO -   📊 Cash: 2 securities
+2025-09-30 16:54:30,511 - preprocessing.transformers.pictet_transformer - INFO -   📊 Alternatives: 1 securities
+2025-09-30 16:54:30,511 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 3: Bond detection and price processing
+2025-09-30 16:54:30,518 - preprocessing.transformers.pictet_transformer - INFO -   📈 Bonds detected: 36
+2025-09-30 16:54:30,518 - preprocessing.transformers.pictet_transformer - INFO -   📈 Bond prices converted: 36
+2025-09-30 16:54:30,519 - preprocessing.transformers.pictet_transformer - INFO -   📈 Non-bond prices preserved: 17
+2025-09-30 16:54:30,519 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 4: CUSIP/ISIN priority processing
+2025-09-30 16:54:30,521 - preprocessing.transformers.pictet_transformer - INFO -   📊 CUSIP values assigned: 53 (CUSIP priority logic)
+2025-09-30 16:54:30,521 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 5: Maturity date conversion
+2025-09-30 16:54:30,524 - preprocessing.transformers.pictet_transformer - INFO -   📅 Maturity dates converted: 34
+2025-09-30 16:54:30,525 - preprocessing.transformers.pictet_transformer - INFO - ✅ Transformation completed: 53 securities
+2025-09-30 16:54:30,525 - preprocessing.transformers.pictet_transformer - INFO - 📊 Output columns: ['bank', 'client', 'account', 'asset_type', 'name', 'cost_basis', 'market_value', 'quantity', 'price', 'ticker', 'cusip', 'coupon_rate', 'maturity_date']
+2025-09-30 16:54:30,525 - __main__ - INFO -   ✅ Pictet securities: 53 records processed
+2025-09-30 16:54:30,525 - __main__ - INFO -   📄 Processing Pictet transactions file: Pictet_transactions_30_09_2025.xlsx
+2025-09-30 16:54:30,525 - preprocessing.transformers.pictet_transformer - INFO - 🔄 Transforming Pictet transactions file: data/excel/input_files/Pictet_transactions_30_09_2025.xlsx
+2025-09-30 16:54:30,544 - preprocessing.transformers.pictet_transformer - INFO - 📊 Loaded 34 transactions with 15 columns
+2025-09-30 16:54:30,548 - preprocessing.transformers.pictet_transformer - INFO - ✅ Transformation completed: 34 transactions
+2025-09-30 16:54:30,548 - preprocessing.transformers.pictet_transformer - INFO - 📊 Output columns: ['bank', 'client', 'account', 'date', 'transaction_type', 'amount', 'price', 'quantity', 'cusip']
+2025-09-30 16:54:30,548 - __main__ - INFO -   ✅ Pictet transactions: 34 records processed
+2025-09-30 16:54:30,548 - __main__ - INFO - 🔗 Combining data from all banks...
+2025-09-30 16:54:30,548 - __main__ - INFO -   📊 Adding Pictet: 53 securities, 34 transactions
+2025-09-30 16:54:30,549 - __main__ - INFO - ✅ Combined totals: 53 securities, 34 transactions
+2025-09-30 16:54:30,589 - __main__ - INFO - 💾 Created backup: backups/transactions_30_09_2025.backup_20250930_165430.xlsx
+2025-09-30 16:54:30,609 - __main__ - INFO - 🎉 All done! Check the output directory for your combined files.
+2025-09-30 16:59:36,235 - __main__ - INFO - 🚀 Unified preprocessor initialized
+2025-09-30 16:59:36,236 - __main__ - INFO - 📋 Supported banks: JPM, MS, CSC, Pershing, CS, JB, HSBC, Valley, Safra, LO, IDB, Banchile, ALT, Citi, STDSZ, Pictet
+2025-09-30 16:59:36,236 - __main__ - INFO - 🚀 Starting unified bank preprocessing...
+2025-09-30 16:59:36,236 - __main__ - INFO - 📁 Input directory: data/excel/input_files
+2025-09-30 16:59:36,236 - __main__ - INFO - 📁 Output directory: data/excel
+2025-09-30 16:59:36,236 - __main__ - INFO - 🎯 Using specified date: 30_09_2025
+2025-09-30 16:59:36,237 - __main__ - INFO - 🔄 Starting pre-processing phase (enrichers + combiners)
+2025-09-30 16:59:36,237 - __main__ - INFO - 🚀 Starting pre-processing phase (enrichers + combiners)
+2025-09-30 16:59:36,237 - __main__ - INFO - 📋 Phase 1: Running Enrichers
+2025-09-30 16:59:36,238 - __main__ - INFO -   ⚠️ HSBC: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:59:36,238 - __main__ - INFO -   ⚠️ Lombard: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:59:36,238 - __main__ - INFO -   ⚠️ Pershing: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:59:36,238 - __main__ - INFO -   ⚠️ IDB: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:59:36,238 - __main__ - INFO -   ⚠️ STDSZ: No files found for date 30_09_2025, skipping enrichment
+2025-09-30 16:59:36,239 - __main__ - INFO - 📋 Phase 2: Running Combiners
+2025-09-30 16:59:36,239 - __main__ - INFO -   ⚠️ CS: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,239 - __main__ - INFO -   ⚠️ CSC: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,239 - __main__ - INFO -   ⚠️ JB: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,239 - __main__ - INFO -   ⚠️ Valley: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,239 - __main__ - INFO -   ⚠️ Banchile: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,240 - __main__ - INFO -   ⚠️ Pershing: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,240 - __main__ - INFO -   ⚠️ Lombard: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,240 - __main__ - INFO -   ⚠️ IDB: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,240 - __main__ - INFO -   ⚠️ STDSZ: No files found for date 30_09_2025, skipping combination
+2025-09-30 16:59:36,241 - __main__ - INFO -   🔄 Running Pictet combiner...
+2025-09-30 16:59:36,241 - __main__ - INFO -   🔄 Running: python3 portfolio/preprocessing/combine_pictet.py --date 30_09_2025 --input-dir data/excel/input_files/pictet --output-dir data/excel/input_files
+2025-09-30 16:59:37,947 - __main__ - INFO -   ✅ Script completed successfully in 1.7s
+2025-09-30 16:59:37,947 - __main__ - INFO -   ✅ Pictet combination completed
+2025-09-30 16:59:37,948 - __main__ - INFO - 📊 Pre-processing phase summary:
+2025-09-30 16:59:37,948 - __main__ - INFO -   ✅ Successful: 1/15
+2025-09-30 16:59:37,948 - __main__ - INFO -   ⚠️ Skipped: 14
+2025-09-30 16:59:37,948 - __main__ - INFO -   ❌ Errors: 0
+2025-09-30 16:59:37,948 - __main__ - INFO -   📋 Skipped operations:
+2025-09-30 16:59:37,948 - __main__ - INFO -     - HSBC enricher - no files for date
+2025-09-30 16:59:37,949 - __main__ - INFO -     - Lombard enricher - no files for date
+2025-09-30 16:59:37,949 - __main__ - INFO -     - Pershing enricher - no files for date
+2025-09-30 16:59:37,949 - __main__ - INFO -     - IDB enricher - no files for date
+2025-09-30 16:59:37,949 - __main__ - INFO -     - STDSZ enricher - no files for date
+2025-09-30 16:59:37,949 - __main__ - INFO -     - CS combiner - no files for date
+2025-09-30 16:59:37,949 - __main__ - INFO -     - CSC combiner - no files for date
+2025-09-30 16:59:37,949 - __main__ - INFO -     - JB combiner - no files for date
+2025-09-30 16:59:37,950 - __main__ - INFO -     - Valley combiner - no files for date
+2025-09-30 16:59:37,950 - __main__ - INFO -     - Banchile combiner - no files for date
+2025-09-30 16:59:37,950 - __main__ - INFO -     - Pershing combiner - no files for date
+2025-09-30 16:59:37,950 - __main__ - INFO -     - Lombard combiner - no files for date
+2025-09-30 16:59:37,950 - __main__ - INFO -     - IDB combiner - no files for date
+2025-09-30 16:59:37,950 - __main__ - INFO -     - STDSZ combiner - no files for date
+2025-09-30 16:59:37,951 - __main__ - INFO - 📊 Pre-processing phase completed:
+2025-09-30 16:59:37,951 - __main__ - INFO -   ✅ Successful operations: 1
+2025-09-30 16:59:37,951 - __main__ - INFO -   ⚠️ Skipped operations: 14
+2025-09-30 16:59:37,951 - __main__ - INFO -   ❌ Failed operations: 0
+2025-09-30 16:59:37,951 - __main__ - INFO - 🔍 Discovering banks ready for main preprocessing...
+2025-09-30 16:59:37,952 - __main__ - INFO - Checking files for bank: JPM
+2025-09-30 16:59:37,952 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,952 - __main__ - INFO - Looking for securities patterns: ['JPM_Securities_30_09_2025.xlsx', 'JPM_securities_30_09_2025.xlsx', 'Jpm_Securities_30_09_2025.xlsx', 'Jpm_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,952 - __main__ - INFO - Looking for transactions patterns: ['JPM_transactions_30_09_2025.xlsx', 'Jpm_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,953 - __main__ - INFO - Checking data/excel/input_files/JPM_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,953 - __main__ - INFO - Checking data/excel/input_files/JPM_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,953 - __main__ - INFO - Checking data/excel/input_files/Jpm_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,954 - __main__ - INFO - Checking data/excel/input_files/Jpm_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,954 - __main__ - INFO - Checking data/excel/input_files/JPM_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,954 - __main__ - INFO - Checking data/excel/input_files/Jpm_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,955 - __main__ - INFO - Final result for JPM: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,955 - __main__ - WARNING - ⚠️ JPM has no files for date 30_09_2025
+2025-09-30 16:59:37,955 - __main__ - INFO - Checking files for bank: MS
+2025-09-30 16:59:37,955 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,955 - __main__ - INFO - Looking for securities patterns: ['MS_Securities_30_09_2025.xlsx', 'MS_securities_30_09_2025.xlsx', 'Ms_Securities_30_09_2025.xlsx', 'Ms_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,957 - __main__ - INFO - Looking for transactions patterns: ['MS_transactions_30_09_2025.xlsx', 'Ms_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,957 - __main__ - INFO - Checking data/excel/input_files/MS_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,957 - __main__ - INFO - Checking data/excel/input_files/MS_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,958 - __main__ - INFO - Checking data/excel/input_files/Ms_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,958 - __main__ - INFO - Checking data/excel/input_files/Ms_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,958 - __main__ - INFO - Checking data/excel/input_files/MS_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,958 - __main__ - INFO - Checking data/excel/input_files/Ms_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,959 - __main__ - INFO - Final result for MS: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,959 - __main__ - WARNING - ⚠️ MS has no files for date 30_09_2025
+2025-09-30 16:59:37,959 - __main__ - INFO - Checking files for bank: CSC
+2025-09-30 16:59:37,959 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,959 - __main__ - INFO - Looking for securities patterns: ['CSC_Securities_30_09_2025.xlsx', 'CSC_securities_30_09_2025.xlsx', 'Csc_Securities_30_09_2025.xlsx', 'Csc_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,959 - __main__ - INFO - Looking for transactions patterns: ['CSC_transactions_30_09_2025.xlsx', 'Csc_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,959 - __main__ - INFO - Checking data/excel/input_files/CSC_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,960 - __main__ - INFO - Checking data/excel/input_files/CSC_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,960 - __main__ - INFO - Checking data/excel/input_files/Csc_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,960 - __main__ - INFO - Checking data/excel/input_files/Csc_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,960 - __main__ - INFO - Checking data/excel/input_files/CSC_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,960 - __main__ - INFO - Checking data/excel/input_files/Csc_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,960 - __main__ - INFO - Final result for CSC: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,961 - __main__ - WARNING - ⚠️ CSC has no files for date 30_09_2025
+2025-09-30 16:59:37,961 - __main__ - INFO - Checking files for bank: Pershing
+2025-09-30 16:59:37,961 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,961 - __main__ - INFO - Looking for securities patterns: ['Pershing_Securities_30_09_2025.xlsx', 'Pershing_securities_30_09_2025.xlsx', 'Pershing_Securities_30_09_2025.xlsx', 'Pershing_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,961 - __main__ - INFO - Looking for transactions patterns: ['Pershing_transactions_30_09_2025.xlsx', 'Pershing_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,961 - __main__ - INFO - Checking data/excel/input_files/Pershing_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,961 - __main__ - INFO - Checking data/excel/input_files/Pershing_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,961 - __main__ - INFO - Checking data/excel/input_files/Pershing_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,962 - __main__ - INFO - Checking data/excel/input_files/Pershing_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,962 - __main__ - INFO - Checking data/excel/input_files/Pershing_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,962 - __main__ - INFO - Checking data/excel/input_files/Pershing_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,962 - __main__ - INFO - Final result for Pershing: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,963 - __main__ - WARNING - ⚠️ Pershing has no files for date 30_09_2025
+2025-09-30 16:59:37,963 - __main__ - INFO - Checking files for bank: CS
+2025-09-30 16:59:37,963 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,963 - __main__ - INFO - Looking for securities patterns: ['CS_Securities_30_09_2025.xlsx', 'CS_securities_30_09_2025.xlsx', 'Cs_Securities_30_09_2025.xlsx', 'Cs_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,963 - __main__ - INFO - Looking for transactions patterns: ['CS_transactions_30_09_2025.xlsx', 'Cs_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,963 - __main__ - INFO - Checking data/excel/input_files/CS_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,963 - __main__ - INFO - Checking data/excel/input_files/CS_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,964 - __main__ - INFO - Checking data/excel/input_files/Cs_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,964 - __main__ - INFO - Checking data/excel/input_files/Cs_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,964 - __main__ - INFO - Checking data/excel/input_files/CS_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,964 - __main__ - INFO - Checking data/excel/input_files/Cs_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,964 - __main__ - INFO - Final result for CS: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,964 - __main__ - WARNING - ⚠️ CS has no files for date 30_09_2025
+2025-09-30 16:59:37,964 - __main__ - INFO - Checking files for bank: JB
+2025-09-30 16:59:37,965 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,965 - __main__ - INFO - Looking for securities patterns: ['JB_Securities_30_09_2025.xlsx', 'JB_securities_30_09_2025.xlsx', 'Jb_Securities_30_09_2025.xlsx', 'Jb_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,965 - __main__ - INFO - Looking for transactions patterns: ['JB_transactions_30_09_2025.xlsx', 'Jb_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,965 - __main__ - INFO - Checking data/excel/input_files/JB_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,965 - __main__ - INFO - Checking data/excel/input_files/JB_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,965 - __main__ - INFO - Checking data/excel/input_files/Jb_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,966 - __main__ - INFO - Checking data/excel/input_files/Jb_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,966 - __main__ - INFO - Checking data/excel/input_files/JB_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,966 - __main__ - INFO - Checking data/excel/input_files/Jb_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,966 - __main__ - INFO - Final result for JB: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,966 - __main__ - WARNING - ⚠️ JB has no files for date 30_09_2025
+2025-09-30 16:59:37,967 - __main__ - INFO - Checking files for bank: HSBC
+2025-09-30 16:59:37,967 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,967 - __main__ - INFO - Looking for securities patterns: ['HSBC_Securities_30_09_2025.xlsx', 'HSBC_securities_30_09_2025.xlsx', 'Hsbc_Securities_30_09_2025.xlsx', 'Hsbc_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,967 - __main__ - INFO - Looking for transactions patterns: ['HSBC_transactions_30_09_2025.xlsx', 'Hsbc_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,967 - __main__ - INFO - Checking data/excel/input_files/HSBC_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,967 - __main__ - INFO - Checking data/excel/input_files/HSBC_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,967 - __main__ - INFO - Checking data/excel/input_files/Hsbc_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,968 - __main__ - INFO - Checking data/excel/input_files/Hsbc_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,968 - __main__ - INFO - Checking data/excel/input_files/HSBC_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,968 - __main__ - INFO - Checking data/excel/input_files/Hsbc_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,968 - __main__ - INFO - Final result for HSBC: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,968 - __main__ - WARNING - ⚠️ HSBC has no files for date 30_09_2025
+2025-09-30 16:59:37,968 - __main__ - INFO - Checking files for bank: Valley
+2025-09-30 16:59:37,969 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,969 - __main__ - INFO - Looking for securities patterns: ['Valley_Securities_30_09_2025.xlsx', 'Valley_securities_30_09_2025.xlsx', 'Valley_Securities_30_09_2025.xlsx', 'Valley_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,969 - __main__ - INFO - Looking for transactions patterns: ['Valley_transactions_30_09_2025.xlsx', 'Valley_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,969 - __main__ - INFO - Checking data/excel/input_files/Valley_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,969 - __main__ - INFO - Checking data/excel/input_files/Valley_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,969 - __main__ - INFO - Checking data/excel/input_files/Valley_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,970 - __main__ - INFO - Checking data/excel/input_files/Valley_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,970 - __main__ - INFO - Checking data/excel/input_files/Valley_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,970 - __main__ - INFO - Checking data/excel/input_files/Valley_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,970 - __main__ - INFO - Final result for Valley: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,970 - __main__ - WARNING - ⚠️ Valley has no files for date 30_09_2025
+2025-09-30 16:59:37,971 - __main__ - INFO - Checking files for bank: Safra
+2025-09-30 16:59:37,971 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,971 - __main__ - INFO - Looking for securities patterns: ['Safra_Securities_30_09_2025.xlsx', 'Safra_securities_30_09_2025.xlsx', 'Safra_Securities_30_09_2025.xlsx', 'Safra_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,971 - __main__ - INFO - Looking for transactions patterns: ['Safra_transactions_30_09_2025.xlsx', 'Safra_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,972 - __main__ - INFO - Checking data/excel/input_files/Safra_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,972 - __main__ - INFO - Checking data/excel/input_files/Safra_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,972 - __main__ - INFO - Checking data/excel/input_files/Safra_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,972 - __main__ - INFO - Checking data/excel/input_files/Safra_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,972 - __main__ - INFO - Checking data/excel/input_files/Safra_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,973 - __main__ - INFO - Checking data/excel/input_files/Safra_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,973 - __main__ - INFO - Final result for Safra: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,973 - __main__ - WARNING - ⚠️ Safra has no files for date 30_09_2025
+2025-09-30 16:59:37,973 - __main__ - INFO - Checking files for bank: LO
+2025-09-30 16:59:37,973 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,973 - __main__ - INFO - Looking for securities patterns: ['LO_Securities_30_09_2025.xlsx', 'LO_securities_30_09_2025.xlsx', 'Lo_Securities_30_09_2025.xlsx', 'Lo_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,973 - __main__ - INFO - Looking for transactions patterns: ['LO_transactions_30_09_2025.xlsx', 'Lo_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,974 - __main__ - INFO - Checking data/excel/input_files/LO_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,974 - __main__ - INFO - Checking data/excel/input_files/LO_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,974 - __main__ - INFO - Checking data/excel/input_files/Lo_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,974 - __main__ - INFO - Checking data/excel/input_files/Lo_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,974 - __main__ - INFO - Checking data/excel/input_files/LO_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,974 - __main__ - INFO - Checking data/excel/input_files/Lo_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,975 - __main__ - INFO - Final result for LO: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,975 - __main__ - WARNING - ⚠️ LO has no files for date 30_09_2025
+2025-09-30 16:59:37,975 - __main__ - INFO - Checking files for bank: IDB
+2025-09-30 16:59:37,975 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,975 - __main__ - INFO - IDB files found for 30_09_2025: []
+2025-09-30 16:59:37,976 - __main__ - WARNING - ⚠️ IDB has no files for date 30_09_2025
+2025-09-30 16:59:37,976 - __main__ - INFO - Checking files for bank: Banchile
+2025-09-30 16:59:37,976 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,976 - __main__ - INFO - Banchile files found for 30_09_2025: []
+2025-09-30 16:59:37,976 - __main__ - WARNING - ⚠️ Banchile has no files for date 30_09_2025
+2025-09-30 16:59:37,976 - __main__ - INFO - Checking files for bank: ALT
+2025-09-30 16:59:37,977 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,977 - __main__ - INFO - Looking for securities patterns: ['ALT_Securities_30_09_2025.xlsx', 'ALT_securities_30_09_2025.xlsx', 'Alt_Securities_30_09_2025.xlsx', 'Alt_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,977 - __main__ - INFO - Looking for transactions patterns: ['ALT_transactions_30_09_2025.xlsx', 'Alt_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,977 - __main__ - INFO - Checking data/excel/input_files/ALT_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,977 - __main__ - INFO - Checking data/excel/input_files/ALT_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,977 - __main__ - INFO - Checking data/excel/input_files/Alt_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,977 - __main__ - INFO - Checking data/excel/input_files/Alt_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,977 - __main__ - INFO - Checking data/excel/input_files/ALT_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,978 - __main__ - INFO - Checking data/excel/input_files/Alt_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,978 - __main__ - INFO - Final result for ALT: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,978 - __main__ - WARNING - ⚠️ ALT has no files for date 30_09_2025
+2025-09-30 16:59:37,978 - __main__ - INFO - Checking files for bank: Citi
+2025-09-30 16:59:37,978 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,978 - __main__ - INFO - Looking for securities patterns: ['Citi_Securities_30_09_2025.xlsx', 'Citi_securities_30_09_2025.xlsx', 'Citi_Securities_30_09_2025.xlsx', 'Citi_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,979 - __main__ - INFO - Looking for transactions patterns: ['Citi_transactions_30_09_2025.xlsx', 'Citi_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,979 - __main__ - INFO - Checking data/excel/input_files/Citi_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,979 - __main__ - INFO - Checking data/excel/input_files/Citi_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,979 - __main__ - INFO - Checking data/excel/input_files/Citi_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,979 - __main__ - INFO - Checking data/excel/input_files/Citi_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,979 - __main__ - INFO - Checking data/excel/input_files/Citi_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,979 - __main__ - INFO - Checking data/excel/input_files/Citi_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,980 - __main__ - INFO - Final result for Citi: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,980 - __main__ - WARNING - ⚠️ Citi has no files for date 30_09_2025
+2025-09-30 16:59:37,980 - __main__ - INFO - Checking files for bank: STDSZ
+2025-09-30 16:59:37,980 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,980 - __main__ - INFO - Looking for securities patterns: ['STDSZ_Securities_30_09_2025.xlsx', 'STDSZ_securities_30_09_2025.xlsx', 'Stdsz_Securities_30_09_2025.xlsx', 'Stdsz_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,980 - __main__ - INFO - Looking for transactions patterns: ['STDSZ_transactions_30_09_2025.xlsx', 'Stdsz_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,980 - __main__ - INFO - Checking data/excel/input_files/STDSZ_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,981 - __main__ - INFO - Checking data/excel/input_files/STDSZ_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,981 - __main__ - INFO - Checking data/excel/input_files/Stdsz_Securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,981 - __main__ - INFO - Checking data/excel/input_files/Stdsz_securities_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,981 - __main__ - INFO - Checking data/excel/input_files/STDSZ_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,981 - __main__ - INFO - Checking data/excel/input_files/Stdsz_transactions_30_09_2025.xlsx: not found
+2025-09-30 16:59:37,981 - __main__ - INFO - Final result for STDSZ: securities_exists=False, transactions_exists=False
+2025-09-30 16:59:37,981 - __main__ - WARNING - ⚠️ STDSZ has no files for date 30_09_2025
+2025-09-30 16:59:37,982 - __main__ - INFO - Checking files for bank: Pictet
+2025-09-30 16:59:37,982 - __main__ - INFO - Input directory: data/excel/input_files
+2025-09-30 16:59:37,982 - __main__ - INFO - Looking for securities patterns: ['Pictet_Securities_30_09_2025.xlsx', 'Pictet_securities_30_09_2025.xlsx', 'Pictet_Securities_30_09_2025.xlsx', 'Pictet_securities_30_09_2025.xlsx']
+2025-09-30 16:59:37,982 - __main__ - INFO - Looking for transactions patterns: ['Pictet_transactions_30_09_2025.xlsx', 'Pictet_transactions_30_09_2025.xlsx']
+2025-09-30 16:59:37,982 - __main__ - INFO - Checking data/excel/input_files/Pictet_Securities_30_09_2025.xlsx: exists
+2025-09-30 16:59:37,982 - __main__ - INFO - Checking data/excel/input_files/Pictet_securities_30_09_2025.xlsx: exists
+2025-09-30 16:59:37,982 - __main__ - INFO - Checking data/excel/input_files/Pictet_Securities_30_09_2025.xlsx: exists
+2025-09-30 16:59:37,982 - __main__ - INFO - Checking data/excel/input_files/Pictet_securities_30_09_2025.xlsx: exists
+2025-09-30 16:59:37,983 - __main__ - INFO - Checking data/excel/input_files/Pictet_transactions_30_09_2025.xlsx: exists
+2025-09-30 16:59:37,983 - __main__ - INFO - Final result for Pictet: securities_exists=True, transactions_exists=True
+2025-09-30 16:59:37,983 - __main__ - INFO - ✅ Pictet has files for date 30_09_2025
+2025-09-30 16:59:37,983 - __main__ - INFO - 📋 Banks ready for processing: Pictet
+2025-09-30 16:59:38,014 - __main__ - INFO -   🔄 Loading Pictet transformer...
+2025-09-30 16:59:38,022 - preprocessing.transformers.pictet_transformer - INFO - 🏦 Initialized Pictet transformer
+2025-09-30 16:59:38,025 - __main__ - INFO -   📄 Processing Pictet securities file: Pictet_Securities_30_09_2025.xlsx
+2025-09-30 16:59:38,025 - preprocessing.transformers.pictet_transformer - INFO - 🔄 Transforming Pictet securities file: data/excel/input_files/Pictet_Securities_30_09_2025.xlsx
+2025-09-30 16:59:38,292 - preprocessing.transformers.pictet_transformer - INFO - 📊 Loaded 53 securities with 78 columns
+2025-09-30 16:59:38,292 - preprocessing.transformers.pictet_transformer - INFO - 📋 Available columns: ['bank', 'client', 'account', 'Unnamed: 0', 'Unnamed: 1', 'Unnamed: 2', 'name', 'Quantity', 'Position\ncurrency', 'Market \nprice', 'Gross unit \ncost', '% G/L gross\non position currency', 'Valuation\n(USD)', '% Total', '% asset\nclass', '% G/L net', '% G/L net\non market', '% G/L net\non currency', 'Accr.\ninterest', 'Pictet\ncode', 'ISIN', 'CUSIP', 'Bloomberg', 'Face\nvalue', 'Coupon\npay\nday', 'Coupon\npay\nfrequency', 'Issue date', 'Probable\nmaturity', "Moody's\nrating", 'SBI®\nComposite-\nRating ', 'Combined\nrating', 'Duration', 'Modified\nduration', 'Weight\nmodified\nduration', 'Yield to\nmaturity', 'Coupon', 'Delta', 'Economic\nvaluation', 'Economic\nvaluation\nweight', 'Marked-to-\nmarket', 'Weighted\nmarked-to-\nmarket', 'Delta\nexposure', 'Delta\nexposure\nweight', 'Liquidity', 'Gamma\nexposure', 'Minimum\nexposure', 'LPP\nexposure', 'Company\nmarket cap\nin company ccy.', 'Company\nmarket cap.\nUSD', 'Security\nmarket cap.\nin security ccy.', 'Security\nmarket cap.\nUSD', 'Cash-flow\nby security', 'Dividend\nyield', 'Last\nprice', 'Actual P/E ratio\n(FY0)', 'Price to\nbook\nratio', 'Issuer', 'Company', 'Bond Issuer Type', 'Risk country', 'Price date', 'Mkt. Price type', 'Subscription\nPeriodicity', 'Subscription\nLimit day', 'No. of days\nbefore NAV for sending\nsubscription orders', 'Subscription\nCalendar/business day', 'Subscription\nBusiness day\ncalcualtion', 'Subscription\nLimit hour', 'Subscription\nSettlement cycle', 'Redemption\nPeriodicity', 'Redemption\nLimit day', 'No. of days\nbefore NAV for sending\nredemption orders', 'Redemption\nCalendar/business day', 'Redemption\nBusiness day\ncalculation', 'Redemption\nLimit hour', 'Redemption\nSettlement cycle', 'ISIN.1', 'Unnamed: 74']
+2025-09-30 16:59:38,292 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 1: Direct column mappings
+2025-09-30 16:59:38,295 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 2: Asset type detection from Bloomberg codes
+2025-09-30 16:59:38,297 - preprocessing.transformers.pictet_transformer - INFO -   📊 Fixed Income: 36 securities
+2025-09-30 16:59:38,297 - preprocessing.transformers.pictet_transformer - INFO -   📊 Equity: 14 securities
+2025-09-30 16:59:38,297 - preprocessing.transformers.pictet_transformer - INFO -   📊 Cash: 2 securities
+2025-09-30 16:59:38,297 - preprocessing.transformers.pictet_transformer - INFO -   📊 Alternatives: 1 securities
+2025-09-30 16:59:38,297 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 3: Bond detection and price processing
+2025-09-30 16:59:38,304 - preprocessing.transformers.pictet_transformer - INFO -   📈 Bonds detected: 36
+2025-09-30 16:59:38,304 - preprocessing.transformers.pictet_transformer - INFO -   📈 Bond prices converted: 36
+2025-09-30 16:59:38,304 - preprocessing.transformers.pictet_transformer - INFO -   📈 Non-bond prices preserved: 17
+2025-09-30 16:59:38,304 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 4: CUSIP/ISIN priority processing
+2025-09-30 16:59:38,312 - preprocessing.transformers.pictet_transformer - INFO -   📊 CUSIP values used: 34
+2025-09-30 16:59:38,312 - preprocessing.transformers.pictet_transformer - INFO -   📊 ISIN values used (fallback): 19
+2025-09-30 16:59:38,312 - preprocessing.transformers.pictet_transformer - INFO -   📊 None/empty values: 0
+2025-09-30 16:59:38,312 - preprocessing.transformers.pictet_transformer - INFO -   📊 Total values assigned: 53
+2025-09-30 16:59:38,312 - preprocessing.transformers.pictet_transformer - INFO - 📋 Step 5: Maturity date conversion
+2025-09-30 16:59:38,314 - preprocessing.transformers.pictet_transformer - INFO -   📅 Maturity dates converted: 34
+2025-09-30 16:59:38,315 - preprocessing.transformers.pictet_transformer - INFO - ✅ Transformation completed: 53 securities
+2025-09-30 16:59:38,315 - preprocessing.transformers.pictet_transformer - INFO - 📊 Output columns: ['bank', 'client', 'account', 'asset_type', 'name', 'cost_basis', 'market_value', 'quantity', 'price', 'ticker', 'cusip', 'coupon_rate', 'maturity_date']
+2025-09-30 16:59:38,316 - __main__ - INFO -   ✅ Pictet securities: 53 records processed
+2025-09-30 16:59:38,316 - __main__ - INFO -   📄 Processing Pictet transactions file: Pictet_transactions_30_09_2025.xlsx
+2025-09-30 16:59:38,316 - preprocessing.transformers.pictet_transformer - INFO - 🔄 Transforming Pictet transactions file: data/excel/input_files/Pictet_transactions_30_09_2025.xlsx
+2025-09-30 16:59:38,345 - preprocessing.transformers.pictet_transformer - INFO - 📊 Loaded 34 transactions with 15 columns
+2025-09-30 16:59:38,350 - preprocessing.transformers.pictet_transformer - INFO - ✅ Transformation completed: 34 transactions
+2025-09-30 16:59:38,350 - preprocessing.transformers.pictet_transformer - INFO - 📊 Output columns: ['bank', 'client', 'account', 'date', 'transaction_type', 'amount', 'price', 'quantity', 'cusip']
+2025-09-30 16:59:38,350 - __main__ - INFO -   ✅ Pictet transactions: 34 records processed
+2025-09-30 16:59:38,350 - __main__ - INFO - 🔗 Combining data from all banks...
+2025-09-30 16:59:38,350 - __main__ - INFO -   📊 Adding Pictet: 53 securities, 34 transactions
+2025-09-30 16:59:38,351 - __main__ - INFO - ✅ Combined totals: 53 securities, 34 transactions
+2025-09-30 16:59:38,416 - __main__ - INFO - 🎉 All done! Check the output directory for your combined files.
