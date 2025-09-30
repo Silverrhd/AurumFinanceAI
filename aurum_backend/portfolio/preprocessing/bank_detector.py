@@ -24,11 +24,12 @@ class BankDetector:
         'Banchile': r'^Banchile_',
         'ALT': r'^alt_',
         'Citi': r'^Citi_',
-        'STDSZ': r'^STDSZ_'
+        'STDSZ': r'^STDSZ_',
+        'Pictet': r'^Pictet_'
     }
     
     # Banks that use individual files per client/account
-    INDIVIDUAL_FILE_BANKS = {'Valley', 'CS', 'CSC', 'JB', 'Pershing', 'HSBC', 'LO', 'IDB', 'STDSZ'}
+    INDIVIDUAL_FILE_BANKS = {'Valley', 'CS', 'CSC', 'JB', 'Pershing', 'HSBC', 'LO', 'IDB', 'STDSZ', 'Pictet'}
     
     @classmethod
     def detect_bank(cls, filename: str) -> Optional[str]:

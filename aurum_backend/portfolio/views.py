@@ -2860,6 +2860,7 @@ def organize_uploaded_file(uploaded_file, bank_code, extracted_date):
             'JB': base_processing_dir / 'jb',
             'Valley': base_processing_dir / 'valley',
             'IDB': base_processing_dir / 'idb',  # Fixed: IDB needs combination processing
+            'Pictet': base_processing_dir / 'pictet',
             
             # Enrichment processing banks
             'HSBC': base_processing_dir / 'hsbc',
@@ -3490,7 +3491,8 @@ def get_bank_status(request):
             {'code': 'LO', 'name': 'Lombard', 'type': 'enrichment_combination'},
             {'code': 'ALT', 'name': 'Alternative Assets', 'type': 'combination'},
             {'code': 'Citi', 'name': 'Citi Bank', 'type': 'simple'},
-            {'code': 'STDSZ', 'name': 'Santander Switzerland', 'type': 'enrichment_combination'}
+            {'code': 'STDSZ', 'name': 'Santander Switzerland', 'type': 'enrichment_combination'},
+            {'code': 'Pictet', 'name': 'Pictet Bank', 'type': 'combination'}
         ]
         
         def get_next_steps(processing_type):

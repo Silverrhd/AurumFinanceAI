@@ -74,7 +74,7 @@ class UnifiedPreprocessor:
     def __init__(self):
         """Initialize the unified preprocessor."""
         self.project_root = Path(__file__).parent.parent.parent
-        self.supported_banks = ['JPM', 'MS', 'CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT', 'Citi', 'STDSZ']
+        self.supported_banks = ['JPM', 'MS', 'CSC', 'Pershing', 'CS', 'JB', 'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT', 'Citi', 'STDSZ', 'Pictet']
         self.transformer_registry = {
             'JPM': 'preprocessing.transformers.jpm_transformer.JPMorganTransformer',
             'MS': 'preprocessing.transformers.ms_transformer.MorganStanleyTransformer',
@@ -89,7 +89,8 @@ class UnifiedPreprocessor:
             'IDB': 'preprocessing.transformers.idb_transformer.IDBTransformer',
             'Banchile': 'preprocessing.transformers.banchile_transformer.BanchileTransformer',
             'Citi': 'preprocessing.transformers.citi_transformer.CitiTransformer',
-            'STDSZ': 'preprocessing.transformers.stdsz_transformer.STDSZTransformer'
+            'STDSZ': 'preprocessing.transformers.stdsz_transformer.STDSZTransformer',
+            'Pictet': 'preprocessing.transformers.pictet_transformer.PictetTransformer'
         }
         self.loaded_transformers = {}
         self.progress_tracker = ProgressTracker()
@@ -445,6 +446,12 @@ class UnifiedPreprocessor:
                 'input_dir': str(input_dir / 'santander_switzerland'),
                 'output_dir': str(input_dir),
                 'check_path': input_dir / 'santander_switzerland'
+            },
+            'Pictet': {
+                'script': 'portfolio/preprocessing/combine_pictet.py',
+                'input_dir': str(input_dir / 'pictet'),
+                'output_dir': str(input_dir),
+                'check_path': input_dir / 'pictet'
             }
         }
         
