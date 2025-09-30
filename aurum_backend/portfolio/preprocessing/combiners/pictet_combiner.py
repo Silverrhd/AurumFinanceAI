@@ -116,16 +116,7 @@ class PictetCombiner:
                 logger.debug(f"  Skipping file with different date: {file.name} (date: {file_date})")
                 continue
             
-            # Extract bank, client, account
-            extraction = BankDetector.extract_client_account_from_filename(file.name)
-            if not extraction:
-                logger.warning(f"⚠️ Could not extract client/account from: {file.name}")
-                continue
-            
-            bank, client, account = extraction
-            clients_found.add(f"{client}_{account}")
-            
-            # Determine file type
+            # Determine file type first
             if 'securities' in file.name.lower():
                 file_type = 'securities'
             elif 'transactions' in file.name.lower():
@@ -134,17 +125,41 @@ class PictetCombiner:
                 logger.warning(f"⚠️ Unknown file type: {file.name}")
                 continue
             
-            file_info = {
-                'file': file,
-                'bank': bank,
-                'client': client,
-                'account': account,
-                'date': file_date,
-                'type': file_type
-            }
+            # Handle securities files (have client/account) vs transactions (pre-combined)
+            if file_type == 'securities':
+                # Extract bank, client, account for securities files
+                extraction = BankDetector.extract_client_account_from_filename(file.name)
+                if not extraction:
+                    logger.warning(f"⚠️ Could not extract client/account from securities file: {file.name}")
+                    continue
+                
+                bank, client, account = extraction
+                clients_found.add(f"{client}_{account}")
+                
+                file_info = {
+                    'file': file,
+                    'bank': bank,
+                    'client': client,
+                    'account': account,
+                    'date': file_date,
+                    'type': file_type
+                }
+            else:
+                # Transactions file is pre-combined, no client/account in filename
+                file_info = {
+                    'file': file,
+                    'bank': 'Pictet',
+                    'client': 'PRECOMBINED',  # Indicates this is pre-combined
+                    'account': 'PRECOMBINED',
+                    'date': file_date,
+                    'type': file_type
+                }
             
             discovered_files[file_type].append(file_info)
-            logger.info(f"  ✅ Found {file_type}: {client}_{account} -> {file.name}")
+            if file_type == 'securities':
+                logger.info(f"  ✅ Found {file_type}: {client}_{account} -> {file.name}")
+            else:
+                logger.info(f"  ✅ Found {file_type}: PRECOMBINED -> {file.name}")
         
         # Summary
         securities_count = len(discovered_files['securities'])
@@ -247,80 +262,200 @@ class PictetCombiner:
     
     def combine_transactions_files(self, files: List[Dict], output_path: Path, account_mappings: Dict[str, Dict[str, str]]) -> bool:
         """
-        Combine individual transactions files into unified file.
+        Process pre-combined Pictet transactions file with dynamic header detection,
+        disclaimer removal, and account mapping.
         
         Args:
-            files: List of file info dictionaries
-            output_path: Path for output file
+            files: List with single file info dict (pre-combined transactions)
+            output_path: Path for output file  
+            account_mappings: Account number to client/account mapping from encrypted file
             
         Returns:
             True if successful, False otherwise
         """
         if not files:
-            logger.warning("⚠️ No transactions files to combine")
+            logger.warning("⚠️ No transactions files to process")
             return False
         
-        logger.info(f"🔗 Combining {len(files)} transactions files...")
+        if len(files) > 1:
+            logger.warning(f"⚠️ Expected 1 pre-combined transactions file, found {len(files)}. Using first one.")
         
-        combined_data = []
-        successful_files = 0
-        failed_files = 0
+        file_info = files[0]
+        file_path = file_info['file']
+        bank = 'Pictet'  # Extract from filename: file_info['bank']
         
-        for file_info in files:
-            file_path = file_info['file']
-            bank = file_info['bank']
-            client = file_info['client']
-            account = file_info['account']
-            
-            try:
-                logger.info(f"  💰 Processing: {client}_{account} -> {file_path.name}")
-                
-                # Read the Excel file
-                # TODO: Add specific header detection logic for Pictet transactions files
-                df = pd.read_excel(file_path)
-                
-                if df.empty:
-                    logger.warning(f"  ⚠️ Empty file: {file_path.name}")
-                    continue
-                
-                # Add bank, client, account columns at the beginning
-                df.insert(0, 'bank', bank)
-                df.insert(1, 'client', client)
-                df.insert(2, 'account', account)
-                
-                combined_data.append(df)
-                successful_files += 1
-                logger.info(f"  ✅ Added {len(df)} records from {client}_{account}")
-                
-            except Exception as e:
-                logger.error(f"  ❌ Error processing {file_path.name}: {str(e)}")
-                logger.error(f"  💡 Skipping corrupted file and continuing...")
-                failed_files += 1
-                continue
-        
-        if not combined_data:
-            logger.error("❌ No valid transactions data to combine")
-            return False
+        logger.info(f"🔗 Processing pre-combined transactions file: {file_path.name}")
         
         try:
-            # Combine all DataFrames
-            final_df = pd.concat(combined_data, ignore_index=True)
+            # STEP 1: DYNAMIC HEADER DETECTION
+            header_row = self._find_transactions_header_row(file_path)
             
-            # Save to output file
-            final_df.to_excel(output_path, index=False)
+            # STEP 2: READ WITH DETECTED HEADER
+            logger.info(f"📖 Reading file with header at row {header_row + 1}")
+            df = pd.read_excel(file_path, header=header_row)
             
-            logger.info(f"✅ Transactions combination completed!")
-            logger.info(f"  📊 Total records: {len(final_df)}")
-            logger.info(f"  ✅ Successful files: {successful_files}")
-            if failed_files > 0:
-                logger.warning(f"  ❌ Failed files: {failed_files}")
+            if df.empty:
+                logger.warning(f"⚠️ Empty file after reading: {file_path.name}")
+                return False
+            
+            logger.info(f"📊 Loaded {len(df)} total rows from file")
+            
+            # STEP 3: DYNAMIC DISCLAIMER REMOVAL  
+            df_clean = self._remove_disclaimer_rows(df)
+            
+            # STEP 4: VALIDATE REQUIRED COLUMNS
+            if 'Portfolio' not in df_clean.columns:
+                logger.error(f"❌ Missing 'Portfolio' column for account mapping")
+                return False
+            
+            # STEP 5: ADD SYSTEM COLUMNS (bank, client, account)
+            df_final = self._add_system_columns(df_clean, bank, account_mappings)
+            
+            # STEP 6: SAVE RESULT
+            df_final.to_excel(output_path, index=False)
+            
+            logger.info(f"✅ Transactions processing completed!")
+            logger.info(f"  📊 Total records: {len(df_final)}")
             logger.info(f"  💾 Saved to: {output_path.name}")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error saving combined transactions file: {str(e)}")
+            logger.error(f"❌ Error processing transactions file {file_path.name}: {str(e)}")
             return False
+    
+    def _find_transactions_header_row(self, file_path: Path, max_search_rows: int = 25) -> int:
+        """
+        Dynamically find header row in Pictet transactions file.
+        
+        Args:
+            file_path: Path to transactions file
+            max_search_rows: Maximum rows to search for headers
+            
+        Returns:
+            Row index (0-based) where headers are found
+        """
+        logger.info(f"🔍 Searching for transaction headers in: {file_path.name}")
+        
+        # Expected key columns for Pictet transactions
+        expected_columns = ['Portfolio', 'Booking date', 'Description', 'Amount']
+        
+        try:
+            # Read first N rows without header to search for patterns
+            df_preview = pd.read_excel(file_path, header=None, nrows=max_search_rows)
+            
+            logger.debug(f"📊 Scanning {len(df_preview)} rows for header patterns...")
+            
+            for row_idx in range(len(df_preview)):
+                row_values = df_preview.iloc[row_idx].astype(str)
+                
+                # Count matches (case-insensitive, partial matching for Amount columns)
+                matches = 0
+                matched_columns = []
+                
+                for expected_col in expected_columns:
+                    for cell_value in row_values:
+                        if pd.notna(cell_value) and expected_col.lower() in str(cell_value).lower():
+                            matches += 1
+                            matched_columns.append(expected_col)
+                            break
+                
+                # If we find 3/4 expected columns, this is likely the header row
+                if matches >= 3:
+                    logger.info(f"✅ Found transaction headers at row {row_idx + 1}")
+                    logger.info(f"📋 Matched columns: {', '.join(matched_columns)}")
+                    logger.info(f"📊 Match rate: {matches}/{len(expected_columns)}")
+                    return row_idx
+            
+            # Fallback to row 13 if no header found
+            logger.warning(f"⚠️ Header detection failed, using fallback row 14 (0-based: 13)")
+            return 13
+            
+        except Exception as e:
+            logger.error(f"❌ Error during header detection: {str(e)}")
+            logger.warning(f"⚠️ Using fallback row 14 (0-based: 13)")
+            return 13
+    
+    def _remove_disclaimer_rows(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Remove disclaimer and empty rows from end of transactions data.
+        
+        Args:
+            df: DataFrame with transactions data
+            
+        Returns:
+            Cleaned DataFrame with only transaction records
+        """
+        logger.info(f"🧹 Removing disclaimer rows from {len(df)} total rows")
+        
+        # Keep only rows where Portfolio contains valid account numbers (numeric patterns)
+        df_clean = df[
+            df['Portfolio'].notna() &  # Not NaN
+            df['Portfolio'].astype(str).str.match(r'^\d+\.\d+$')  # Matches pattern like "586347.001"
+        ].copy()
+        
+        removed_rows = len(df) - len(df_clean)
+        logger.info(f"📊 Removed {removed_rows} disclaimer/empty rows, kept {len(df_clean)} transactions")
+        return df_clean
+    
+    def _add_system_columns(self, df: pd.DataFrame, bank: str, account_mappings: Dict[str, Dict[str, str]]) -> pd.DataFrame:
+        """
+        Add bank, client, account columns using account mappings.
+        
+        Args:
+            df: Clean transactions DataFrame
+            bank: Bank name ('Pictet')
+            account_mappings: Account number to client/account mapping
+            
+        Returns:
+            DataFrame with bank, client, account columns added
+        """
+        logger.info(f"🏦 Adding system columns to {len(df)} transactions")
+        
+        client_list = []
+        account_list = []
+        unmapped_accounts = set()
+        successful_mappings = 0
+        
+        # Process each transaction row
+        for _, row in df.iterrows():
+            account_num = str(row['Portfolio']).strip()
+            
+            if account_num in account_mappings:
+                client = account_mappings[account_num]['client']
+                account = account_mappings[account_num]['account']
+                successful_mappings += 1
+                logger.debug(f"✅ Mapped {account_num} → {client}/{account}")
+            else:
+                client = 'UNMAPPED'
+                account = 'UNMAPPED'
+                unmapped_accounts.add(account_num)
+                logger.debug(f"⚠️ Unmapped account: {account_num}")
+            
+            client_list.append(client)
+            account_list.append(account)
+        
+        # Insert system columns at the beginning
+        df_result = df.copy()
+        df_result.insert(0, 'bank', bank)
+        df_result.insert(1, 'client', client_list)
+        df_result.insert(2, 'account', account_list)
+        
+        # Logging summary
+        logger.info(f"📊 Account mapping summary:")
+        logger.info(f"  ✅ Successfully mapped: {successful_mappings}/{len(df)} accounts")
+        
+        if unmapped_accounts:
+            logger.warning(f"  ⚠️ Unmapped accounts: {sorted(unmapped_accounts)}")
+            logger.warning(f"  💡 These accounts need to be added to the Pictet mappings sheet")
+        
+        # Log account distribution
+        account_distribution = df_result.groupby(['client', 'account']).size()
+        logger.info(f"📈 Transaction distribution:")
+        for (client, account), count in account_distribution.items():
+            logger.info(f"  {client}/{account}: {count} transactions")
+        
+        return df_result
     
     def combine_all_files(self, pictet_dir: Path, output_dir: Path, date: str, mappings_file: str, dry_run: bool = False) -> bool:
         """
@@ -361,11 +496,17 @@ class PictetCombiner:
                     logger.info(f"  💰 Transactions: {file_info['client']}_{file_info['account']}")
                 return True
             
+            # Ensure output directory exists
+            output_dir.mkdir(parents=True, exist_ok=True)
+            
             results = []
+            
+            # Use main input_files directory for output
+            input_files_dir = Path('data/excel/input_files')
             
             # Combine securities files
             if discovered_files['securities']:
-                securities_output = output_dir / f"Pictet_securities_{date}.xlsx"
+                securities_output = input_files_dir / f"Pictet_securities_{date}.xlsx"
                 success = self.combine_securities_files(discovered_files['securities'], securities_output)
                 results.append(success)
                 
@@ -376,7 +517,7 @@ class PictetCombiner:
         
             # Process transactions file (pre-combined)
             if discovered_files['transactions']:
-                transactions_output = output_dir / f"Pictet_transactions_{date}.xlsx"
+                transactions_output = input_files_dir / f"Pictet_transactions_{date}.xlsx"
                 success = self.combine_transactions_files(discovered_files['transactions'], transactions_output, account_mappings)
                 results.append(success)
                 
