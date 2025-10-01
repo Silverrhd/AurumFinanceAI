@@ -2852,7 +2852,7 @@ def organize_uploaded_file(uploaded_file, bank_code, extracted_date):
             'Pershing': base_processing_dir / 'pershing' / 'nonenriched_pershing',
             'LO': base_processing_dir / 'lombard' / 'nonenriched_lombard',
             'STDSZ': base_processing_dir / 'santander_switzerland' / 'nonenriched_santander_switzerland',
-            
+
             # Combination processing banks
             'Banchile': base_processing_dir / 'banchile',
             'CS': base_processing_dir / 'cs',
@@ -2861,13 +2861,14 @@ def organize_uploaded_file(uploaded_file, bank_code, extracted_date):
             'Valley': base_processing_dir / 'valley',
             'IDB': base_processing_dir / 'idb',  # Fixed: IDB needs combination processing
             'Pictet': base_processing_dir / 'pictet',
-            
+            'Gonet': base_processing_dir / 'gonet',
+
             # Enrichment processing banks
             'HSBC': base_processing_dir / 'hsbc',
-            
+
             # Alternative assets - ready for combination
             'ALT': base_processing_dir / 'alternatives',
-            
+
             # Simple processing banks (ready for transform)
             'JPM': base_processing_dir,  # Root directory
             'MS': base_processing_dir,   # Root directory
@@ -3341,7 +3342,11 @@ def scan_bank_files(bank_code, base_processing_dir, target_date=None):
             base_processing_dir / 'idb',  # Upload location
             base_processing_dir  # Final processing location
         ],
-        
+        'Gonet': [
+            base_processing_dir / 'gonet',  # Upload location
+            base_processing_dir  # Final processing location
+        ],
+
         # Enrichment processing banks
         'HSBC': [
             base_processing_dir / 'hsbc',  # Upload location
@@ -3354,6 +3359,11 @@ def scan_bank_files(bank_code, base_processing_dir, target_date=None):
             base_processing_dir  # Final processing location (post-combination)
         ],
         
+        'Pictet': [
+            base_processing_dir / 'pictet',  # Upload location
+            base_processing_dir  # Final processing location
+        ],
+
         # Simple processing banks (already in final location)
         'JPM': [base_processing_dir],  # Root directory only
         'MS': [base_processing_dir],   # Root directory only
@@ -3475,7 +3485,7 @@ def determine_bank_status(bank_info, bank_code, processing_type):
 def get_bank_status(request):
     """Enhanced bank status with real file scanning."""
     try:
-        # The 14 ProjectAurum Banks with their processing types
+        # The 17 ProjectAurum Banks with their processing types
         PROJECTAURUM_BANKS = [
             {'code': 'JPM', 'name': 'JPMorgan', 'type': 'simple'},
             {'code': 'MS', 'name': 'Morgan Stanley', 'type': 'simple'},
@@ -3487,6 +3497,7 @@ def get_bank_status(request):
             {'code': 'JB', 'name': 'JB Private Bank', 'type': 'combination'},
             {'code': 'CSC', 'name': 'Charles Schwab', 'type': 'combination'},
             {'code': 'Banchile', 'name': 'Banchile', 'type': 'combination'},
+            {'code': 'Gonet', 'name': 'Gonet Bank', 'type': 'combination'},
             {'code': 'Pershing', 'name': 'Pershing', 'type': 'enrichment_combination'},
             {'code': 'LO', 'name': 'Lombard', 'type': 'enrichment_combination'},
             {'code': 'ALT', 'name': 'Alternative Assets', 'type': 'combination'},
