@@ -132,18 +132,64 @@ class GonetCombiner:
 
         logger.info(f"🔗 Combining {len(files)} Gonet securities files...")
 
-        # TODO: Implement detailed combination logic
-        # For now, this is a skeleton that needs to be filled in with:
-        # 1. Read each Excel file
-        # 2. Add bank, client, account columns from filename
-        # 3. Combine all DataFrames
-        # 4. Save to output_path
+        combined_data = []
+        successful_files = 0
+        failed_files = 0
 
-        logger.info("⚠️ SKELETON: Securities combination logic needs implementation")
-        logger.info(f"  Would process {len(files)} files")
-        logger.info(f"  Would save to: {output_path}")
+        for file_info in files:
+            file_path = file_info['file']
+            bank = file_info['bank']
+            client = file_info['client']
+            account = file_info['account']
 
-        return False  # Change to True once implemented
+            try:
+                logger.info(f"  📄 Processing: {client}_{account} -> {file_path.name}")
+
+                # Read the Excel file
+                df = pd.read_excel(file_path)
+
+                if df.empty:
+                    logger.warning(f"  ⚠️ Empty file: {file_path.name}")
+                    continue
+
+                # Add bank, client, account columns at the beginning
+                df.insert(0, 'bank', bank)
+                df.insert(1, 'client', client)
+                df.insert(2, 'account', account)
+
+                combined_data.append(df)
+                successful_files += 1
+                logger.info(f"  ✅ Added {len(df)} records from {client}_{account}")
+
+            except Exception as e:
+                logger.error(f"  ❌ Error processing {file_path.name}: {str(e)}")
+                logger.error(f"  💡 Skipping corrupted file and continuing...")
+                failed_files += 1
+                continue
+
+        if not combined_data:
+            logger.error("❌ No valid securities data to combine")
+            return False
+
+        try:
+            # Combine all DataFrames
+            final_df = pd.concat(combined_data, ignore_index=True)
+
+            # Save to output file
+            final_df.to_excel(output_path, index=False)
+
+            logger.info(f"✅ Securities combination completed!")
+            logger.info(f"  📊 Total records: {len(final_df)}")
+            logger.info(f"  ✅ Successful files: {successful_files}")
+            if failed_files > 0:
+                logger.warning(f"  ❌ Failed files: {failed_files}")
+            logger.info(f"  💾 Saved to: {output_path.name}")
+
+            return True
+
+        except Exception as e:
+            logger.error(f"❌ Error saving combined securities file: {str(e)}")
+            return False
 
     def combine_transactions_files(self, files: List[Dict], output_path: Path) -> bool:
         """
@@ -162,18 +208,64 @@ class GonetCombiner:
 
         logger.info(f"🔗 Combining {len(files)} Gonet transactions files...")
 
-        # TODO: Implement detailed combination logic
-        # For now, this is a skeleton that needs to be filled in with:
-        # 1. Read each Excel file
-        # 2. Add bank, client, account columns from filename
-        # 3. Combine all DataFrames
-        # 4. Save to output_path
+        combined_data = []
+        successful_files = 0
+        failed_files = 0
 
-        logger.info("⚠️ SKELETON: Transactions combination logic needs implementation")
-        logger.info(f"  Would process {len(files)} files")
-        logger.info(f"  Would save to: {output_path}")
+        for file_info in files:
+            file_path = file_info['file']
+            bank = file_info['bank']
+            client = file_info['client']
+            account = file_info['account']
 
-        return False  # Change to True once implemented
+            try:
+                logger.info(f"  💰 Processing: {client}_{account} -> {file_path.name}")
+
+                # Read the Excel file
+                df = pd.read_excel(file_path)
+
+                if df.empty:
+                    logger.warning(f"  ⚠️ Empty file: {file_path.name}")
+                    continue
+
+                # Add bank, client, account columns at the beginning
+                df.insert(0, 'bank', bank)
+                df.insert(1, 'client', client)
+                df.insert(2, 'account', account)
+
+                combined_data.append(df)
+                successful_files += 1
+                logger.info(f"  ✅ Added {len(df)} records from {client}_{account}")
+
+            except Exception as e:
+                logger.error(f"  ❌ Error processing {file_path.name}: {str(e)}")
+                logger.error(f"  💡 Skipping corrupted file and continuing...")
+                failed_files += 1
+                continue
+
+        if not combined_data:
+            logger.error("❌ No valid transactions data to combine")
+            return False
+
+        try:
+            # Combine all DataFrames
+            final_df = pd.concat(combined_data, ignore_index=True)
+
+            # Save to output file
+            final_df.to_excel(output_path, index=False)
+
+            logger.info(f"✅ Transactions combination completed!")
+            logger.info(f"  📊 Total records: {len(final_df)}")
+            logger.info(f"  ✅ Successful files: {successful_files}")
+            if failed_files > 0:
+                logger.warning(f"  ❌ Failed files: {failed_files}")
+            logger.info(f"  💾 Saved to: {output_path.name}")
+
+            return True
+
+        except Exception as e:
+            logger.error(f"❌ Error saving combined transactions file: {str(e)}")
+            return False
 
     def combine_all_files(self, gonet_dir: Path, output_dir: Path, date: str, dry_run: bool = False) -> bool:
         """
