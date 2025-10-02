@@ -44,4 +44,4 @@ static_collected/
 *.swo
 
 # Node modules (if any)
-node_modules/
+node_modules/.DS_Store
