@@ -155,7 +155,7 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
 
   const handleGenerateReport = async () => {
     // Check if report type is implemented
-    const implementedTypes = ['weekly_investment', 'bond_issuer_weight', 'bond_maturity', 'cash_position', 'monthly_returns_custody', 'total_positions'];
+    const implementedTypes = ['weekly_investment', 'bond_issuer_weight', 'bond_maturity', 'cash_position', 'monthly_returns_custody', 'total_positions', 'equity_breakdown'];
     if (!implementedTypes.includes(reportType)) {
       toast.error(`${title} generation is not yet implemented. Coming soon!`);
       return;
@@ -508,7 +508,15 @@ export function ReportCard({ title, icon, reportType, generateLabel, openLabel }
                 </p>
               </div>
             )}
-            
+
+            {reportType === 'equity_breakdown' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <p className="text-sm text-blue-700">
+                  ℹ️ Equity Breakdown reports use the latest available portfolio data automatically. Includes sector analysis and SPY benchmark comparison.
+                </p>
+              </div>
+            )}
+
             <div>
               <Label className="block text-xs font-medium text-gray-700 mb-1">
                 {isLatestOnlyReport(reportType) ? 'Client:' : 'Client:'}

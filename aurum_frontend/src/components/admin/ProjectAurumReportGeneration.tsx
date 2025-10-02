@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { FileText, BarChart3, Calendar, Building, TrendingUp, DollarSign, PieChart } from 'lucide-react';
+import { FileText, BarChart3, Calendar, Building, TrendingUp, DollarSign, PieChart, Activity } from 'lucide-react';
 import { portfolioAPI } from '@/lib/api/portfolio';
 import { Client } from '@/types/portfolio';
 import { ReportCard } from './ReportCard';
@@ -197,7 +197,7 @@ export function ProjectAurumReportGeneration() {
 
   return (
     <div className="space-y-6">
-      {/* 2x3 Grid - Added Cash Report as 5th card */}
+      {/* 3x3 Grid - 7 report cards total */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Card 1: Investment Reports */}
         <ReportCard
@@ -251,6 +251,15 @@ export function ProjectAurumReportGeneration() {
           reportType="monthly_returns_custody"
           generateLabel="Generate Monthly Returns by Custody"
           openLabel="Open Monthly Returns Reports"
+        />
+
+        {/* Card 7: Equity Breakdown Reports - Row 3, Column 1 */}
+        <ReportCard
+          title="Equity Breakdown Reports"
+          icon={<Activity />}
+          reportType="equity_breakdown"
+          generateLabel="Generate Equity Breakdown Report"
+          openLabel="Open Equity Breakdown Reports"
         />
       </div>
     </div>

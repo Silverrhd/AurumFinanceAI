@@ -472,6 +472,152 @@ def generate_all_total_positions_reports():
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+def generate_all_equity_breakdown_reports():
+    """Generate Equity Breakdown reports for all clients with equity positions."""
+    from .utils.report_utils import save_report_html
+    from .services.equity_breakdown_report_service import EquityBreakdownReportService
+    from django.db import IntegrityError, transaction
+    import time
+
+    logger.info("Starting bulk Equity Breakdown report generation")
+
+    start_time = time.time()
+
+    try:
+        # Delete existing equity breakdown reports
+        Report.objects.filter(report_type='EQUITY_BREAKDOWN').delete()
+        logger.info("Deleted existing Equity Breakdown reports")
+
+        # Initialize report service
+        report_service = EquityBreakdownReportService()
+
+        generated_reports = []
+        failed_reports = []
+        skipped_reports = []
+
+        # Generate individual reports for each client (exclude ALL which is not a real client)
+        clients = Client.objects.exclude(code='ALL')
+
+        for client in clients:
+            try:
+                # CHECK: Skip clients with zero equities
+                equity_count = Position.objects.filter(
+                    snapshot__client=client,
+                    asset__asset_type='Equities'
+                ).exclude(asset__bank='ALT').count()
+
+                if equity_count == 0:
+                    skipped_reports.append({
+                        'client': client.code,
+                        'status': 'skipped_no_equities',
+                        'message': 'Client has no equity positions'
+                    })
+                    logger.info(f"Skipped {client.code} - no equity positions")
+                    continue
+
+                logger.info(f"Generating Equity Breakdown report for {client.code}")
+
+                # Generate individual report HTML
+                html_content, snapshot_date = report_service.generate_equity_breakdown_report(client.code)
+
+                # Prepare report date
+                current_date = snapshot_date.strftime('%Y-%m-%d') if snapshot_date else datetime.now().strftime('%Y-%m-%d')
+
+                # Save report file (if not already saved by service)
+                file_path, file_size = save_report_html(
+                    client.code,
+                    'equity_breakdown',
+                    current_date,
+                    html_content
+                )
+
+                # Check if report already exists for this client and date
+                existing_report = Report.objects.filter(
+                    client=client,
+                    report_type='EQUITY_BREAKDOWN',
+                    report_date=current_date
+                ).first()
+
+                if existing_report:
+                    # Update existing report
+                    existing_report.file_path = file_path
+                    existing_report.file_size = file_size
+                    existing_report.save()
+
+                    generated_reports.append({
+                        'client': client.code,
+                        'status': 'updated',
+                        'report_id': existing_report.id,
+                        'file_size': file_size
+                    })
+                else:
+                    # Create new database record
+                    with transaction.atomic():
+                        report = Report.objects.create(
+                            client=client,
+                            report_type='EQUITY_BREAKDOWN',
+                            report_date=current_date,
+                            file_path=file_path,
+                            file_size=file_size
+                        )
+
+                    generated_reports.append({
+                        'client': client.code,
+                        'status': 'success',
+                        'report_id': report.id,
+                        'file_size': file_size
+                    })
+
+                logger.info(f"Successfully generated Equity Breakdown report for {client.code}")
+
+            except Exception as e:
+                logger.error(f"Error generating Equity Breakdown report for {client.code}: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+                failed_reports.append({
+                    'client': client.code,
+                    'status': 'error',
+                    'error': str(e)
+                })
+
+        total_generated = len(generated_reports)
+        total_skipped = len(skipped_reports)
+        total_failed = len(failed_reports)
+        generation_time = time.time() - start_time
+
+        logger.info(f"Bulk Equity Breakdown report generation complete: {total_generated} successful, {total_skipped} skipped, {total_failed} failed ({generation_time:.1f}s)")
+
+        # Combine all results
+        all_results = generated_reports + skipped_reports + failed_reports
+
+        # Create summary
+        summary = {
+            'total': len(all_results),
+            'success': len([r for r in generated_reports if r['status'] == 'success']),
+            'updated': len([r for r in generated_reports if r['status'] == 'updated']),
+            'skipped_no_equities': total_skipped,
+            'errors': total_failed,
+            'generation_time': generation_time
+        }
+
+        return Response({
+            'success': True,
+            'message': f'Generated {total_generated} Equity Breakdown reports, skipped {total_skipped} clients with no equities',
+            'results': all_results,
+            'summary': summary
+        })
+
+    except Exception as e:
+        logger.error(f"Error in bulk Equity Breakdown report generation: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 def generate_all_monthly_returns_custody_reports(year, month):
     """Generate monthly returns reports for ALL clients + individual clients."""
     from .utils.report_utils import save_report_html
@@ -1411,15 +1557,16 @@ def generate_report_no_open(request):
                 from .services.total_positions_report_service import TotalPositionsReportService
                 report_service = TotalPositionsReportService()
                 html_content, _ = report_service.generate_total_positions_report(client_code)
-                
+
         elif report_type == 'equity_breakdown':
-            from .services.report_generation_service import ReportGenerationService
-            report_service = ReportGenerationService()
-            result = report_service.generate_equity_breakdown_report(current_date or '2025-07-24', client_code)
-            if result.get('success'):
-                html_content = f"<html><body><h1>Equity Breakdown Report</h1><p>{result.get('message', 'Report generated successfully')}</p></body></html>"
+            if not client_code or client_code == 'ALL':
+                # Generate for all clients (bulk generation)
+                return generate_all_equity_breakdown_reports()
             else:
-                return Response({'success': False, 'error': result.get('error', 'Equity breakdown report generation failed')})
+                # Generate for specific client
+                from .services.equity_breakdown_report_service import EquityBreakdownReportService
+                report_service = EquityBreakdownReportService()
+                html_content, _ = report_service.generate_equity_breakdown_report(client_code)
                 
         elif report_type == 'monthly_returns_custody':
             year = int(data.get('year', 2025))

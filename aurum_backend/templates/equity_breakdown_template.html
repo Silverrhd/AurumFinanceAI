@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equity Breakdown Report - {{ client_name or 'All Clients' }}</title>
+    <title>Equity Breakdown Report - {{ client_name or client_code }}</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -16,25 +16,25 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
         
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 3px solid #e9ecef;
         }
         
         .logo-left {
-            height: 60px;
+            height: 70px;
             width: auto;
         }
         
@@ -42,7 +42,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 10px;
+            gap: 12px;
         }
         
         .report-date {
@@ -55,87 +55,116 @@
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.3);
         }
         
         .print-btn:hover {
             background-color: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.4);
         }
         
         .report-title {
             text-align: center;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: #2c3e50;
-            margin: 0 0 10px 0;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .client-name {
             text-align: center;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 500;
             color: #34495e;
-            margin: 0 0 30px 0;
+            margin: 0 0 35px 0;
         }
         
         .summary-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid #007bff;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
         
         .summary-section h3 {
-            margin: 0 0 15px 0;
-            color: #2c3e50;
-            font-size: 18px;
+            margin: 0 0 20px 0;
+            color: white;
+            font-size: 20px;
             font-weight: 600;
+            text-align: center;
         }
         
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
         }
         
         .summary-card {
             background-color: white;
-            padding: 15px;
-            border-radius: 6px;
+            padding: 20px;
+            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-3px);
         }
         
         .summary-card .value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            color: #007bff;
-            margin-bottom: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
         
         .summary-card .label {
             font-size: 14px;
             color: #6c757d;
-            font-weight: 500;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .section-header {
-            margin: 40px 0 20px 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e9ecef;
+            margin: 45px 0 25px 0;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #e9ecef;
         }
         
         .section-header h2 {
             margin: 0;
             color: #2c3e50;
-            font-size: 22px;
-            font-weight: 600;
+            font-size: 24px;
+            font-weight: 700;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-header h2:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
         }
         
         .holdings-section {
@@ -145,7 +174,8 @@
         .holdings-section h3 {
             color: #2c3e50;
             font-size: 18px;
-            margin: 20px 0;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
         }
         
         .holdings-table {
@@ -153,41 +183,96 @@
             border-collapse: collapse;
             margin: 20px 0;
             font-size: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .holdings-table th {
-            background-color: #2c3e50;
-            color: white;
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #34495e;
-        }
-        
-        .holdings-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #e9ecef;
-            vertical-align: top;
-        }
-        
-        .holdings-table tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        .holdings-table tr:hover {
-            background-color: #e3f2fd;
-        }
-        
-        .sector-section {
-            margin-bottom: 40px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            border-radius: 8px;
             overflow: hidden;
         }
         
-        .sector-chart-container {
-            height: 400px;
-            margin: 20px 0;
+        .holdings-table th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 14px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .holdings-table th.numeric,
+        .holdings-table td.numeric {
+            text-align: right;
+        }
+        
+        .holdings-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .holdings-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .holdings-table tbody tr:hover {
+            background-color: #e3f2fd;
+            transition: background-color 0.2s;
+        }
+        
+        .holdings-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .etf-row {
+            cursor: pointer;
             position: relative;
+        }
+        
+        .etf-row:hover {
+            background-color: #d4e6f1 !important;
+        }
+        
+        .expand-icon {
+            display: inline-block;
+            transition: transform 0.3s;
+            margin-right: 8px;
+            font-size: 12px;
+        }
+        
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .etf-details-row {
+            display: none;
+            background-color: #f0f8ff !important;
+        }
+        
+        .etf-details-row.visible {
+            display: table-row;
+        }
+        
+        .etf-breakdown {
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .etf-breakdown h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .sector-breakdown-table {
+            width: 60%;
+            margin: 15px auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .sector-breakdown-table th {
+            background-color: #667eea;
         }
         
         .sector-table {
@@ -195,44 +280,133 @@
             border-collapse: collapse;
             margin: 20px 0;
             font-size: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            border-radius: 8px;
+            overflow: hidden;
         }
         
         .sector-table th {
-            background-color: #2c3e50;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
-            padding: 12px 8px;
+            padding: 14px 10px;
             text-align: left;
             font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .sector-table th.numeric {
+            text-align: right;
         }
         
         .sector-table td {
-            padding: 10px 8px;
+            padding: 12px 10px;
             border-bottom: 1px solid #e9ecef;
         }
         
-        .sector-table tr:nth-child(even) {
+        .sector-table td.numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .sector-table tbody tr:nth-child(even) {
             background-color: #f8f9fa;
         }
         
-        .sector-table td.positive {
-            color: #28a745;
-        }
-        
-        .sector-table td.negative {
-            color: #dc3545;
+        .sector-table tbody tr:last-child td {
+            border-bottom: none;
         }
         
         .sector-table td.overweight {
-            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            font-weight: 700;
         }
         
         .sector-table td.underweight {
-            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            font-weight: 700;
         }
         
         .sector-table td.neutral {
-            background-color: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .chart-section {
+            margin: 30px 0;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .chart-container {
+            height: 450px;
+            position: relative;
+        }
+        
+        .legend {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        
+        .legend strong {
+            color: #2c3e50;
+            margin-right: 10px;
+        }
+        
+        .legend-item {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        
+        .legend-item.green {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .legend-item.red {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .legend-item.gray {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .no-data-message {
+            text-align: center;
+            padding: 60px 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin: 40px 0;
+        }
+        
+        .no-data-message p {
+            font-size: 18px;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .no-data-message strong {
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 13px;
         }
         
         @media print {
@@ -254,12 +428,22 @@
                 box-shadow: none;
             }
             
-            .holdings-table tr:hover, .sector-table tr:hover {
-                background-color: transparent;
+            .etf-details-row {
+                display: table-row !important;
             }
             
-            .sector-chart-container {
+            .chart-section {
                 page-break-inside: avoid;
+            }
+            
+            .summary-section {
+                background: #f8f9fa;
+                box-shadow: none;
+            }
+            
+            .summary-card .value {
+                -webkit-print-color-adjust: exact;
+                color: #667eea;
             }
         }
         
@@ -280,43 +464,12 @@
             
             .holdings-table th, .holdings-table td,
             .sector-table th, .sector-table td {
-                padding: 8px 4px;
+                padding: 8px 6px;
             }
-        }
-        
-        .data-source-alert {
-            margin: 20px 0;
-            padding: 10px 15px;
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 4px;
-            color: #856404;
-            font-size: 14px;
-        }
-        
-        .etf-sources {
-            font-size: 12px;
-            color: #666;
-            font-style: italic;
-        }
-        
-        .sector-table td.overweight {
-            color: #28a745;
-            font-weight: bold;
-        }
-        
-        .sector-table td.underweight {
-            color: #dc3545;
-            font-weight: bold;
-        }
-        
-        .sector-table td.neutral {
-            color: #6c757d;
-        }
-        
-        .chart-section {
-            margin: 20px 0;
-            height: 400px;
+            
+            .sector-breakdown-table {
+                width: 90%;
+            }
         }
     </style>
 </head>
@@ -324,197 +477,308 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            {% if logo_base64 %}
-                <img src="data:image/png;base64,{{ logo_base64 }}" alt="Logo" class="logo-left">
-            {% else %}
-                <div class="logo-left"></div>
-            {% endif %}
+            <div class="logo-left"></div>
             <div class="header-right">
-                <div class="report-date">Generated: {{ report_date }}</div>
+                <div class="report-date">Report Date: {{ report_date }}</div>
+                <div class="report-date">Generated: {{ generation_date }}</div>
                 <button class="print-btn" onclick="window.print()">Print Report</button>
             </div>
         </div>
         
         <!-- Title -->
         <h1 class="report-title">Equity Breakdown Report</h1>
-        <div class="client-name">{{ client_name or 'All Clients' }}</div>
+        <div class="client-name">{{ client_name or client_code }}</div>
         
-        <!-- Summary Section -->
-        <div class="summary-section">
-            <h3>Portfolio Summary</h3>
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <div class="value">${{ "{:,.0f}".format(summary_stats.total_equity_value) }}</div>
-                    <div class="label">Total Equity Value</div>
-                </div>
-                <div class="summary-card">
-                    <div class="value">{{ summary_stats.num_holdings }}</div>
-                    <div class="label">Number of Holdings</div>
-                </div>
-                <div class="summary-card">
-                    <div class="value">{{ summary_stats.num_sectors }}</div>
-                    <div class="label">Sectors Represented</div>
+        {% if error %}
+            <!-- Error state -->
+            <div class="no-data-message">
+                <p><strong>Error generating report</strong></p>
+                <p>{{ error }}</p>
+            </div>
+        {% elif direct_holdings_count == 0 and etf_holdings_count == 0 %}
+            <!-- Empty state -->
+            <div class="no-data-message">
+                <p><strong>No equity positions found</strong></p>
+                <p>This client does not have any equity holdings in the latest snapshot.</p>
+            </div>
+        {% else %}
+            <!-- Summary Section -->
+            <div class="summary-section">
+                <h3>Portfolio Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="value">${{ "{:,.0f}".format(total_equity_value) }}</div>
+                        <div class="label">Total Equity Value</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="value">{{ direct_holdings_count }}</div>
+                        <div class="label">Direct Holdings</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="value">{{ etf_holdings_count }}</div>
+                        <div class="label">ETF Holdings</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Holdings Analysis -->
-        <div class="section-header">
-            <h2>Portfolio Holdings Analysis</h2>
-        </div>
-        
-        <!-- Direct Holdings Section -->
-        <div class="holdings-section">
-            <h3>Top 10 Direct Holdings</h3>
-            <table class="holdings-table">
-                <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Market Value</th>
-                        <th>% of Portfolio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for holding in direct_holdings %}
-                    <tr>
-                        <td>{{ holding.ticker }}</td>
-                        <td>{{ holding.name }}</td>
-                        <td>{{ holding.type }}</td>
-                        <td>${{ "{:,.2f}".format(holding.market_value) }}</td>
-                        <td>{{ "{:.2f}%".format(holding.percentage) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Add data source alert -->
-        {% if sector_allocation.using_fallback %}
-        <div class="data-source-alert">
-            Note: Using cached/fallback data for some calculations. Real-time data unavailable.
-        </div>
+            
+            <!-- Holdings Analysis -->
+            <div class="section-header">
+                <h2>Portfolio Holdings Analysis</h2>
+            </div>
+            
+            <!-- Direct Holdings Section -->
+            {% if direct_holdings_count > 0 %}
+            <div class="holdings-section">
+                <h3>Direct Equity Holdings</h3>
+                <table class="holdings-table">
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Company Name</th>
+                            <th>Sector</th>
+                            <th class="numeric">Quantity</th>
+                            <th class="numeric">Market Value</th>
+                            <th class="numeric">% of Equities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for holding in direct_holdings %}
+                        <tr>
+                            <td><strong>{{ holding.ticker }}</strong></td>
+                            <td>{{ holding.name }}</td>
+                            <td>{{ holding.sector }}</td>
+                            <td class="numeric">{{ "{:,.2f}".format(holding.quantity) }}</td>
+                            <td class="numeric">${{ "{:,.2f}".format(holding.market_value) }}</td>
+                            <td class="numeric">{{ "{:.2f}".format(holding.percentage) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            
+            <!-- ETF Holdings Section -->
+            {% if etf_holdings_count > 0 %}
+            <div class="holdings-section">
+                <h3>ETF Holdings with Sector Breakdown</h3>
+                <table class="holdings-table">
+                    <thead>
+                        <tr>
+                            <th>ETF Name</th>
+                            <th>Ticker</th>
+                            <th class="numeric">Quantity</th>
+                            <th class="numeric">Market Value</th>
+                            <th class="numeric">% of Equities</th>
+                            <th style="text-align: center;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for etf in etf_holdings %}
+                        <tr class="etf-row" onclick="toggleETFDetails({{ loop.index }})">
+                            <td>{{ etf.name }}</td>
+                            <td><strong>{{ etf.ticker }}</strong></td>
+                            <td class="numeric">{{ "{:,.2f}".format(etf.quantity) }}</td>
+                            <td class="numeric">${{ "{:,.2f}".format(etf.market_value) }}</td>
+                            <td class="numeric">{{ "{:.2f}".format(etf.percentage) }}%</td>
+                            <td style="text-align: center;">
+                                <span id="icon-{{ loop.index }}" class="expand-icon">▼</span>
+                                <strong>View Sector Breakdown</strong>
+                            </td>
+                        </tr>
+                        <tr id="etf-details-{{ loop.index }}" class="etf-details-row">
+                            <td colspan="6">
+                                <div class="etf-breakdown">
+                                    <h4>📊 Sector Breakdown: {{ etf.name }}</h4>
+                                    {% if etf.sector_breakdown %}
+                                    <table class="sector-breakdown-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sector</th>
+                                                <th class="numeric">Weight %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for sector, weight in etf.sector_breakdown.items() %}
+                                            <tr>
+                                                <td>{{ sector }}</td>
+                                                <td class="numeric">{{ "{:.2f}".format(weight) }}%</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% else %}
+                                    <p style="text-align: center; color: #6c757d; font-style: italic;">Sector breakdown data not available for this ETF</p>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            
+            <!-- Sector Analysis -->
+            <div class="section-header">
+                <h2>Sector Allocation Analysis</h2>
+            </div>
+            
+            {% if sector_breakdown %}
+            <div class="holdings-section">
+                <h3>Combined Sector Exposure vs SPY Benchmark</h3>
+                <table class="sector-table">
+                    <thead>
+                        <tr>
+                            <th>Sector</th>
+                            <th class="numeric">Direct %</th>
+                            <th class="numeric">ETF %</th>
+                            <th class="numeric">Total %</th>
+                            <th class="numeric">SPY %</th>
+                            <th class="numeric">Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sector, data in sector_breakdown.items() %}
+                        <tr>
+                            <td><strong>{{ sector }}</strong></td>
+                            <td class="numeric">{{ "{:.2f}".format(data.direct) }}%</td>
+                            <td class="numeric">{{ "{:.2f}".format(data.etf) }}%</td>
+                            <td class="numeric"><strong>{{ "{:.2f}".format(data.total) }}%</strong></td>
+                            <td class="numeric">{{ "{:.2f}".format(data.spy) }}%</td>
+                            <td class="numeric {% if data.diff > 5 %}overweight{% elif data.diff < -5 %}underweight{% else %}neutral{% endif %}">
+                                {% if data.diff > 0 %}+{% endif %}{{ "{:.2f}".format(data.diff) }}%
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <div class="legend">
+                    <strong>Legend:</strong>
+                    <span class="legend-item green">Overweight (&gt;5% vs SPY)</span>
+                    <span class="legend-item red">Underweight (&lt;-5% vs SPY)</span>
+                    <span class="legend-item gray">Neutral (±5% vs SPY)</span>
+                </div>
+            </div>
+            
+            <!-- Sector Comparison Chart -->
+            <div class="chart-section">
+                <div class="chart-container">
+                    <canvas id="sectorChart"></canvas>
+                </div>
+            </div>
+            {% endif %}
         {% endif %}
         
-        <!-- Update combined holdings table -->
-        <div class="holdings-section">
-            <h3>Top 10 Combined Holdings (Direct + ETF Exposure)</h3>
-            <table class="holdings-table">
-                <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th>Name</th>
-                        <th>Direct Value</th>
-                        <th>ETF Exposure</th>
-                        <th>ETF Sources</th>
-                        <th>Total Value</th>
-                        <th>% of Portfolio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for holding in combined_holdings %}
-                    <tr>
-                        <td>{{ holding.ticker }}</td>
-                        <td>{{ holding.name }}</td>
-                        <td>${{ "{:,.2f}".format(holding.direct_value) }}</td>
-                        <td>${{ "{:,.2f}".format(holding.indirect_value) }}</td>
-                        <td><span class="etf-sources">{{ holding.etf_sources }}</span></td>
-                        <td>${{ "{:,.2f}".format(holding.total_value) }}</td>
-                        <td>{{ "{:.2f}%".format(holding.percentage) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Sector Analysis -->
-        <div class="section-header">
-            <h2>Sector Analysis</h2>
-        </div>
-        
-        <!-- Sector Allocation Section -->
-        <div class="sector-section">
-            <h3>Sector Allocation Analysis</h3>
-            <table class="sector-table">
-                <thead>
-                    <tr>
-                        <th>Sector</th>
-                        <th>Portfolio %</th>
-                        <th>SPY %</th>
-                        <th>Difference</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sector in sector_allocation.sectors %}
-                    <tr>
-                        <td>{{ sector.sector }}</td>
-                        <td>{{ "{:.2f}%".format(sector.client_percentage) }}</td>
-                        <td>{{ "{:.2f}%".format(sector.spy_percentage) }}</td>
-                        <td class="{{ sector.status.lower() }}">{{ "{:+.2f}%".format(sector.delta) }}</td>
-                        <td>{{ sector.status }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Add sector chart -->
-        <div class="chart-section">
-            <canvas id="sectorChart"></canvas>
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Equity Breakdown Report</strong> | {{ client_code }} | {{ report_date }}</p>
+            <p>This report excludes ALT (alternative investment) positions | Powered by AurumFinance</p>
         </div>
     </div>
     
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Create sector comparison chart
-        const sectorCtx = document.getElementById('sectorChart').getContext('2d');
-        const sectorData = {
-            labels: [{% for sector in sector_allocation.sectors %}'{{ sector.sector }}',{% endfor %}],
-            datasets: [{
-                label: 'Portfolio',
-                data: [{% for sector in sector_allocation.sectors %}{{ sector.client_percentage }},{% endfor %}],
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }, {
-                label: 'SPY',
-                data: [{% for sector in sector_allocation.sectors %}{{ sector.spy_percentage }},{% endfor %}],
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        };
-
-        new Chart(sectorCtx, {
-            type: 'bar',
-            data: sectorData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
+        function toggleETFDetails(index) {
+            const detailsRow = document.getElementById(`etf-details-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            
+            if (detailsRow.classList.contains('visible')) {
+                detailsRow.classList.remove('visible');
+                icon.classList.remove('expanded');
+            } else {
+                detailsRow.classList.add('visible');
+                icon.classList.add('expanded');
+            }
+        }
+        
+        // Chart.js sector comparison
+        {% if sector_breakdown %}
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('sectorChart').getContext('2d');
+            
+            const labels = [{% for sector in sector_breakdown.keys() %}'{{ sector }}',{% endfor %}];
+            const portfolioData = [{% for data in sector_breakdown.values() %}{{ data.total }},{% endfor %}];
+            const spyData = [{% for data in sector_breakdown.values() %}{{ data.spy }},{% endfor %}];
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Portfolio Allocation',
+                        data: portfolioData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: 'SPY Benchmark',
+                        data: spyData,
+                        backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
                         title: {
                             display: true,
-                            text: 'Percentage'
+                            text: 'Sector Allocation Comparison: Portfolio vs SPY Benchmark',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: 20
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
+                                }
+                            }
                         }
                     }
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Sector Allocation vs SPY'
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
                 }
-            }
+            });
         });
-    });
+        {% endif %}
     </script>
 </body>
 </html>
