@@ -57,6 +57,8 @@ class CashFlowService:
         'BILL PMT',
         # CS Bank_Specific
         'Cross Border Credit Transfer',
+        # HSBC Bank-Specific
+        'Wire Transfer Debit',
         #banchile Bank-Specific
         'Wire Transfer Out', 'Rescate'
     ]
@@ -112,7 +114,7 @@ class CashFlowService:
                 'Wire Transfer Debit', 'Withdrawal', 'Wire Out'
             ],
             'TRADING_EXCLUDED': [
-                'Security Redeemed', 'Purchase', 'Sale'
+                'Security Redeemed', 'Sell', 'Buy', 'Purchase', 'Sale'
             ],
             'PROBLEMATIC_EXCLUDED': []
         },
@@ -405,6 +407,37 @@ class CashFlowService:
         
         return transaction_type.strip()
     
+    def _extract_hsbc_transaction_type(self, transaction_type: str) -> str:
+        """
+        Extract clean transaction type from HSBC bank complex descriptions.
+        
+        HSBC patterns:
+        - "Sell -250000.00000 Parvalue Of Tsrys5668797 At 100.0625" -> "Sell"
+        - "Buy 150000.00000 Parvalue Of Orcl5903544 At 97.0000" -> "Buy"
+        - "Purchase 161 Shares of SPDR Gold Shares @ 308.8199" -> "Purchase"
+        
+        Args:
+            transaction_type: Raw HSBC transaction description
+            
+        Returns:
+            Extracted transaction type
+        """
+        patterns = [
+            (r'^(Sell)\s+[-]?[\d,]+\.?\d*\s+Parvalue\s+Of\s+\w+\s+At\s+[\d.]+', r'\1'),
+            (r'^(Buy)\s+[-]?[\d,]+\.?\d*\s+Parvalue\s+Of\s+\w+\s+At\s+[\d.]+', r'\1'),
+            (r'^(Purchase)\s+[-]?\d+\s+Shares\s+of', r'\1'),
+            (r'^(Sale)\s+[-]?[\d,]+\.?\d*\s+Parvalue\s+Of', r'\1'),
+        ]
+        
+        for pattern, replacement in patterns:
+            match = re.match(pattern, transaction_type, re.IGNORECASE)
+            if match:
+                extracted = match.group(1)
+                logger.debug(f"HSBC extraction: '{transaction_type}' -> '{extracted}'")
+                return extracted
+        
+        return transaction_type.strip()
+    
     def _extract_stdsz_transaction_type(self, transaction_type: str) -> str:
         """
         Extract clean transaction type from STDSZ bank complex descriptions.
@@ -486,6 +519,8 @@ class CashFlowService:
             return self._extract_idb_transaction_type(transaction_type)
         elif bank in ['Pershing', 'PERSHING']:
             return self._extract_pershing_transaction_type(transaction_type)
+        elif bank == 'HSBC':
+            return self._extract_hsbc_transaction_type(transaction_type)
         elif bank == 'STDSZ':
             return self._extract_stdsz_transaction_type(transaction_type)
         return transaction_type.strip()

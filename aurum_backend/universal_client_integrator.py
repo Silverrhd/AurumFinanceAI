@@ -194,7 +194,7 @@ class UniversalClientIntegrator:
                 # Remove the id and snapshot reference for recreation
                 pos_data.pop('id', None)
                 pos_data['snapshot'] = snapshot
-                pos_data['asset_id'] = pos_data.pop('asset')  # Fix foreign key reference
+                # The foreign key field is already 'asset_id' in values() output, no need to rename
                 Position.objects.create(**pos_data)
             
             self.logger.info(f"   🔄 Restored {len(preserved_positions)} positions from other banks")

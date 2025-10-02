@@ -16,7 +16,7 @@ import {
   Settings
 } from 'lucide-react';
 
-// The 12 ProjectAurum Banks with their processing types
+// The 13 ProjectAurum Banks with their processing types
 const PROJECTAURUM_BANKS = [
   { code: 'JPM', name: 'JPMorgan', type: 'simple', color: 'bg-blue-500' },
   { code: 'MS', name: 'Morgan Stanley', type: 'simple', color: 'bg-green-500' },
@@ -28,6 +28,7 @@ const PROJECTAURUM_BANKS = [
   { code: 'JB', name: 'JB Private Bank', type: 'combination', color: 'bg-teal-500' },
   { code: 'CSC', name: 'Charles Schwab', type: 'combination', color: 'bg-lime-500' },
   { code: 'Banchile', name: 'Banchile', type: 'combination', color: 'bg-cyan-500' },
+  { code: 'Gonet', name: 'Gonet Bank', type: 'combination', color: 'bg-slate-600' },
   { code: 'Pershing', name: 'Pershing', type: 'enrichment_combination', color: 'bg-indigo-500' },
   { code: 'LO', name: 'Lombard', type: 'enrichment_combination', color: 'bg-pink-500' }
 ];
@@ -172,7 +173,7 @@ export function ProjectAurumBankStatus({ onProcessBank }: ProjectAurumBankStatus
           </Button>
         </div>
         <p className="text-sm text-gray-600">
-          Monitor file status and processing requirements for all 12 ProjectAurum banks
+          Monitor file status and processing requirements for all 13 ProjectAurum banks
           {currentDate && (
             <span className="font-medium text-blue-600"> - Status for {formatDateDisplay(currentDate)}</span>
           )}
@@ -275,7 +276,7 @@ export function ProjectAurumBankStatus({ onProcessBank }: ProjectAurumBankStatus
             </div>
             <div className="flex items-center gap-2">
               <Badge className="bg-purple-100 text-purple-700">Combination</Badge>
-              <span className="text-gray-600">Requires combining (CS, Valley, JB, CSC, Banchile)</span>
+              <span className="text-gray-600">Requires combining (CS, Valley, JB, CSC, Banchile, Gonet)</span>
             </div>
             <div className="flex items-center gap-2">
               <Badge className="bg-red-100 text-red-700">Enrichment + Combination</Badge>

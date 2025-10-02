@@ -24,7 +24,7 @@ class ProcessingService:
         self.preprocessor = UnifiedPreprocessor()
         self.supported_banks = [
             'JPM', 'MS', 'CSC', 'Pershing', 'CS', 'JB', 
-            'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT', 'Citi'
+            'HSBC', 'Valley', 'Safra', 'LO', 'IDB', 'Banchile', 'ALT', 'Citi', 'Pictet'
         ]
     
     def detect_bank(self, filename: str) -> Optional[str]:
