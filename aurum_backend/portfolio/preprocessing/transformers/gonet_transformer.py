@@ -141,23 +141,6 @@ class GonetTransformer:
 
         Returns:
             DataFrame with transformed transactions data
-
-        TODO: Implement column mapping from Gonet format to standard format
-
-        Gonet Columns (from sample file):
-        - Fecha (date)
-        - CUSIP
-        - Descripción (description)
-        - Valor (value date)
-        - Débito (debit)
-        - Crédito (credit)
-        - Ingresos (income)
-        - Balance
-
-        Standard Output Columns Needed:
-        ['bank', 'client', 'account', 'transaction_date', 'settlement_date',
-         'description', 'cusip', 'ticker', 'quantity', 'price', 'amount',
-         'transaction_type', 'currency']
         """
         logger.info(f"🔄 Transforming Gonet transactions file: {transactions_file}")
 
@@ -172,21 +155,50 @@ class GonetTransformer:
             logger.info(f"📊 Loaded {len(df)} transactions with {len(df.columns)} columns")
             logger.info(f"📋 Available columns: {list(df.columns)}")
 
-            # TODO: Implement detailed transformation logic here
-            # Steps needed:
-            # 1. Date parsing (Fecha -> transaction_date)
-            # 2. Map Débito/Crédito to amount
-            # 3. Determine transaction_type
-            # 4. Handle CUSIP mapping
-            # 5. Extract currency
+            # Create result DataFrame
+            result_df = pd.DataFrame()
 
-            logger.info("⚠️ SKELETON: Transactions transformation logic needs implementation")
-            logger.info(f"  Would transform {len(df)} transactions")
+            # STEP 1: Direct mappings
+            logger.info("📋 Step 1: Direct column mappings")
+            result_df['bank'] = df['bank']
+            result_df['client'] = df['client']
+            result_df['account'] = df['account']
+            result_df['cusip'] = df['CUSIP']
+            result_df['transaction_type'] = df['Descripción']
 
-            return self._create_empty_transactions_dataframe()
+            # STEP 2: Empty columns (no data available)
+            result_df['price'] = None
+            result_df['quantity'] = None
+
+            # STEP 3: Date conversion (DD.MM.YYYY → MM/DD/YYYY)
+            logger.info("📋 Step 2: Converting date format (DD.MM.YYYY → MM/DD/YYYY)")
+            result_df['date'] = df['Fecha'].apply(self._convert_gonet_date)
+
+            # STEP 4: Amount conversion (Débito + Crédito → amount)
+            logger.info("📋 Step 3: Merging Débito/Crédito into amount (American+spaces → European)")
+            amounts = []
+            for idx, row in df.iterrows():
+                amount = self._convert_amount_from_debit_credit(row['Débito'], row['Crédito'])
+                amounts.append(amount)
+
+            result_df['amount'] = amounts
+
+            # STEP 5: Ensure column order
+            output_columns = [
+                'bank', 'client', 'account', 'date', 'transaction_type',
+                'cusip', 'price', 'quantity', 'amount'
+            ]
+            result_df = result_df[output_columns]
+
+            logger.info(f"✅ Transformation completed: {len(result_df)} transactions")
+            logger.info(f"📊 Output columns: {list(result_df.columns)}")
+
+            return result_df
 
         except Exception as e:
             logger.error(f"❌ Error transforming transactions: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
             return self._create_empty_transactions_dataframe()
 
     def _clean_quantity(self, quantity_value):
@@ -317,10 +329,104 @@ class GonetTransformer:
             'ticker', 'cusip', 'coupon_rate', 'maturity_date'
         ])
 
+    def _convert_gonet_date(self, date_value):
+        """
+        Convert Gonet date format from DD.MM.YYYY to MM/DD/YYYY.
+
+        Examples:
+            03.01.2024 → 01/03/2024
+            17.04.2024 → 04/17/2024
+            25.12.2024 → 12/25/2024
+        """
+        if pd.isna(date_value):
+            return None
+
+        try:
+            # Parse DD.MM.YYYY format
+            date_str = str(date_value).strip()
+            date_obj = datetime.strptime(date_str, '%d.%m.%Y')
+
+            # Format to MM/DD/YYYY
+            result = date_obj.strftime('%m/%d/%Y')
+
+            return result
+
+        except Exception as e:
+            logger.warning(f"Could not convert date '{date_value}': {e}")
+            return None
+
+    def _convert_amount_from_debit_credit(self, debito_value, credito_value):
+        """
+        Merge Débito and Crédito columns into single amount.
+        Convert American format with spaces to European format.
+
+        Logic:
+        - If Crédito exists: use Crédito (positive)
+        - Else if Débito exists: use Débito (negative)
+        - Remove spaces, convert to European format
+
+        Examples:
+            Crédito: "4 382.05" → "4382,05"
+            Crédito: "1 141.78 1" → "1141,78" (strip extra text)
+            Débito: "-6 416.94" → "-6416,94"
+            Débito: "-203 200.00" → "-203200,00"
+        """
+        # Determine which value to use
+        if pd.notna(credito_value):
+            amount_value = credito_value
+        elif pd.notna(debito_value):
+            amount_value = debito_value
+        else:
+            return None
+
+        try:
+            # Convert to string
+            amount_str = str(amount_value).strip()
+
+            # Handle negative sign
+            is_negative = amount_str.startswith('-')
+            if is_negative:
+                amount_str = amount_str[1:].strip()
+
+            # Step 1: Remove ALL spaces (thousands separators)
+            amount_str = amount_str.replace(' ', '')
+
+            # Step 2: Remove any trailing text (like "1" in "1 141.78 1")
+            # Extract only the numeric part with period/comma
+            import re
+            numeric_match = re.match(r'^([\d,\.]+)', amount_str)
+            if numeric_match:
+                amount_str = numeric_match.group(1)
+
+            # Step 3: Convert American to European format
+            # American: 7,802.30 → European: 7.802,30
+            if '.' in amount_str:
+                # Has decimal point
+                if ',' in amount_str:
+                    # Has both comma and period: "7,802.30"
+                    # Replace comma with period, then final period with comma
+                    parts = amount_str.split('.')
+                    if len(parts) == 2:
+                        integer_part = parts[0].replace(',', '.')
+                        decimal_part = parts[1]
+                        amount_str = f"{integer_part},{decimal_part}"
+                else:
+                    # Only period: "7802.30"
+                    # Replace period with comma
+                    amount_str = amount_str.replace('.', ',')
+
+            # Re-add negative sign if needed
+            result = f"-{amount_str}" if is_negative else amount_str
+
+            return result
+
+        except Exception as e:
+            logger.warning(f"Could not convert amount from Débito={debito_value}, Crédito={credito_value}: {e}")
+            return None
+
     def _create_empty_transactions_dataframe(self) -> pd.DataFrame:
         """Create empty DataFrame with standard transactions columns."""
         return pd.DataFrame(columns=[
-            'bank', 'client', 'account', 'transaction_date', 'settlement_date',
-            'description', 'cusip', 'ticker', 'quantity', 'price',
-            'amount', 'transaction_type', 'currency'
+            'bank', 'client', 'account', 'date', 'transaction_type',
+            'cusip', 'price', 'quantity', 'amount'
         ])
