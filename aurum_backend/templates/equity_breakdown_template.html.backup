@@ -511,8 +511,8 @@
                         <div class="label">Total Equity Value</div>
                     </div>
                     <div class="summary-card">
-                        <div class="value">{{ aggregated_holdings_count }}</div>
-                        <div class="label">Unique Stock Holdings</div>
+                        <div class="value">{{ direct_holdings_count }}</div>
+                        <div class="label">Direct Holdings</div>
                     </div>
                     <div class="summary-card">
                         <div class="value">{{ etf_holdings_count }}</div>
@@ -523,99 +523,34 @@
             
             <!-- Holdings Analysis -->
             <div class="section-header">
-                <h2>Portfolio Holdings Analysis (Look-Through View)</h2>
-                <p style="text-align: center; color: #666; font-size: 14px; margin-top: 10px;">
-                    📊 This view shows all stock holdings with ETF positions "looked through" to show underlying stocks
-                </p>
+                <h2>Portfolio Holdings Analysis</h2>
             </div>
-
-            <!-- Aggregated Holdings Section (NEW - Look-Through View) -->
-            {% if aggregated_holdings_count > 0 %}
+            
+            <!-- Direct Holdings Section -->
+            {% if direct_holdings_count > 0 %}
             <div class="holdings-section">
-                <h3>Stock Holdings (Direct + ETF Look-Through)</h3>
-                <p style="font-size: 13px; color: #666; margin: 5px 0 15px 0; font-style: italic;">
-                    📊 ETF analysis shows top 10 holdings per fund, representing approximately 30-50% of each fund's value
-                </p>
+                <h3>Direct Equity Holdings</h3>
                 <table class="holdings-table">
                     <thead>
                         <tr>
                             <th>Ticker</th>
                             <th>Company Name</th>
                             <th>Sector</th>
-                            <th class="numeric">Direct Value</th>
-                            <th class="numeric">ETF Value</th>
-                            <th class="numeric">Total Value</th>
-                            <th class="numeric">% Portfolio</th>
-                            <th style="text-align: center;">Source</th>
+                            <th class="numeric">Quantity</th>
+                            <th class="numeric">Market Value</th>
+                            <th class="numeric">% of Equities</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for holding in aggregated_holdings %}
-                        <tr class="{% if holding.etf_contributions|length > 0 %}has-etf-contrib{% endif %}">
+                        {% for holding in direct_holdings %}
+                        <tr>
                             <td><strong>{{ holding.ticker }}</strong></td>
                             <td>{{ holding.name }}</td>
                             <td>{{ holding.sector }}</td>
-                            <td class="numeric">
-                                {% if holding.direct_value > 0 %}
-                                    ${{ "{:,.2f}".format(holding.direct_value) }}
-                                    <br><small>({{ "{:,.1f}".format(holding.direct_shares) }} shares)</small>
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td class="numeric">
-                                {% if holding.etf_value > 0 %}
-                                    ${{ "{:,.2f}".format(holding.etf_value) }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td class="numeric"><strong>${{ "{:,.2f}".format(holding.total_value) }}</strong></td>
-                            <td class="numeric"><strong>{{ "{:.2f}".format(holding.percentage) }}%</strong></td>
-                            <td style="text-align: center; font-size: 12px;">
-                                {% if holding.direct_value > 0 and holding.etf_value > 0 %}
-                                    <span style="color: #0066cc;">🔵 Direct + ETFs</span>
-                                {% elif holding.direct_value > 0 %}
-                                    <span style="color: #00aa00;">✓ Direct Only</span>
-                                {% else %}
-                                    <span style="color: #ff6600;">📦 via ETFs Only</span>
-                                {% endif %}
-                                {% if holding.etf_contributions|length > 0 %}
-                                    <br><button onclick="toggleETFSource('{{ holding.ticker }}')" style="font-size: 11px; padding: 2px 8px; margin-top: 4px; cursor: pointer; background: #f0f0f0; border: 1px solid #ccc; border-radius: 3px;">
-                                        View ETF Sources ▼
-                                    </button>
-                                {% endif %}
-                            </td>
+                            <td class="numeric">{{ "{:,.2f}".format(holding.quantity) }}</td>
+                            <td class="numeric">${{ "{:,.2f}".format(holding.market_value) }}</td>
+                            <td class="numeric">{{ "{:.2f}".format(holding.percentage) }}%</td>
                         </tr>
-                        {% if holding.etf_contributions|length > 0 %}
-                        <tr id="etf-source-{{ holding.ticker }}" class="etf-source-row" style="display: none;">
-                            <td colspan="8" style="background-color: #f9f9f9; padding: 15px;">
-                                <div style="margin-left: 20px;">
-                                    <h4 style="margin: 0 0 10px 0; color: #555;">📊 ETF Contributions for {{ holding.ticker }}:</h4>
-                                    <table style="width: 100%; font-size: 13px;">
-                                        <thead>
-                                            <tr style="background-color: #e0e0e0;">
-                                                <th style="padding: 8px; text-align: left;">ETF Ticker</th>
-                                                <th style="padding: 8px; text-align: left;">ETF Name</th>
-                                                <th style="padding: 8px; text-align: right;">Weight in ETF</th>
-                                                <th style="padding: 8px; text-align: right;">Indirect Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for contrib in holding.etf_contributions %}
-                                            <tr>
-                                                <td style="padding: 6px;"><strong>{{ contrib.etf_ticker }}</strong></td>
-                                                <td style="padding: 6px;">{{ contrib.etf_name }}</td>
-                                                <td style="padding: 6px; text-align: right;">{{ "{:.2f}".format(contrib.weight) }}%</td>
-                                                <td style="padding: 6px; text-align: right;">${{ "{:,.2f}".format(contrib.value) }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -746,23 +681,13 @@
         function toggleETFDetails(index) {
             const detailsRow = document.getElementById(`etf-details-${index}`);
             const icon = document.getElementById(`icon-${index}`);
-
+            
             if (detailsRow.classList.contains('visible')) {
                 detailsRow.classList.remove('visible');
                 icon.classList.remove('expanded');
             } else {
                 detailsRow.classList.add('visible');
                 icon.classList.add('expanded');
-            }
-        }
-
-        // NEW: Toggle ETF source details for aggregated holdings
-        function toggleETFSource(ticker) {
-            const sourceRow = document.getElementById(`etf-source-${ticker}`);
-            if (sourceRow.style.display === 'none') {
-                sourceRow.style.display = 'table-row';
-            } else {
-                sourceRow.style.display = 'none';
             }
         }
         
