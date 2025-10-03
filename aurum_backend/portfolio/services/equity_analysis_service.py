@@ -18,18 +18,20 @@ class EquityAnalysisService:
 
     def __init__(self):
         self.fmp_service = FMPEquityService()
-        self.etf_detector = ETFDetector()
+        # Pass FMP service to ETF detector for API-based detection
+        self.etf_detector = ETFDetector(fmp_service=self.fmp_service)
 
     def analyze_equity_portfolio(self, positions) -> Dict:
         """
-        Main analysis method.
+        Main analysis method with ETF look-through disaggregation.
 
         Args:
             positions: QuerySet of Position objects (Equities only, ALTs excluded)
 
         Returns:
             {
-                'direct_holdings': [...],
+                'aggregated_holdings': [...],  # Stock-level view with direct + ETF contributions
+                'direct_holdings': [...],  # DEPRECATED: kept for backward compatibility
                 'etf_holdings': [...],
                 'direct_sector_exposure': {...},
                 'etf_sector_exposure': {...},
@@ -50,8 +52,15 @@ class EquityAnalysisService:
         # Enrich direct equities with sector data
         direct_holdings_enriched = self._enrich_direct_holdings(direct_equities, total_equity_value)
 
-        # Analyze ETF holdings
+        # Analyze ETF holdings with sector breakdown
         etf_holdings_enriched = self._enrich_etf_holdings(etfs, total_equity_value)
+
+        # NEW: Perform ETF look-through disaggregation
+        aggregated_holdings = self._aggregate_with_etf_lookthrough(
+            direct_equities,
+            etfs,
+            total_equity_value
+        )
 
         # Calculate sector exposures
         direct_sector_exposure = self._calculate_direct_sector_exposure(direct_holdings_enriched)
@@ -68,7 +77,8 @@ class EquityAnalysisService:
         sector_comparison = self._compare_with_spy(combined_sector_exposure, spy_benchmark)
 
         return {
-            'direct_holdings': direct_holdings_enriched,
+            'aggregated_holdings': aggregated_holdings,  # NEW: Look-through view
+            'direct_holdings': direct_holdings_enriched,  # Kept for backward compatibility
             'etf_holdings': etf_holdings_enriched,
             'direct_sector_exposure': direct_sector_exposure,
             'etf_sector_exposure': etf_sector_exposure,
@@ -212,3 +222,140 @@ class EquityAnalysisService:
         comparison = dict(sorted(comparison.items(), key=lambda x: x[1]['total'], reverse=True))
 
         return comparison
+
+    def _aggregate_with_etf_lookthrough(self, direct_equities: List, etfs: List, total_equity_value: float) -> List[Dict]:
+        """
+        Aggregate stock holdings with ETF look-through disaggregation.
+
+        This method "looks through" ETFs to show the underlying stock holdings,
+        combining them with any direct holdings of the same stock.
+
+        Args:
+            direct_equities: List of direct stock positions
+            etfs: List of ETF positions
+            total_equity_value: Total portfolio equity value
+
+        Returns:
+            List of aggregated holdings with structure:
+            [
+                {
+                    'ticker': 'AAPL',
+                    'name': 'Apple Inc',
+                    'sector': 'Technology',
+                    'direct_value': 100000,
+                    'direct_shares': 100,
+                    'etf_value': 50000,
+                    'etf_contributions': [
+                        {'etf_ticker': 'SPY', 'etf_name': 'S&P 500 ETF', 'value': 30000, 'weight': 6.7},
+                        {'etf_ticker': 'QQQ', 'etf_name': 'Nasdaq ETF', 'value': 20000, 'weight': 8.2}
+                    ],
+                    'total_value': 150000,
+                    'percentage': 5.5
+                },
+                ...
+            ]
+        """
+        logger.info("Performing ETF look-through disaggregation...")
+
+        aggregated_map = {}  # ticker -> aggregated data
+
+        # Step 1: Add direct holdings to aggregated map
+        for position in direct_equities:
+            ticker = position.asset.ticker or position.asset.name
+            if not ticker:
+                continue
+
+            ticker = ticker.upper().strip()
+
+            # Get sector from FMP
+            profile = self.fmp_service.get_company_profile(ticker)
+            sector = profile.get('sector', 'Unknown') if profile else 'Unknown'
+            company_name = profile.get('company_name', position.asset.name) if profile else position.asset.name
+
+            aggregated_map[ticker] = {
+                'ticker': ticker,
+                'name': company_name,
+                'sector': sector,
+                'direct_value': float(position.market_value),
+                'direct_shares': float(position.quantity),
+                'etf_value': 0.0,
+                'etf_contributions': [],
+                'total_value': 0.0,
+                'percentage': 0.0
+            }
+
+        # Step 2: For each ETF, get holdings and distribute to aggregated map
+        for etf_position in etfs:
+            etf_ticker = etf_position.asset.ticker
+            if not etf_ticker:
+                logger.warning(f"Skipping ETF without ticker: {etf_position.asset.name}")
+                continue
+
+            etf_value = float(etf_position.market_value)
+            etf_name = etf_position.asset.name
+
+            # Get ETF holdings from FMP API
+            etf_holdings = self.fmp_service.get_etf_holdings(etf_ticker)
+
+            if not etf_holdings:
+                logger.warning(f"No holdings data found for ETF {etf_ticker}")
+                continue
+
+            # Use Top 10 holdings only for performance and practical relevance
+            original_count = len(etf_holdings)
+            if original_count > 10:
+                etf_holdings = etf_holdings[:10]
+                logger.info(f"Using top 10 holdings for {etf_ticker} (out of {original_count} total)")
+            else:
+                logger.info(f"Processing {original_count} holdings from {etf_ticker}")
+
+            # Distribute ETF value across underlying holdings
+            for holding in etf_holdings:
+                stock_ticker = holding.get('symbol', '').upper().strip()
+                if not stock_ticker:
+                    continue
+
+                weight = holding.get('weight', 0) / 100.0  # Convert percentage to decimal
+                indirect_value = etf_value * weight
+
+                # Initialize or update aggregated holding
+                if stock_ticker not in aggregated_map:
+                    # Get sector for this stock
+                    profile = self.fmp_service.get_company_profile(stock_ticker)
+                    sector = profile.get('sector', 'Unknown') if profile else 'Unknown'
+                    stock_name = holding.get('name', stock_ticker)
+
+                    aggregated_map[stock_ticker] = {
+                        'ticker': stock_ticker,
+                        'name': stock_name,
+                        'sector': sector,
+                        'direct_value': 0.0,
+                        'direct_shares': 0.0,
+                        'etf_value': 0.0,
+                        'etf_contributions': [],
+                        'total_value': 0.0,
+                        'percentage': 0.0
+                    }
+
+                # Add ETF contribution
+                aggregated_map[stock_ticker]['etf_value'] += indirect_value
+                aggregated_map[stock_ticker]['etf_contributions'].append({
+                    'etf_ticker': etf_ticker,
+                    'etf_name': etf_name,
+                    'value': indirect_value,
+                    'weight': round(weight * 100, 2)
+                })
+
+        # Step 3: Calculate totals and percentages
+        aggregated_holdings = []
+        for ticker, data in aggregated_map.items():
+            data['total_value'] = data['direct_value'] + data['etf_value']
+            data['percentage'] = round((data['total_value'] / total_equity_value * 100), 2) if total_equity_value > 0 else 0.0
+            aggregated_holdings.append(data)
+
+        # Step 4: Sort by total value descending
+        aggregated_holdings.sort(key=lambda x: x['total_value'], reverse=True)
+
+        logger.info(f"Aggregated into {len(aggregated_holdings)} unique stock holdings")
+
+        return aggregated_holdings

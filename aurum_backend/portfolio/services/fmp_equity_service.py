@@ -16,6 +16,71 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+# Comprehensive UCITS to US ETF Mapping Dictionary
+# Maps European UCITS ETFs to their US-domiciled equivalents for data lookup
+UCITS_TO_US_MAPPING = {
+    # S&P 500 Core Trackers
+    'CSPX': 'IVV',          # iShares Core S&P 500 UCITS → iShares Core S&P 500
+    'CSPX LN': 'IVV',       # Same with London exchange suffix
+    'VUSA': 'VOO',          # Vanguard S&P 500 UCITS → Vanguard S&P 500
+    'VUAA': 'VOO',          # Vanguard S&P 500 UCITS (Acc) → Vanguard S&P 500
+    'SPY5': 'SPY',          # SPDR S&P 500 UCITS → SPDR S&P 500
+    'CSTNL': 'IVV',         # iShares Core S&P 500 UCITS → iShares Core S&P 500
+
+    # Nasdaq 100 Trackers
+    'EQQQ': 'QQQ',          # Invesco EQQQ Nasdaq 100 UCITS → Invesco QQQ
+    'EQAC': 'QQQ',          # Invesco EQQQ Nasdaq 100 UCITS (Acc) → Invesco QQQ
+    'CNDX': 'QQQ',          # iShares Nasdaq 100 UCITS → Invesco QQQ
+
+    # Total Market / Broad Trackers
+    'VWRA': 'VT',           # Vanguard FTSE All-World UCITS (Acc) → Vanguard Total World
+    'VWRL': 'VT',           # Vanguard FTSE All-World UCITS (Dist) → Vanguard Total World
+    'IRRRF': 'ACWI',        # iShares MSCI World UCITS → iShares MSCI ACWI
+
+    # Europe / Regional Trackers
+    'IEUR': 'VGK',          # iShares Core MSCI Europe UCITS → Vanguard FTSE Europe
+    'ISF': 'ISF',           # iShares Core FTSE 100 → No US equivalent (UK-specific)
+    'CCAU': 'EWC',          # iShares MSCI Canada UCITS → iShares MSCI Canada
+
+    # Emerging Markets
+    'EIMI': 'IEMG',         # iShares Core EM IMI UCITS → iShares Core MSCI EM
+    'ICHN': 'MCHI',         # iShares MSCI China UCITS → iShares MSCI China
+    'NDIA': 'INDA',         # iShares MSCI India UCITS → iShares MSCI India
+    'CPXJ': 'EPP',          # iShares MSCI Pacific ex-Japan UCITS → iShares MSCI Pacific ex-Japan
+
+    # iShares S&P 500 Sector UCITS ETFs → Select Sector SPDR ETFs
+    'IUCD': 'XLY',          # iShares S&P 500 Consumer Discretionary UCITS → Consumer Discretionary SPDR
+    'IUCD LN': 'XLY',       # Same with London exchange suffix
+    'IUCS': 'XLP',          # iShares S&P 500 Consumer Staples UCITS → Consumer Staples SPDR
+    'IUCS LN': 'XLP',       # Same with London exchange suffix
+    'IUFS': 'XLF',          # iShares S&P 500 Financials UCITS → Financial SPDR
+    'IUHC': 'XLV',          # iShares S&P 500 Healthcare UCITS → Healthcare SPDR
+    'IUIS': 'XLI',          # iShares S&P 500 Industrials UCITS → Industrial SPDR
+    'IUIT': 'XLK',          # iShares S&P 500 Info Tech UCITS → Technology SPDR
+    'IUCM': 'XLC',          # iShares S&P 500 Communication UCITS → Communication Services SPDR
+    'IUUS': 'XLU',          # iShares S&P 500 Utilities UCITS → Utilities SPDR
+
+    # Xtrackers MSCI USA Sector UCITS ETFs → Select Sector SPDR ETFs
+    'XUCD': 'XLY',          # Xtrackers MSCI USA Consumer Discretionary UCITS → Consumer Discretionary SPDR
+    'XUFN': 'XLF',          # Xtrackers MSCI USA Financials UCITS → Financial SPDR
+    'XUHC': 'XLV',          # Xtrackers MSCI USA Healthcare UCITS → Healthcare SPDR
+    'XUTC': 'XLK',          # Xtrackers MSCI USA Info Tech UCITS → Technology SPDR
+    'XUCM': 'XLC',          # Xtrackers MSCI USA Communication Services UCITS → Communication Services SPDR
+
+    # iShares MSCI Europe Sector ETFs → Vanguard/iShares US Sector Equivalents
+    'ESIN.DE': 'XLI',       # iShares MSCI Europe Industrials → Industrial SPDR
+    'ESIH.DE': 'XLV',       # iShares MSCI Europe Healthcare → Healthcare SPDR
+    'ESI1.DE': 'XLY',       # iShares MSCI Europe Consumer Discretionary → Consumer Discretionary SPDR
+    'ESIS.DE': 'XLP',       # iShares MSCI Europe Consumer Staples → Consumer Staples SPDR
+    'ESIF.DE': 'XLF',       # iShares MSCI Europe Financials → Financial SPDR
+    'ESIT.DE': 'XLK',       # iShares MSCI Europe Info Tech → Technology SPDR
+
+    # Thematic / Strategy ETFs
+    'ICLN': 'ICLN',         # iShares Global Clean Energy → Same ticker exists in US
+    'IEMXF': 'ACWV',        # iShares Edge MSCI World Min Vol → iShares MSCI Global Min Vol
+}
+
+
 class FMPRateLimiter:
     """Token bucket rate limiter for FMP API (300 req/min)."""
 
@@ -250,21 +315,22 @@ class FMPEquityService:
                 'market_cap': profile_data.get('mktCap', 0)
             }
 
-            # Cache the result
+            # Cache the successful result
             self.cache.set(ticker, result, 'profile')
             return result
 
-        # Cache empty result
+        # DON'T cache empty/failed results - return without caching
+        # This allows retry on next request in case of temporary API issues
+        logger.warning(f"No profile data found for {ticker} - will retry on next request")
         empty_result = {
             'ticker': ticker,
             'sector': 'Unknown',
             'error': 'No data available'
         }
-        self.cache.set(ticker, empty_result, 'profile')
         return empty_result
 
     def get_etf_holdings(self, ticker: str) -> Optional[List[Dict]]:
-        """Get ETF holdings breakdown."""
+        """Get ETF holdings breakdown with UCITS to US mapping fallback."""
         if not ticker:
             return None
 
@@ -275,32 +341,45 @@ class FMPEquityService:
         if cached_data:
             return cached_data
 
-        # Make API request
-        endpoint = f"v4/etf-holdings"
-        params = {'symbol': ticker}
-        response_data = self._make_request(endpoint, params)
+        # Make API request - use v3/etf-holder endpoint (confirmed working)
+        endpoint = f"v3/etf-holder/{ticker}"
+        response_data = self._make_request(endpoint)
 
-        if response_data and isinstance(response_data, list):
+        if response_data and isinstance(response_data, list) and len(response_data) > 0:
             holdings = []
             for holding in response_data:
                 holdings.append({
-                    'symbol': holding.get('symbol', ''),
+                    'symbol': holding.get('asset', ''),
                     'name': holding.get('name', ''),
                     'weight': holding.get('weightPercentage', 0),
                     'shares': holding.get('sharesNumber', 0),
                     'market_value': holding.get('marketValue', 0)
                 })
 
-            # Cache the result
+            # Cache successful result (7 days - ETF holdings change slowly)
             self.cache.set(ticker, holdings, 'etf_holdings')
+            logger.info(f"Fetched {len(holdings)} holdings for ETF {ticker}")
             return holdings
 
-        # Cache empty result
-        self.cache.set(ticker, [], 'etf_holdings')
+        # UCITS Mapping Fallback: Try US equivalent if European UCITS ETF
+        if ticker in UCITS_TO_US_MAPPING:
+            us_equivalent = UCITS_TO_US_MAPPING[ticker]
+            logger.info(f"No data for UCITS ETF {ticker}, using US equivalent {us_equivalent}")
+
+            # Recursively call with US equivalent (will use cache if available)
+            us_holdings = self.get_etf_holdings(us_equivalent)
+            if us_holdings:
+                # Cache the result under original ticker too
+                self.cache.set(ticker, us_holdings, 'etf_holdings')
+                logger.info(f"Successfully mapped {ticker} → {us_equivalent} ({len(us_holdings)} holdings)")
+                return us_holdings
+
+        # DON'T cache empty/failed results - return without caching
+        logger.warning(f"No ETF holdings found for {ticker} - will retry on next request")
         return []
 
     def get_etf_sector_weightings(self, ticker: str) -> Optional[Dict[str, float]]:
-        """Get ETF sector allocation breakdown."""
+        """Get ETF sector allocation breakdown with UCITS to US mapping fallback."""
         if not ticker:
             return None
 
@@ -338,9 +417,55 @@ class FMPEquityService:
             self.cache.set(ticker, sector_weights, 'sector_weightings')
             return sector_weights
 
-        # Cache empty result
-        self.cache.set(ticker, {}, 'sector_weightings')
+        # UCITS Mapping Fallback: Try US equivalent if European UCITS ETF
+        if ticker in UCITS_TO_US_MAPPING:
+            us_equivalent = UCITS_TO_US_MAPPING[ticker]
+            logger.info(f"No sector data for UCITS ETF {ticker}, using US equivalent {us_equivalent}")
+
+            # Recursively call with US equivalent (will use cache if available)
+            us_sectors = self.get_etf_sector_weightings(us_equivalent)
+            if us_sectors:
+                # Cache the result under original ticker too
+                self.cache.set(ticker, us_sectors, 'sector_weightings')
+                logger.info(f"Successfully mapped {ticker} → {us_equivalent} (sector weightings)")
+                return us_sectors
+
+        # DON'T cache empty/failed results - return without caching
+        logger.warning(f"No sector weightings found for {ticker} - will retry on next request")
         return {}
+
+    def is_etf(self, ticker: str) -> bool:
+        """
+        Check if a ticker is an ETF using FMP API.
+
+        Args:
+            ticker: Stock ticker to check
+
+        Returns:
+            True if ticker is an ETF, False otherwise
+        """
+        if not ticker:
+            return False
+
+        ticker = ticker.upper().strip()
+
+        # Check cache first
+        cached_result = self.cache.get(ticker, 'is_etf')
+        if cached_result is not None:
+            return cached_result
+
+        # Make API request to ETF info endpoint
+        endpoint = f"v3/etf-info"
+        params = {'symbol': ticker}
+        response_data = self._make_request(endpoint, params)
+
+        # If we get data back, it's an ETF
+        is_etf_result = bool(response_data and isinstance(response_data, list) and len(response_data) > 0)
+
+        # Cache the result (30 days - this won't change)
+        self.cache.set(ticker, is_etf_result, 'is_etf')
+
+        return is_etf_result
 
     def get_spy_benchmark_allocation(self) -> Dict[str, float]:
         """Get SPY sector allocation for benchmark comparison."""

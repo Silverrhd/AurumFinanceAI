@@ -66,8 +66,10 @@ class EquityBreakdownReportService(EnhancedReportService):
                 'client_code': client_code,
                 'report_date': snapshot.snapshot_date.strftime('%Y-%m-%d'),
                 'total_equity_value': analysis_results['total_equity_value'],
-                'direct_holdings': analysis_results['direct_holdings'],
+                'aggregated_holdings': analysis_results['aggregated_holdings'],  # NEW: Look-through view
+                'direct_holdings': analysis_results['direct_holdings'],  # Kept for backward compat
                 'etf_holdings': analysis_results['etf_holdings'],
+                'aggregated_holdings_count': len(analysis_results['aggregated_holdings']),
                 'direct_holdings_count': len(analysis_results['direct_holdings']),
                 'etf_holdings_count': len(analysis_results['etf_holdings']),
                 'sector_breakdown': analysis_results['sector_comparison'],
@@ -113,8 +115,10 @@ class EquityBreakdownReportService(EnhancedReportService):
             'client_name': 'Unknown',
             'report_date': None,
             'total_equity_value': 0.0,
+            'aggregated_holdings': [],
             'direct_holdings': [],
             'etf_holdings': [],
+            'aggregated_holdings_count': 0,
             'direct_holdings_count': 0,
             'etf_holdings_count': 0,
             'sector_breakdown': {},

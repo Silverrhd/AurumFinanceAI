@@ -1,6 +1,6 @@
 """
 ETF Detection Utility
-Identifies ETFs from equity positions using name-based patterns
+Identifies ETFs from equity positions using FMP API + fallback name patterns
 """
 
 import logging
@@ -11,29 +11,54 @@ logger = logging.getLogger(__name__)
 
 
 class ETFDetector:
-    """Detect ETFs using name-based patterns."""
+    """Detect ETFs using FMP API and name-based patterns as fallback."""
 
+    # Enhanced keywords to catch more ETFs
     ETF_KEYWORDS = [
-        'ETF', 'FUND', 'INDEX', 'TRUST',
-        'ISHARES', 'SPDR', 'VANGUARD', 'INVESCO',
-        'PROSHARES', 'POWERSHARES', 'WISDOMTREE'
+        'ETF', 'FUND', 'INDEX', 'TRUST', 'SELECT SECTOR',
+        'ISH', 'ISHARES', 'SPDR', 'VANGUARD', 'INVESCO',
+        'PROSHARES', 'POWERSHARES', 'WISDOMTREE', 'ARK',
+        'SCHWAB', 'FIDELITY', 'BLACKROCK'
     ]
+
+    def __init__(self, fmp_service=None):
+        """
+        Initialize ETF detector.
+
+        Args:
+            fmp_service: Optional FMPEquityService instance for API-based detection
+        """
+        self.fmp_service = fmp_service
 
     def is_etf(self, asset: Asset) -> bool:
         """
-        Check if asset is ETF using name patterns.
+        Check if asset is ETF using FMP API first, then name patterns as fallback.
 
         Args:
             asset: Asset object to check
 
         Returns:
-            True if asset is likely an ETF
+            True if asset is an ETF
         """
-        if not asset or not asset.name:
+        if not asset:
             return False
 
-        name = asset.name.upper()
-        return any(keyword in name for keyword in self.ETF_KEYWORDS)
+        # Method 1: Use FMP API if available and ticker exists
+        if self.fmp_service and asset.ticker:
+            try:
+                is_etf_api = self.fmp_service.is_etf(asset.ticker)
+                if is_etf_api:
+                    return True
+            except Exception as e:
+                logger.warning(f"FMP API ETF check failed for {asset.ticker}: {e}")
+
+        # Method 2: Fallback to name-based pattern matching
+        if asset.name:
+            name = asset.name.upper()
+            if any(keyword in name for keyword in self.ETF_KEYWORDS):
+                return True
+
+        return False
 
     def separate_equities(self, positions) -> Tuple[List, List]:
         """
