@@ -202,6 +202,29 @@ class InvestmentCashFlowService:
                 'CURRENCY PURCHASE',    # FX operations (not investment activity)
                 'CURRENCY SALE'         # FX operations (not investment activity)
             ]
+        },
+        'PICTET': {
+            'INTEREST_INCOME': [
+                'Interest'                       # All interest/coupon payments
+            ],
+            'SERVICE_FEES': [
+                'Management fees PNAA',          # Management fees
+                'Portfolio fees'                 # Administration + flat fees
+            ],
+            'TRADING_BUY': [
+                'Purchase'                       # Security purchases (excluded)
+            ],
+            'TRADING_SELL': [
+                'Sale',                          # Security sales (excluded)
+                'Redemption',                    # Fund/bond redemptions (excluded)
+                'Redemption prior to maturity'   # Early redemptions (excluded)
+            ],
+            'EXTERNAL_FLOWS': [
+                # None found in sample
+            ],
+            'OTHER_EXCLUDED': [
+                # None identified
+            ]
         }
     }
     

@@ -278,7 +278,7 @@ class CashFlowService:
         },
         'STDSZ': {
             'EXTERNAL_INFLOWS': [],  # None identified in current data
-            'EXTERNAL_OUTFLOWS': [],  # None identified in current data  
+            'EXTERNAL_OUTFLOWS': [],  # None identified in current data
             'TRADING_EXCLUDED': [
                 'SECURITIES PURCHASE',  # Stock/ETF/Bond purchases (exclude from Modified Dietz)
                 'SECURITIES SALE',      # Stock/ETF sales (exclude from Modified Dietz)
@@ -287,6 +287,23 @@ class CashFlowService:
             'PROBLEMATIC_EXCLUDED': [
                 'CURRENCY PURCHASE',    # FX operations (not investment performance)
                 'CURRENCY SALE'         # FX operations (not investment performance)
+            ]
+        },
+        'PICTET': {
+            'EXTERNAL_INFLOWS': [
+                # None found in sample - deposits/wires would appear here
+            ],
+            'EXTERNAL_OUTFLOWS': [
+                # None found in sample - withdrawals/wires would appear here
+            ],
+            'TRADING_EXCLUDED': [
+                'Purchase',                      # Security purchases (exclude from returns)
+                'Sale',                          # Security sales (exclude from returns)
+                'Redemption',                    # Fund/bond redemptions (exclude from returns)
+                'Redemption prior to maturity'   # Early bond redemptions (exclude from returns)
+            ],
+            'PROBLEMATIC_EXCLUDED': [
+                # None identified in sample
             ]
         }
     }
