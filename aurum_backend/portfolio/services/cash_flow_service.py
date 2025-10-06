@@ -294,7 +294,8 @@ class CashFlowService:
                 # None found in sample - deposits/wires would appear here
             ],
             'EXTERNAL_OUTFLOWS': [
-                # None found in sample - withdrawals/wires would appear here
+                'Management fees PNAA',          # Management fees
+                'Portfolio fees'                 # Administration + flat fees
             ],
             'TRADING_EXCLUDED': [
                 'Purchase',                      # Security purchases (exclude from returns)
