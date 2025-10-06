@@ -224,7 +224,16 @@ class PortfolioPopulationService:
                         'Withdrawal', 'Deposit', 'Transfer', 'Wire Transfer', 'ACH',
                         'OUTGOING', 'Cash withdrawal', 'ATM Withdrawal', 'Wire Transfer Credit',
                         'ELECTRONIFIED CHECK', 'Cash Liquidation', 'BILL PMT', 'Zelle Payment',
-                        'Online Transfer', 'TRANSFER ACCOUNT', 'Cross Border Credit Transfer'
+                        'Online Transfer', 'TRANSFER ACCOUNT', 'Cross Border Credit Transfer',
+
+                        # Pictet-specific (fallback when CUSIP matching fails)
+                        'Purchase',                      # Security purchases
+                        'Sale',                          # Security sales
+                        'Redemption',                    # Fund/bond redemptions
+                        'Redemption prior to maturity',  # Early bond redemptions
+                        'Management fees PNAA',          # Management fees
+                        'Portfolio fees',                # Administration + flat fees
+                        'Interest'                       # Interest (fallback if CUSIP fails)
                     ]
                     
                     if transaction_type in cash_transaction_types:

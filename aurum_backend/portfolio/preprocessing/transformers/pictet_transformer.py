@@ -8,6 +8,7 @@ Handles securities and transactions data with Pictet-specific logic.
 
 import logging
 import pandas as pd
+import re
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 from datetime import datetime
@@ -187,14 +188,59 @@ class PictetTransformer:
             # Step 2: Date transformation (Timestamp → MM/DD/YYYY)
             logger.debug("📅 Step 2: Date format transformation")
             result_df['date'] = df['Value date'].dt.strftime('%m/%d/%Y')
-            
+
             # Step 3: Empty columns (system handles these)
             logger.debug("⭕ Step 3: Setting empty columns")
             result_df['price'] = None
-            result_df['quantity'] = None  
-            result_df['cusip'] = None
-            
-            # Ensure column order
+            result_df['quantity'] = None
+
+            # Step 4: CUSIP matching logic
+            logger.info("📋 Step 4: Matching transactions to securities for CUSIP lookup")
+
+            # Load transformed securities file to get CUSIP mappings
+            securities_file = transactions_file.replace('_transactions_', '_securities_')
+            if Path(securities_file).exists():
+                logger.info(f"  📂 Loading securities file: {Path(securities_file).name}")
+                securities_df = pd.read_excel(securities_file)
+
+                cusips = []
+                matched_count = 0
+                unmatched_transactions = []
+
+                for idx, row in df.iterrows():
+                    description = row.get('Description', '')
+                    order_type = row.get('Order type', '')
+
+                    # Extract asset name from description
+                    extracted_name = self._extract_asset_name_from_description(description)
+
+                    if extracted_name:
+                        # Match to security and get CUSIP
+                        cusip = self._match_transaction_to_security(extracted_name, securities_df)
+                        if cusip:
+                            matched_count += 1
+                        else:
+                            unmatched_transactions.append((order_type, description))
+                        cusips.append(cusip)
+                    else:
+                        # No extraction (fees, external flows, etc.)
+                        cusips.append(None)
+
+                result_df['cusip'] = cusips
+                logger.info(f"  ✅ Matched {matched_count}/{len(df)} transactions to securities")
+
+                if unmatched_transactions:
+                    logger.warning(f"  ⚠️ {len(unmatched_transactions)} transactions could not be matched:")
+                    for order_type, desc in unmatched_transactions[:5]:  # Show first 5
+                        logger.warning(f"    • {order_type}: {desc[:80]}")
+                    if len(unmatched_transactions) > 5:
+                        logger.warning(f"    ... and {len(unmatched_transactions) - 5} more")
+            else:
+                logger.warning(f"⚠️ Securities file not found: {securities_file}")
+                logger.warning("⚠️ Cannot populate transaction CUSIPs - all will be None")
+                result_df['cusip'] = None
+
+            # Step 5: Ensure column order
             result_df = result_df[output_columns]
             
             logger.info(f"✅ Transformation completed: {len(result_df)} transactions")
@@ -207,7 +253,82 @@ class PictetTransformer:
             # Return empty DataFrame with correct structure on error
             return pd.DataFrame(columns=['bank', 'client', 'account', 'date', 'transaction_type',
                                        'amount', 'price', 'quantity', 'cusip'])
-    
+
+    def _extract_asset_name_from_description(self, description: str) -> Optional[str]:
+        """
+        Extract asset identifier from Pictet transaction description.
+
+        Examples:
+        - "Ordinary interest 140000 5.60% HYUNDAI CAP. 23/28 SR S" → "5.60% HYUNDAI CAP. 23/28"
+        - "Purchase 18000 TBI USA 150126 SR" → "TBI USA 150126"
+        - "Interest 102000 9.7% JPM (SPX/SX5E/NKY) 25/26" → "9.7% JPM (SPX/SX5E/NKY) 25/26"
+        - "Management fees 3rd quarter 2025" → None
+
+        Args:
+            description: Transaction description from Pictet file
+
+        Returns:
+            Extracted asset name or None if not a security transaction
+        """
+        if pd.isna(description) or not description:
+            return None
+
+        # Pattern: Extract after quantity, before optional "SR S" suffix
+        patterns = [
+            # Pattern for interest/redemptions: "Interest 140000 5.60% HYUNDAI CAP. 23/28 SR S"
+            r'(?:Ordinary interest|Interest|Early redemption)\s+\d+\s+([\d.]+%\s+[\w\s\.\-\(\)/]+?)(?:\s+SR\s*S?)?$',
+            # Pattern for purchases/sales: "Purchase 18000 TBI USA 150126 SR"
+            r'(?:Purchase|Sale)\s+\d+\s+([\w\s\.\-\(\)/]+?)(?:\s+SR\s*S?)?$',
+            # Pattern for redemptions: "Redemption 500 LOFS-SHO.-T.MONEY MKT(USD)M USD-ACC"
+            r'Redemption\s+\d+\s+([\w\s\.\-\(\)/]+?)$',
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, description, re.IGNORECASE)
+            if match:
+                extracted = match.group(1).strip()
+                # Remove trailing "SR S" or "SR" if still present
+                extracted = re.sub(r'\s+SR\s*S?$', '', extracted, flags=re.IGNORECASE)
+                logger.debug(f"Extracted asset name: '{description}' → '{extracted}'")
+                return extracted
+
+        logger.debug(f"No asset name extracted from: '{description}'")
+        return None
+
+    def _match_transaction_to_security(self, extracted_name: str, securities_df: pd.DataFrame) -> Optional[str]:
+        """
+        Match extracted transaction name to security and return CUSIP.
+        Uses case-insensitive fuzzy matching to handle minor format differences.
+
+        Args:
+            extracted_name: Asset name extracted from transaction description
+            securities_df: DataFrame of transformed securities with 'name' and 'cusip'/'CUSIP' columns
+
+        Returns:
+            CUSIP/ISIN value or None if no match found
+        """
+        if not extracted_name or securities_df.empty:
+            return None
+
+        # Normalize for comparison
+        extracted_upper = extracted_name.upper().strip()
+
+        # Try to find match in securities
+        for idx, row in securities_df.iterrows():
+            sec_name = str(row.get('name', '')).upper().strip()
+
+            # Check if either contains the other (handles minor format differences)
+            # e.g., "5.60% HYUNDAI CAP. 23/28" matches "5.60% Hyundai Cap. 23/28 Sr S"
+            if extracted_upper in sec_name or sec_name in extracted_upper:
+                # Try both lowercase and uppercase CUSIP column names
+                cusip = row.get('cusip') if 'cusip' in securities_df.columns else row.get('CUSIP')
+                if pd.notna(cusip) and str(cusip).strip() != '' and str(cusip).strip() != '-':
+                    logger.debug(f"✅ Matched '{extracted_name}' → '{row['name']}' (CUSIP: {cusip})")
+                    return str(cusip).strip()
+
+        logger.debug(f"⚠️ No security match found for '{extracted_name}'")
+        return None
+
     def _standardize_date_format(self, date_str: str) -> Optional[str]:
         """
         Standardize date format for database insertion.
