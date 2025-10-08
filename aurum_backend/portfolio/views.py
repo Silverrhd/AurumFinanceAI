@@ -2125,6 +2125,10 @@ def admin_dashboard_data_original(request, client_filter=None):
         total_period_return_dollar = 0
         weighted_period_return_percent = 0
 
+        # Monthly Returns
+        total_monthly_return_dollar = 0
+        weighted_monthly_return_percent = 0
+
         clients_data = []
         asset_allocation_aggregated = {}
         bank_allocation_aggregated = {}
@@ -2163,6 +2167,22 @@ def admin_dashboard_data_original(request, client_filter=None):
                     # Weight period return percent
                     weighted_period_return_percent += client_period_percent * client_total_value
 
+                # Calculate monthly return for this client
+                from portfolio.services.portfolio_calculation_service import PortfolioCalculationService
+                calc_service = PortfolioCalculationService()
+                monthly_result = calc_service.calculate_monthly_return(
+                    client.code,
+                    latest_snapshot.snapshot_date
+                )
+
+                client_monthly_dollar = float(monthly_result['monthly_return_dollar'])
+                client_monthly_percent = float(monthly_result['monthly_return_percent'])
+
+                total_monthly_return_dollar += client_monthly_dollar
+
+                if client_total_value > 0:
+                    weighted_monthly_return_percent += client_monthly_percent * client_total_value
+
                 # Aggregate asset allocation
                 client_asset_allocation = metrics.get('asset_allocation', {})
                 for asset_type, allocation_data in client_asset_allocation.items():
@@ -2198,6 +2218,9 @@ def admin_dashboard_data_original(request, client_filter=None):
         # Calculate weighted period return percent
         final_period_percent = weighted_period_return_percent / total_aum if total_aum > 0 else 0
 
+        # Calculate weighted monthly return percent
+        final_monthly_percent = weighted_monthly_return_percent / total_aum if total_aum > 0 else 0
+
         # Generate chart data structures
         chart_data = _generate_admin_chart_data(clients_data, asset_allocation_aggregated, client_filter)
         
@@ -2211,6 +2234,10 @@ def admin_dashboard_data_original(request, client_filter=None):
             # This Period Returns
             'period_return_dollar': total_period_return_dollar,
             'period_return_percent': final_period_percent,
+
+            # Monthly Returns
+            'monthly_return_dollar': total_monthly_return_dollar,
+            'monthly_return_percent': final_monthly_percent,
 
             'client_count': len(clients_data),
             'filter_applied': client_filter
@@ -2977,6 +3004,10 @@ def client_dashboard_data(request, client_code=None):
             # This Period Returns
             'period_return_dollar': metrics.get('real_gain_loss_dollar', 0),
             'period_return_percent': metrics.get('real_gain_loss_percent', 0),
+
+            # Monthly Returns
+            'monthly_return_dollar': PortfolioCalculationService().calculate_monthly_return(client_code, latest_snapshot.snapshot_date)['monthly_return_dollar'],
+            'monthly_return_percent': PortfolioCalculationService().calculate_monthly_return(client_code, latest_snapshot.snapshot_date)['monthly_return_percent'],
 
             'position_count': metrics.get('position_count', 0),
             'asset_allocation': metrics.get('asset_allocation', {}),

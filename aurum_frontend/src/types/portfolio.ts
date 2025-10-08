@@ -14,6 +14,8 @@ export interface PortfolioSummary {
   estimated_annual_income: number;
   period_return_dollar: number;
   period_return_percent: number;
+  monthly_return_dollar: number;
+  monthly_return_percent: number;
   client_count?: number;
   filter_applied?: string;
 }

@@ -431,22 +431,40 @@ export default function ClientDashboardPage() {
                     </CardContent>
                   </Card>
 
-                  {/* Empty placeholders for Monthly Returns (Phase 2) */}
-                  <Card className="opacity-50">
+                  {/* Monthly Returns */}
+                  <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-gray-400">MONTHLY $ (Coming Soon)</CardTitle>
+                      <CardTitle className="text-sm font-medium text-gray-600">MONTHLY $</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-gray-400">--</div>
+                      <div className={`text-2xl font-bold ${
+                        loading ? 'aurum-text-dark' :
+                        (summary?.monthly_return_dollar || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {loading ? (
+                          <><span className="loading-spinner"></span>Loading...</>
+                        ) : (
+                          formatCurrency(summary?.monthly_return_dollar || 0)
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="opacity-50">
+                  <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-gray-400">MONTHLY % (Coming Soon)</CardTitle>
+                      <CardTitle className="text-sm font-medium text-gray-600">MONTHLY %</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-gray-400">--</div>
+                      <div className={`text-2xl font-bold ${
+                        loading ? 'aurum-text-dark' :
+                        (summary?.monthly_return_percent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {loading ? (
+                          <><span className="loading-spinner"></span>Loading...</>
+                        ) : (
+                          formatPercentage(summary?.monthly_return_percent || 0)
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 </div>

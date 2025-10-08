@@ -491,3 +491,106 @@ class PortfolioCalculationService:
             }
         except (Client.DoesNotExist, PortfolioSnapshot.DoesNotExist):
             return None
+
+    def calculate_monthly_return(self, client_code: str, snapshot_date) -> dict:
+        """
+        Calculate monthly return for a client at a specific snapshot date.
+        Returns dollar and percentage returns from previous month-end to current month-end.
+
+        Args:
+            client_code: Client identifier
+            snapshot_date: Current snapshot date (date object or string YYYY-MM-DD)
+
+        Returns:
+            {
+                'monthly_return_dollar': float,
+                'monthly_return_percent': float
+            }
+        """
+        from datetime import datetime
+
+        # Convert to date object if string
+        if isinstance(snapshot_date, str):
+            current_date = datetime.strptime(snapshot_date, '%Y-%m-%d').date()
+        else:
+            current_date = snapshot_date
+
+        # Get current month/year
+        current_year = current_date.year
+        current_month = current_date.month
+
+        # Get previous month/year
+        if current_month == 1:
+            prev_month = 12
+            prev_year = current_year - 1
+        else:
+            prev_month = current_month - 1
+            prev_year = current_year
+
+        # Find latest snapshot in current month
+        month_end_snapshot = PortfolioSnapshot.objects.filter(
+            client__code=client_code,
+            snapshot_date__year=current_year,
+            snapshot_date__month=current_month
+        ).order_by('-snapshot_date').first()
+
+        if not month_end_snapshot:
+            return {'monthly_return_dollar': 0.0, 'monthly_return_percent': 0.0}
+
+        # Calculate month boundary for accurate monthly comparison
+        month_boundary = datetime(current_year, current_month, 1).date()
+
+        # Get LAST snapshot in previous month
+        prev_month_last = PortfolioSnapshot.objects.filter(
+            client__code=client_code,
+            snapshot_date__year=prev_year,
+            snapshot_date__month=prev_month
+        ).order_by('-snapshot_date').first()
+
+        # Get FIRST snapshot in current month
+        current_month_first = PortfolioSnapshot.objects.filter(
+            client__code=client_code,
+            snapshot_date__year=current_year,
+            snapshot_date__month=current_month
+        ).order_by('snapshot_date').first()
+
+        # Choose snapshot closest to month boundary (day 1 of current month)
+        prev_month_snapshot = None
+
+        if prev_month_last and current_month_first:
+            # Both exist - compare distances from boundary
+            dist_prev = abs((month_boundary - prev_month_last.snapshot_date).days)
+            dist_current = abs((current_month_first.snapshot_date - month_boundary).days)
+
+            if dist_current < dist_prev:
+                # Current month first is closer
+                prev_month_snapshot = current_month_first
+            elif dist_prev < dist_current:
+                # Previous month last is closer
+                prev_month_snapshot = prev_month_last
+            else:
+                # Tie - prefer current month first
+                prev_month_snapshot = current_month_first
+
+        elif prev_month_last:
+            # Only previous month available
+            prev_month_snapshot = prev_month_last
+        elif current_month_first:
+            # Only current month available
+            prev_month_snapshot = current_month_first
+
+        if not prev_month_snapshot:
+            return {'monthly_return_dollar': 0.0, 'monthly_return_percent': 0.0}
+
+        # Calculate Modified Dietz return
+        dietz_service = ModifiedDietzService()
+        result = dietz_service.calculate_portfolio_return_detailed(
+            client_code,
+            prev_month_snapshot.snapshot_date,
+            month_end_snapshot.snapshot_date
+        )
+
+        return {
+            'monthly_return_dollar': result.get('gain_loss', 0.0),
+            'monthly_return_percent': result.get('return_percentage', 0.0)
+        }

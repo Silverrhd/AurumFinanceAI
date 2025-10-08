@@ -98,6 +98,10 @@ class CorrectDashboardCacheService:
             total_period_return_dollar = Decimal('0')
             weighted_period_return_percent = Decimal('0')
 
+            # Monthly Returns aggregation
+            total_monthly_return_dollar = Decimal('0')
+            weighted_monthly_return_percent = Decimal('0')
+
             asset_allocation_aggregated = {}
             bank_allocation_aggregated = {}
             bond_maturity_aggregated = {}
@@ -131,7 +135,24 @@ class CorrectDashboardCacheService:
 
                     # Weight period return percent by AUM
                     weighted_period_return_percent += client_period_percent * client_total_value
-                
+
+                # Calculate monthly return for this client
+                from portfolio.services.portfolio_calculation_service import PortfolioCalculationService
+                calc_service = PortfolioCalculationService()
+                monthly_result = calc_service.calculate_monthly_return(
+                    snapshot.client.code,
+                    snapshot.snapshot_date
+                )
+
+                client_monthly_dollar = Decimal(str(monthly_result['monthly_return_dollar']))
+                client_monthly_percent = Decimal(str(monthly_result['monthly_return_percent']))
+
+                # Aggregate monthly returns
+                total_monthly_return_dollar += client_monthly_dollar
+
+                if client_total_value > 0:
+                    weighted_monthly_return_percent += client_monthly_percent * client_total_value
+
                 # Aggregate asset allocation
                 client_asset_allocation = metrics.get('asset_allocation', {})
                 for asset_type, allocation_data in client_asset_allocation.items():
@@ -163,6 +184,9 @@ class CorrectDashboardCacheService:
 
             # Calculate weighted period return percent
             final_period_percent = weighted_period_return_percent / total_aum if total_aum > 0 else Decimal('0')
+
+            # Calculate weighted monthly return percent
+            final_monthly_percent = weighted_monthly_return_percent / total_aum if total_aum > 0 else Decimal('0')
 
             # Consolidate Cash + Money Market before storing (consistent with chart generation)
             consolidated_allocation = {}
@@ -207,6 +231,10 @@ class CorrectDashboardCacheService:
                         # This Period Returns
                         'total_period_return_dollar': total_period_return_dollar,
                         'weighted_period_return_percent': final_period_percent,
+
+                        # Monthly Returns
+                        'total_monthly_return_dollar': total_monthly_return_dollar,
+                        'weighted_monthly_return_percent': final_monthly_percent,
 
                         'asset_allocation_data': asset_allocation_json,
                         'bank_allocation_data': bank_allocation_json,
@@ -266,6 +294,10 @@ class CorrectDashboardCacheService:
                 # This Period Returns
                 'period_return_dollar': float(latest_cache.total_period_return_dollar),
                 'period_return_percent': float(latest_cache.weighted_period_return_percent),
+
+                # Monthly Returns
+                'monthly_return_dollar': float(latest_cache.total_monthly_return_dollar),
+                'monthly_return_percent': float(latest_cache.weighted_monthly_return_percent),
 
                 'client_count': latest_cache.client_count,
                 'filter_applied': 'ALL'

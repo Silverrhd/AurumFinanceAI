@@ -375,6 +375,16 @@ class DateAggregatedMetrics(models.Model):
         help_text="Weighted average this-period percentage return (weighted by AUM)"
     )
 
+    # Monthly Returns (month-end to month-end)
+    total_monthly_return_dollar = models.DecimalField(
+        max_digits=20, decimal_places=2, default=0,
+        help_text="Aggregated monthly dollar returns (month-end to month-end)"
+    )
+    weighted_monthly_return_percent = models.DecimalField(
+        max_digits=10, decimal_places=4, default=0,
+        help_text="Weighted average monthly percentage return (weighted by AUM)"
+    )
+
     # Pre-computed chart data (to eliminate expensive chart generation)
     asset_allocation_data = models.JSONField(help_text="Aggregated asset allocation for this date")
     bank_allocation_data = models.JSONField(default=dict, help_text='Aggregated bank allocation for this date')
