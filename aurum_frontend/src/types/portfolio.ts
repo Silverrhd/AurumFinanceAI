@@ -12,6 +12,8 @@ export interface PortfolioSummary {
   inception_dollar_performance: number;
   inception_return_pct: number;
   estimated_annual_income: number;
+  period_return_dollar: number;
+  period_return_percent: number;
   client_count?: number;
   filter_applied?: string;
 }

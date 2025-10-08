@@ -31,6 +31,10 @@ __pycache__/
 *.pyd
 .Python
 
+# FMP cache files
+**/fmp_cache.json
+fmp_cache.json
+
 # Django
 *.log
 logs/

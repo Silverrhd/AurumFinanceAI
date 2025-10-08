@@ -311,6 +311,64 @@ export default function AdminDashboardPage() {
                   </Card>
                 </div>
 
+                {/* Second Row - This Period Returns + Monthly Placeholders */}
+                <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ${filterLoading ? 'opacity-75' : ''}`}>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">THIS PERIOD $</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className={`text-2xl font-bold ${
+                        loading || filterLoading ? 'aurum-text-dark' :
+                        (summary?.period_return_dollar || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {loading || filterLoading ? (
+                          <><span className="loading-spinner"></span>Loading...</>
+                        ) : (
+                          formatCurrency(summary?.period_return_dollar || 0)
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600">THIS PERIOD %</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className={`text-2xl font-bold ${
+                        loading || filterLoading ? 'aurum-text-dark' :
+                        (summary?.period_return_percent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {loading || filterLoading ? (
+                          <><span className="loading-spinner"></span>Loading...</>
+                        ) : (
+                          formatPercentage(summary?.period_return_percent || 0)
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Empty placeholders for Monthly Returns (Phase 2) */}
+                  <Card className="opacity-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-400">MONTHLY $ (Coming Soon)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-400">--</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="opacity-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-400">MONTHLY % (Coming Soon)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-gray-400">--</div>
+                    </CardContent>
+                  </Card>
+                </div>
+
                 {/* Charts Grid (2x3) */}
                 <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${filterLoading ? 'opacity-75' : ''}`}>
                   <Card className="p-6">

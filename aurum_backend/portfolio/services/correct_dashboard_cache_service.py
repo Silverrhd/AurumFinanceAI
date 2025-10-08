@@ -93,6 +93,11 @@ class CorrectDashboardCacheService:
             total_inception_dollar = Decimal('0')
             weighted_inception_percent = Decimal('0')
             total_annual_income = Decimal('0')
+
+            # This Period Returns aggregation
+            total_period_return_dollar = Decimal('0')
+            weighted_period_return_percent = Decimal('0')
+
             asset_allocation_aggregated = {}
             bank_allocation_aggregated = {}
             bond_maturity_aggregated = {}
@@ -107,15 +112,25 @@ class CorrectDashboardCacheService:
                 client_inception_dollar = Decimal(str(metrics.get('inception_gain_loss_dollar', 0)))
                 client_inception_percent = Decimal(str(metrics.get('inception_gain_loss_percent', 0)))
                 client_annual_income = Decimal(str(metrics.get('estimated_annual_income', 0)))
-                
+
+                # Extract this period returns (already in metrics!)
+                client_period_dollar = Decimal(str(metrics.get('real_gain_loss_dollar', 0)))
+                client_period_percent = Decimal(str(metrics.get('real_gain_loss_percent', 0)))
+
                 # Aggregate totals
                 total_aum += client_total_value
                 total_inception_dollar += client_inception_dollar
                 total_annual_income += client_annual_income
-                
-                # For weighted average inception percentage
+
+                # Aggregate this period returns
+                total_period_return_dollar += client_period_dollar
+
+                # For weighted averages
                 if client_total_value > 0:
                     weighted_inception_percent += client_inception_percent * client_total_value
+
+                    # Weight period return percent by AUM
+                    weighted_period_return_percent += client_period_percent * client_total_value
                 
                 # Aggregate asset allocation
                 client_asset_allocation = metrics.get('asset_allocation', {})
@@ -143,9 +158,12 @@ class CorrectDashboardCacheService:
                 
                 client_count += 1
             
-            # Calculate final weighted percentage
+            # Calculate final weighted percentages
             final_inception_percent = weighted_inception_percent / total_aum if total_aum > 0 else Decimal('0')
-            
+
+            # Calculate weighted period return percent
+            final_period_percent = weighted_period_return_percent / total_aum if total_aum > 0 else Decimal('0')
+
             # Consolidate Cash + Money Market before storing (consistent with chart generation)
             consolidated_allocation = {}
             for asset_type, value in asset_allocation_aggregated.items():
@@ -185,6 +203,11 @@ class CorrectDashboardCacheService:
                         'weighted_inception_percent': final_inception_percent,
                         'total_annual_income': total_annual_income,
                         'client_count': client_count,
+
+                        # This Period Returns
+                        'total_period_return_dollar': total_period_return_dollar,
+                        'weighted_period_return_percent': final_period_percent,
+
                         'asset_allocation_data': asset_allocation_json,
                         'bank_allocation_data': bank_allocation_json,
                         'bond_maturity_data': bond_maturity_json,
@@ -239,6 +262,11 @@ class CorrectDashboardCacheService:
                 'inception_dollar_performance': float(latest_cache.total_inception_dollar),
                 'inception_return_pct': float(latest_cache.weighted_inception_percent),
                 'estimated_annual_income': float(latest_cache.total_annual_income),
+
+                # This Period Returns
+                'period_return_dollar': float(latest_cache.total_period_return_dollar),
+                'period_return_percent': float(latest_cache.weighted_period_return_percent),
+
                 'client_count': latest_cache.client_count,
                 'filter_applied': 'ALL'
             }

@@ -2120,6 +2120,11 @@ def admin_dashboard_data_original(request, client_filter=None):
         total_inception_dollar = 0
         weighted_inception_percent = 0
         total_annual_income = 0
+
+        # This Period Returns
+        total_period_return_dollar = 0
+        weighted_period_return_percent = 0
+
         clients_data = []
         asset_allocation_aggregated = {}
         bank_allocation_aggregated = {}
@@ -2138,16 +2143,26 @@ def admin_dashboard_data_original(request, client_filter=None):
                 client_inception_dollar = float(metrics.get('inception_gain_loss_dollar', 0))
                 client_inception_percent = float(metrics.get('inception_gain_loss_percent', 0))
                 client_annual_income = float(metrics.get('estimated_annual_income', 0))
-                
+
+                # Extract this period returns
+                client_period_dollar = float(metrics.get('real_gain_loss_dollar', 0))
+                client_period_percent = float(metrics.get('real_gain_loss_percent', 0))
+
                 # Aggregate totals
                 total_aum += client_total_value
                 total_inception_dollar += client_inception_dollar
                 total_annual_income += client_annual_income
-                
-                # For weighted average inception percentage
+
+                # Aggregate this period returns
+                total_period_return_dollar += client_period_dollar
+
+                # For weighted averages
                 if client_total_value > 0:
                     weighted_inception_percent += client_inception_percent * client_total_value
-                
+
+                    # Weight period return percent
+                    weighted_period_return_percent += client_period_percent * client_total_value
+
                 # Aggregate asset allocation
                 client_asset_allocation = metrics.get('asset_allocation', {})
                 for asset_type, allocation_data in client_asset_allocation.items():
@@ -2177,9 +2192,12 @@ def admin_dashboard_data_original(request, client_filter=None):
                     'snapshot_date': latest_snapshot.snapshot_date.isoformat()
                 })
         
-        # Calculate weighted average inception percentage
+        # Calculate weighted average percentages
         final_inception_percent = weighted_inception_percent / total_aum if total_aum > 0 else 0
-        
+
+        # Calculate weighted period return percent
+        final_period_percent = weighted_period_return_percent / total_aum if total_aum > 0 else 0
+
         # Generate chart data structures
         chart_data = _generate_admin_chart_data(clients_data, asset_allocation_aggregated, client_filter)
         
@@ -2189,6 +2207,11 @@ def admin_dashboard_data_original(request, client_filter=None):
             'inception_dollar_performance': total_inception_dollar,
             'inception_return_pct': final_inception_percent,
             'estimated_annual_income': total_annual_income,
+
+            # This Period Returns
+            'period_return_dollar': total_period_return_dollar,
+            'period_return_percent': final_period_percent,
+
             'client_count': len(clients_data),
             'filter_applied': client_filter
         }
@@ -2950,6 +2973,11 @@ def client_dashboard_data(request, client_code=None):
             'unrealized_gain_loss': metrics.get('unrealized_gain_loss', 0),
             'unrealized_gain_loss_pct': metrics.get('unrealized_gain_loss_pct', 0),
             'estimated_annual_income': metrics.get('estimated_annual_income', 0),
+
+            # This Period Returns
+            'period_return_dollar': metrics.get('real_gain_loss_dollar', 0),
+            'period_return_percent': metrics.get('real_gain_loss_percent', 0),
+
             'position_count': metrics.get('position_count', 0),
             'asset_allocation': metrics.get('asset_allocation', {}),
             'custody_allocation': metrics.get('custody_allocation', {}),
