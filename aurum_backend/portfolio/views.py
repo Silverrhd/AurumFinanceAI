@@ -2302,7 +2302,18 @@ def client_dashboard_with_charts(request):
         inception_dollar = float(metrics.get('inception_gain_loss_dollar', 0))
         inception_percent = float(metrics.get('inception_gain_loss_percent', 0))
         annual_income = float(metrics.get('estimated_annual_income', 0))
-        
+
+        # Extract this period returns from metrics
+        period_dollar = float(metrics.get('real_gain_loss_dollar', 0))
+        period_percent = float(metrics.get('real_gain_loss_percent', 0))
+
+        # Calculate monthly returns
+        from portfolio.services.portfolio_calculation_service import PortfolioCalculationService
+        calc_service = PortfolioCalculationService()
+        monthly_result = calc_service.calculate_monthly_return(client.code, latest_snapshot.snapshot_date)
+        monthly_dollar = float(monthly_result['monthly_return_dollar'])
+        monthly_percent = float(monthly_result['monthly_return_percent'])
+
         # Asset allocation for charts
         client_asset_allocation = metrics.get('asset_allocation', {})
         asset_allocation_aggregated = {}
@@ -2330,6 +2341,15 @@ def client_dashboard_with_charts(request):
             'inception_dollar_performance': inception_dollar,
             'inception_return_pct': inception_percent,
             'estimated_annual_income': annual_income,
+
+            # This Period Returns
+            'period_return_dollar': period_dollar,
+            'period_return_percent': period_percent,
+
+            # Monthly Returns
+            'monthly_return_dollar': monthly_dollar,
+            'monthly_return_percent': monthly_percent,
+
             'client_count': 1,  # Always 1 for client dashboard
             'filter_applied': client_code
         }
