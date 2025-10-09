@@ -5,6 +5,17 @@
 
 set -e
 
+# Load secrets from server file
+SECRETS_FILE="/opt/aurumfinance/secrets.sh"
+if [ -f "$SECRETS_FILE" ]; then
+    source "$SECRETS_FILE"
+    echo "✅ Secrets loaded from $SECRETS_FILE"
+else
+    echo "❌ ERROR: Secrets file not found at $SECRETS_FILE"
+    echo "Create it first with: sudo nano $SECRETS_FILE"
+    exit 1
+fi
+
 if [ -z "$1" ]; then
     echo "❌ Error: Please provide your AWS public IP"
     echo "Usage: ./github_deploy.sh YOUR_AWS_IP"
@@ -57,7 +68,7 @@ ALLOWED_HOSTS=$AWS_IP,127.0.0.1,localhost,aurum.dndpi.cl
 USE_POSTGRESQL=True
 DB_NAME=aurum_finance_prod
 DB_USER=aurumuser
-DB_PASSWORD=AurumSecure2025!
+DB_PASSWORD=$DB_PASSWORD
 DB_HOST=localhost
 DB_PORT=5432
 
@@ -74,9 +85,14 @@ EMAIL_HOST_PASSWORD=
 DEFAULT_FROM_EMAIL=noreply@aurumfinance.com
 
 # API Keys
-OPENFIGI_API_KEY=bf21060a-0568-489e-8622-efcaf02e52cf
-MAPPINGS_ENCRYPTION_KEY=5vfZ2BJUS53dJUUM6jgLqKnqFZyeA9yG44oHgDV-POs=
+OPENFIGI_API_KEY=$OPENFIGI_API_KEY
+MAPPINGS_ENCRYPTION_KEY=$MAPPINGS_ENCRYPTION_KEY
 EOF
+
+# Secure .env file permissions
+echo "🔒 Securing .env file permissions..."
+chmod 600 $APP_DIR/source/aurum_backend/.env
+chown aurumapp:aurumapp $APP_DIR/source/aurum_backend/.env
 
 # Step 5: Setup Django
 echo "🔧 Setting up Django..."
