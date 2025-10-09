@@ -5,6 +5,9 @@
 
 set -e
 
+echo "❌ Database already exists. This script is not needed"
+exit 1
+
 echo "🐘 Setting up PostgreSQL database..."
 
 # Start PostgreSQL

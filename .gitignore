@@ -49,6 +49,7 @@ static_collected/
 
 # Node modules (if any)
 node_modules/
+node_modules/.DS_Store
 
 # Secrets files (NEVER commit)
 **/secrets.sh

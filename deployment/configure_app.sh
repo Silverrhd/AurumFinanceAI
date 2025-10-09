@@ -5,6 +5,9 @@
 
 set -e
 
+echo "❌ This script is deprecated. Use github_deploy.sh instead"
+exit 1
+
 if [ -z "$1" ]; then
     echo "❌ Error: Please provide your AWS public IP"
     echo "Usage: ./configure_app.sh YOUR_AWS_IP"
