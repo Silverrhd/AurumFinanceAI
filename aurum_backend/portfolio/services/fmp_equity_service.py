@@ -198,9 +198,7 @@ class FMPEquityService:
     30-day cache minimizes API usage
     """
 
-    # HARDCODED API KEY (Following OpenFIGI pattern)
-    # Replace this placeholder with your actual FMP API key
-    API_KEY = 'R4Ha75HU1HmKoiFqfuYHuTFCwOchsgOo'
+    # API key loaded from environment for security
     BASE_URL = 'https://financialmodelingprep.com/api'
 
     # Hardcoded SPY sector weights (fallback if API fails)
@@ -241,6 +239,14 @@ class FMPEquityService:
     }
 
     def __init__(self):
+        # Load API key from environment
+        self.API_KEY = os.environ.get('FMP_API_KEY')
+        if not self.API_KEY:
+            raise ValueError(
+                "FMP_API_KEY environment variable not set. "
+                "Please ensure it's defined in your .env file."
+            )
+
         self.rate_limiter = FMPRateLimiter(max_requests=300, time_window=60)
         self.cache = FMPCache(cache_file='fmp_cache.json', expire_days=30)
         self.session = requests.Session()
