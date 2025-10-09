@@ -2221,6 +2221,28 @@ def admin_dashboard_data_original(request, client_filter=None):
         # Calculate weighted monthly return percent
         final_monthly_percent = weighted_monthly_return_percent / total_aum if total_aum > 0 else 0
 
+        # Generate period and monthly labels using most recent snapshot across all clients
+        period_label = ""
+        monthly_label = ""
+        if clients_data:
+            # Get most recent snapshot across all clients
+            most_recent = max(clients_data, key=lambda x: x['snapshot_date'])
+            most_recent_date = datetime.fromisoformat(most_recent['snapshot_date']).date()
+
+            # Get previous snapshot for that client
+            most_recent_client = Client.objects.get(code=most_recent['client_code'])
+            previous_snapshot = PortfolioSnapshot.objects.filter(
+                client=most_recent_client,
+                snapshot_date__lt=most_recent_date
+            ).order_by('-snapshot_date').first()
+
+            if previous_snapshot:
+                period_label = f"{previous_snapshot.snapshot_date.strftime('%b %d')} → {most_recent_date.strftime('%b %d')}"
+            else:
+                period_label = most_recent_date.strftime('%b %d')
+
+            monthly_label = most_recent_date.strftime('%B')
+
         # Generate chart data structures
         chart_data = _generate_admin_chart_data(clients_data, asset_allocation_aggregated, client_filter)
         
@@ -2234,10 +2256,12 @@ def admin_dashboard_data_original(request, client_filter=None):
             # This Period Returns
             'period_return_dollar': total_period_return_dollar,
             'period_return_percent': final_period_percent,
+            'period_comparison_label': period_label,
 
             # Monthly Returns
             'monthly_return_dollar': total_monthly_return_dollar,
             'monthly_return_percent': final_monthly_percent,
+            'monthly_return_month': monthly_label,
 
             'client_count': len(clients_data),
             'filter_applied': client_filter
@@ -2314,6 +2338,21 @@ def client_dashboard_with_charts(request):
         monthly_dollar = float(monthly_result['monthly_return_dollar'])
         monthly_percent = float(monthly_result['monthly_return_percent'])
 
+        # Get previous snapshot for period comparison label
+        previous_snapshot = PortfolioSnapshot.objects.filter(
+            client=client,
+            snapshot_date__lt=latest_snapshot.snapshot_date
+        ).order_by('-snapshot_date').first()
+
+        # Format period comparison label
+        if previous_snapshot:
+            period_label = f"{previous_snapshot.snapshot_date.strftime('%b %d')} → {latest_snapshot.snapshot_date.strftime('%b %d')}"
+        else:
+            period_label = latest_snapshot.snapshot_date.strftime('%b %d')
+
+        # Format monthly return label (current month)
+        monthly_label = latest_snapshot.snapshot_date.strftime('%B')
+
         # Asset allocation for charts
         client_asset_allocation = metrics.get('asset_allocation', {})
         asset_allocation_aggregated = {}
@@ -2345,10 +2384,12 @@ def client_dashboard_with_charts(request):
             # This Period Returns
             'period_return_dollar': period_dollar,
             'period_return_percent': period_percent,
+            'period_comparison_label': period_label,
 
             # Monthly Returns
             'monthly_return_dollar': monthly_dollar,
             'monthly_return_percent': monthly_percent,
+            'monthly_return_month': monthly_label,
 
             'client_count': 1,  # Always 1 for client dashboard
             'filter_applied': client_code

@@ -397,7 +397,9 @@ export default function ClientDashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-gray-600">THIS PERIOD $</CardTitle>
+                      <CardTitle className="text-sm font-medium text-gray-600">
+                        THIS PERIOD $ {summary?.period_comparison_label && `(${summary.period_comparison_label})`}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className={`text-2xl font-bold ${
@@ -434,7 +436,9 @@ export default function ClientDashboardPage() {
                   {/* Monthly Returns */}
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-gray-600">MONTHLY $</CardTitle>
+                      <CardTitle className="text-sm font-medium text-gray-600">
+                        MONTHLY $ {summary?.monthly_return_month && `(${summary.monthly_return_month})`}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className={`text-2xl font-bold ${

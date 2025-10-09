@@ -283,7 +283,22 @@ class CorrectDashboardCacheService:
             
             if not latest_cache:
                 return {'success': False, 'error': 'No cached data found'}
-            
+
+            # Get previous cache for period label
+            previous_cache = DateAggregatedMetrics.objects.filter(
+                client_filter='ALL',
+                snapshot_date__lt=latest_cache.snapshot_date
+            ).order_by('-snapshot_date').first()
+
+            # Format period comparison label
+            if previous_cache:
+                period_label = f"{previous_cache.snapshot_date.strftime('%b %d')} → {latest_cache.snapshot_date.strftime('%b %d')}"
+            else:
+                period_label = latest_cache.snapshot_date.strftime('%b %d')
+
+            # Format monthly return label (current month)
+            monthly_label = latest_cache.snapshot_date.strftime('%B')
+
             # Current metrics from latest date
             summary = {
                 'total_aum': float(latest_cache.total_aum),
@@ -294,10 +309,12 @@ class CorrectDashboardCacheService:
                 # This Period Returns
                 'period_return_dollar': float(latest_cache.total_period_return_dollar),
                 'period_return_percent': float(latest_cache.weighted_period_return_percent),
+                'period_comparison_label': period_label,
 
                 # Monthly Returns
                 'monthly_return_dollar': float(latest_cache.total_monthly_return_dollar),
                 'monthly_return_percent': float(latest_cache.weighted_monthly_return_percent),
+                'monthly_return_month': monthly_label,
 
                 'client_count': latest_cache.client_count,
                 'filter_applied': 'ALL'
