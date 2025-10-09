@@ -49,3 +49,6 @@ static_collected/
 
 # Node modules (if any)
 node_modules/
+
+# Secrets files (NEVER commit)
+**/secrets.sh
