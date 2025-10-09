@@ -23,6 +23,34 @@ class GonetTransformer:
         self.bank_name = 'Gonet'
         logger.info(f"🏦 Initialized {self.bank_name} transformer")
 
+    def _detect_asset_type(self, name: str) -> str:
+        """
+        Detect asset type from security name/description.
+
+        Logic:
+        - Name contains "Current account" (case-insensitive) → "Cash"
+        - All other securities → "Alternatives"
+
+        Args:
+            name: Security Description/Name
+
+        Returns:
+            Asset type string
+        """
+        if pd.isna(name):
+            return 'Alternatives'
+
+        name_str = str(name).strip().lower()
+
+        # Check if this is a current account (cash)
+        if 'current account' in name_str:
+            logger.debug(f"Asset type detection: '{name}' → Cash (current account)")
+            return 'Cash'
+
+        # Default: all other Gonet securities are alternatives
+        logger.debug(f"Asset type detection: '{name}' → Alternatives")
+        return 'Alternatives'
+
     def transform_securities(self, securities_file: str) -> pd.DataFrame:
         """
         Transform Gonet securities data to standard format.
@@ -64,10 +92,18 @@ class GonetTransformer:
             result_df['cusip'] = df['CUSIP']
             result_df['name'] = df['Security Description']
             result_df['market_value'] = df['Valuation USD']
-            result_df['asset_type'] = 'Alternatives'  # All Gonet securities are alternatives
             result_df['ticker'] = None
             result_df['coupon_rate'] = None
             result_df['maturity_date'] = None
+
+            # STEP 1b: Detect asset types from security descriptions
+            logger.info("📋 Step 1b: Detecting asset types from security descriptions")
+            result_df['asset_type'] = df['Security Description'].apply(self._detect_asset_type)
+
+            # Log asset type distribution
+            asset_counts = result_df['asset_type'].value_counts()
+            for asset_type, count in asset_counts.items():
+                logger.info(f"  📊 {asset_type}: {count} securities")
 
             # STEP 2: Clean quantity (remove spaces)
             logger.info("📋 Step 2: Cleaning quantity values (removing spaces)")
