@@ -29,7 +29,7 @@ ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'development')
 IS_PRODUCTION = ENVIRONMENT == 'production'
 
 # Allowed hosts configuration
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '18.231.106.188']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '56.125.169.17', 'aurum.dndpi.cl']
 if IS_PRODUCTION:
     additional_hosts = os.environ.get('ALLOWED_HOSTS', '')
     if additional_hosts:
@@ -265,6 +265,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",  # Next.js running on 3001
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
+    "https://aurum.dndpi.cl",  # Production domain with SSL
 ]
 
 # Production CORS settings

@@ -93,6 +93,15 @@ class CorrectDashboardCacheService:
             total_inception_dollar = Decimal('0')
             weighted_inception_percent = Decimal('0')
             total_annual_income = Decimal('0')
+
+            # This Period Returns aggregation
+            total_period_return_dollar = Decimal('0')
+            weighted_period_return_percent = Decimal('0')
+
+            # Monthly Returns aggregation
+            total_monthly_return_dollar = Decimal('0')
+            weighted_monthly_return_percent = Decimal('0')
+
             asset_allocation_aggregated = {}
             bank_allocation_aggregated = {}
             bond_maturity_aggregated = {}
@@ -107,16 +116,43 @@ class CorrectDashboardCacheService:
                 client_inception_dollar = Decimal(str(metrics.get('inception_gain_loss_dollar', 0)))
                 client_inception_percent = Decimal(str(metrics.get('inception_gain_loss_percent', 0)))
                 client_annual_income = Decimal(str(metrics.get('estimated_annual_income', 0)))
-                
+
+                # Extract this period returns (already in metrics!)
+                client_period_dollar = Decimal(str(metrics.get('real_gain_loss_dollar', 0)))
+                client_period_percent = Decimal(str(metrics.get('real_gain_loss_percent', 0)))
+
                 # Aggregate totals
                 total_aum += client_total_value
                 total_inception_dollar += client_inception_dollar
                 total_annual_income += client_annual_income
-                
-                # For weighted average inception percentage
+
+                # Aggregate this period returns
+                total_period_return_dollar += client_period_dollar
+
+                # For weighted averages
                 if client_total_value > 0:
                     weighted_inception_percent += client_inception_percent * client_total_value
-                
+
+                    # Weight period return percent by AUM
+                    weighted_period_return_percent += client_period_percent * client_total_value
+
+                # Calculate monthly return for this client
+                from portfolio.services.portfolio_calculation_service import PortfolioCalculationService
+                calc_service = PortfolioCalculationService()
+                monthly_result = calc_service.calculate_monthly_return(
+                    snapshot.client.code,
+                    snapshot.snapshot_date
+                )
+
+                client_monthly_dollar = Decimal(str(monthly_result['monthly_return_dollar']))
+                client_monthly_percent = Decimal(str(monthly_result['monthly_return_percent']))
+
+                # Aggregate monthly returns
+                total_monthly_return_dollar += client_monthly_dollar
+
+                if client_total_value > 0:
+                    weighted_monthly_return_percent += client_monthly_percent * client_total_value
+
                 # Aggregate asset allocation
                 client_asset_allocation = metrics.get('asset_allocation', {})
                 for asset_type, allocation_data in client_asset_allocation.items():
@@ -143,9 +179,15 @@ class CorrectDashboardCacheService:
                 
                 client_count += 1
             
-            # Calculate final weighted percentage
+            # Calculate final weighted percentages
             final_inception_percent = weighted_inception_percent / total_aum if total_aum > 0 else Decimal('0')
-            
+
+            # Calculate weighted period return percent
+            final_period_percent = weighted_period_return_percent / total_aum if total_aum > 0 else Decimal('0')
+
+            # Calculate weighted monthly return percent
+            final_monthly_percent = weighted_monthly_return_percent / total_aum if total_aum > 0 else Decimal('0')
+
             # Consolidate Cash + Money Market before storing (consistent with chart generation)
             consolidated_allocation = {}
             for asset_type, value in asset_allocation_aggregated.items():
@@ -185,6 +227,15 @@ class CorrectDashboardCacheService:
                         'weighted_inception_percent': final_inception_percent,
                         'total_annual_income': total_annual_income,
                         'client_count': client_count,
+
+                        # This Period Returns
+                        'total_period_return_dollar': total_period_return_dollar,
+                        'weighted_period_return_percent': final_period_percent,
+
+                        # Monthly Returns
+                        'total_monthly_return_dollar': total_monthly_return_dollar,
+                        'weighted_monthly_return_percent': final_monthly_percent,
+
                         'asset_allocation_data': asset_allocation_json,
                         'bank_allocation_data': bank_allocation_json,
                         'bond_maturity_data': bond_maturity_json,
@@ -232,13 +283,39 @@ class CorrectDashboardCacheService:
             
             if not latest_cache:
                 return {'success': False, 'error': 'No cached data found'}
-            
+
+            # Get previous cache for period label
+            previous_cache = DateAggregatedMetrics.objects.filter(
+                client_filter='ALL',
+                snapshot_date__lt=latest_cache.snapshot_date
+            ).order_by('-snapshot_date').first()
+
+            # Format period comparison label
+            if previous_cache:
+                period_label = f"{previous_cache.snapshot_date.strftime('%b %d')} → {latest_cache.snapshot_date.strftime('%b %d')}"
+            else:
+                period_label = latest_cache.snapshot_date.strftime('%b %d')
+
+            # Format monthly return label (current month)
+            monthly_label = latest_cache.snapshot_date.strftime('%B')
+
             # Current metrics from latest date
             summary = {
                 'total_aum': float(latest_cache.total_aum),
                 'inception_dollar_performance': float(latest_cache.total_inception_dollar),
                 'inception_return_pct': float(latest_cache.weighted_inception_percent),
                 'estimated_annual_income': float(latest_cache.total_annual_income),
+
+                # This Period Returns
+                'period_return_dollar': float(latest_cache.total_period_return_dollar),
+                'period_return_percent': float(latest_cache.weighted_period_return_percent),
+                'period_comparison_label': period_label,
+
+                # Monthly Returns
+                'monthly_return_dollar': float(latest_cache.total_monthly_return_dollar),
+                'monthly_return_percent': float(latest_cache.weighted_monthly_return_percent),
+                'monthly_return_month': monthly_label,
+
                 'client_count': latest_cache.client_count,
                 'filter_applied': 'ALL'
             }

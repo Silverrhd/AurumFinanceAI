@@ -2120,6 +2120,15 @@ def admin_dashboard_data_original(request, client_filter=None):
         total_inception_dollar = 0
         weighted_inception_percent = 0
         total_annual_income = 0
+
+        # This Period Returns
+        total_period_return_dollar = 0
+        weighted_period_return_percent = 0
+
+        # Monthly Returns
+        total_monthly_return_dollar = 0
+        weighted_monthly_return_percent = 0
+
         clients_data = []
         asset_allocation_aggregated = {}
         bank_allocation_aggregated = {}
@@ -2138,16 +2147,42 @@ def admin_dashboard_data_original(request, client_filter=None):
                 client_inception_dollar = float(metrics.get('inception_gain_loss_dollar', 0))
                 client_inception_percent = float(metrics.get('inception_gain_loss_percent', 0))
                 client_annual_income = float(metrics.get('estimated_annual_income', 0))
-                
+
+                # Extract this period returns
+                client_period_dollar = float(metrics.get('real_gain_loss_dollar', 0))
+                client_period_percent = float(metrics.get('real_gain_loss_percent', 0))
+
                 # Aggregate totals
                 total_aum += client_total_value
                 total_inception_dollar += client_inception_dollar
                 total_annual_income += client_annual_income
-                
-                # For weighted average inception percentage
+
+                # Aggregate this period returns
+                total_period_return_dollar += client_period_dollar
+
+                # For weighted averages
                 if client_total_value > 0:
                     weighted_inception_percent += client_inception_percent * client_total_value
-                
+
+                    # Weight period return percent
+                    weighted_period_return_percent += client_period_percent * client_total_value
+
+                # Calculate monthly return for this client
+                from portfolio.services.portfolio_calculation_service import PortfolioCalculationService
+                calc_service = PortfolioCalculationService()
+                monthly_result = calc_service.calculate_monthly_return(
+                    client.code,
+                    latest_snapshot.snapshot_date
+                )
+
+                client_monthly_dollar = float(monthly_result['monthly_return_dollar'])
+                client_monthly_percent = float(monthly_result['monthly_return_percent'])
+
+                total_monthly_return_dollar += client_monthly_dollar
+
+                if client_total_value > 0:
+                    weighted_monthly_return_percent += client_monthly_percent * client_total_value
+
                 # Aggregate asset allocation
                 client_asset_allocation = metrics.get('asset_allocation', {})
                 for asset_type, allocation_data in client_asset_allocation.items():
@@ -2177,9 +2212,37 @@ def admin_dashboard_data_original(request, client_filter=None):
                     'snapshot_date': latest_snapshot.snapshot_date.isoformat()
                 })
         
-        # Calculate weighted average inception percentage
+        # Calculate weighted average percentages
         final_inception_percent = weighted_inception_percent / total_aum if total_aum > 0 else 0
-        
+
+        # Calculate weighted period return percent
+        final_period_percent = weighted_period_return_percent / total_aum if total_aum > 0 else 0
+
+        # Calculate weighted monthly return percent
+        final_monthly_percent = weighted_monthly_return_percent / total_aum if total_aum > 0 else 0
+
+        # Generate period and monthly labels using most recent snapshot across all clients
+        period_label = ""
+        monthly_label = ""
+        if clients_data:
+            # Get most recent snapshot across all clients
+            most_recent = max(clients_data, key=lambda x: x['snapshot_date'])
+            most_recent_date = datetime.fromisoformat(most_recent['snapshot_date']).date()
+
+            # Get previous snapshot for that client
+            most_recent_client = Client.objects.get(code=most_recent['client_code'])
+            previous_snapshot = PortfolioSnapshot.objects.filter(
+                client=most_recent_client,
+                snapshot_date__lt=most_recent_date
+            ).order_by('-snapshot_date').first()
+
+            if previous_snapshot:
+                period_label = f"{previous_snapshot.snapshot_date.strftime('%b %d')} → {most_recent_date.strftime('%b %d')}"
+            else:
+                period_label = most_recent_date.strftime('%b %d')
+
+            monthly_label = most_recent_date.strftime('%B')
+
         # Generate chart data structures
         chart_data = _generate_admin_chart_data(clients_data, asset_allocation_aggregated, client_filter)
         
@@ -2189,6 +2252,17 @@ def admin_dashboard_data_original(request, client_filter=None):
             'inception_dollar_performance': total_inception_dollar,
             'inception_return_pct': final_inception_percent,
             'estimated_annual_income': total_annual_income,
+
+            # This Period Returns
+            'period_return_dollar': total_period_return_dollar,
+            'period_return_percent': final_period_percent,
+            'period_comparison_label': period_label,
+
+            # Monthly Returns
+            'monthly_return_dollar': total_monthly_return_dollar,
+            'monthly_return_percent': final_monthly_percent,
+            'monthly_return_month': monthly_label,
+
             'client_count': len(clients_data),
             'filter_applied': client_filter
         }
@@ -2252,7 +2326,33 @@ def client_dashboard_with_charts(request):
         inception_dollar = float(metrics.get('inception_gain_loss_dollar', 0))
         inception_percent = float(metrics.get('inception_gain_loss_percent', 0))
         annual_income = float(metrics.get('estimated_annual_income', 0))
-        
+
+        # Extract this period returns from metrics
+        period_dollar = float(metrics.get('real_gain_loss_dollar', 0))
+        period_percent = float(metrics.get('real_gain_loss_percent', 0))
+
+        # Calculate monthly returns
+        from portfolio.services.portfolio_calculation_service import PortfolioCalculationService
+        calc_service = PortfolioCalculationService()
+        monthly_result = calc_service.calculate_monthly_return(client.code, latest_snapshot.snapshot_date)
+        monthly_dollar = float(monthly_result['monthly_return_dollar'])
+        monthly_percent = float(monthly_result['monthly_return_percent'])
+
+        # Get previous snapshot for period comparison label
+        previous_snapshot = PortfolioSnapshot.objects.filter(
+            client=client,
+            snapshot_date__lt=latest_snapshot.snapshot_date
+        ).order_by('-snapshot_date').first()
+
+        # Format period comparison label
+        if previous_snapshot:
+            period_label = f"{previous_snapshot.snapshot_date.strftime('%b %d')} → {latest_snapshot.snapshot_date.strftime('%b %d')}"
+        else:
+            period_label = latest_snapshot.snapshot_date.strftime('%b %d')
+
+        # Format monthly return label (current month)
+        monthly_label = latest_snapshot.snapshot_date.strftime('%B')
+
         # Asset allocation for charts
         client_asset_allocation = metrics.get('asset_allocation', {})
         asset_allocation_aggregated = {}
@@ -2280,6 +2380,17 @@ def client_dashboard_with_charts(request):
             'inception_dollar_performance': inception_dollar,
             'inception_return_pct': inception_percent,
             'estimated_annual_income': annual_income,
+
+            # This Period Returns
+            'period_return_dollar': period_dollar,
+            'period_return_percent': period_percent,
+            'period_comparison_label': period_label,
+
+            # Monthly Returns
+            'monthly_return_dollar': monthly_dollar,
+            'monthly_return_percent': monthly_percent,
+            'monthly_return_month': monthly_label,
+
             'client_count': 1,  # Always 1 for client dashboard
             'filter_applied': client_code
         }
@@ -2950,6 +3061,15 @@ def client_dashboard_data(request, client_code=None):
             'unrealized_gain_loss': metrics.get('unrealized_gain_loss', 0),
             'unrealized_gain_loss_pct': metrics.get('unrealized_gain_loss_pct', 0),
             'estimated_annual_income': metrics.get('estimated_annual_income', 0),
+
+            # This Period Returns
+            'period_return_dollar': metrics.get('real_gain_loss_dollar', 0),
+            'period_return_percent': metrics.get('real_gain_loss_percent', 0),
+
+            # Monthly Returns
+            'monthly_return_dollar': PortfolioCalculationService().calculate_monthly_return(client_code, latest_snapshot.snapshot_date)['monthly_return_dollar'],
+            'monthly_return_percent': PortfolioCalculationService().calculate_monthly_return(client_code, latest_snapshot.snapshot_date)['monthly_return_percent'],
+
             'position_count': metrics.get('position_count', 0),
             'asset_allocation': metrics.get('asset_allocation', {}),
             'custody_allocation': metrics.get('custody_allocation', {}),

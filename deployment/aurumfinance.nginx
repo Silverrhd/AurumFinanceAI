@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name 18.231.106.188;
+    server_name 56.125.169.17 aurum.dndpi.cl;
 
     # Frontend (Next.js)
     location / {

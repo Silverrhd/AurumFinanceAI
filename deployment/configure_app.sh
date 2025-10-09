@@ -33,7 +33,7 @@ cat > aurum_backend/.env << EOF
 DJANGO_ENVIRONMENT=production
 DEBUG=False
 SECRET_KEY=$(python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
-ALLOWED_HOSTS=$AWS_IP,127.0.0.1,localhost
+ALLOWED_HOSTS=$AWS_IP,127.0.0.1,localhost,aurum.dndpi.cl
 
 # Database
 USE_POSTGRESQL=True
@@ -44,7 +44,7 @@ DB_HOST=localhost
 DB_PORT=5432
 
 # CORS for frontend
-CORS_ALLOWED_ORIGINS=http://$AWS_IP,http://127.0.0.1:3000,http://localhost:3000
+CORS_ALLOWED_ORIGINS=http://$AWS_IP,http://127.0.0.1:3000,http://localhost:3000,https://aurum.dndpi.cl
 
 # Email (optional - can be configured later)
 EMAIL_HOST=smtp.gmail.com
@@ -116,7 +116,7 @@ cd ../aurum_frontend
 
 # Create frontend environment
 cat > .env.local << EOF
-NEXT_PUBLIC_API_URL=http://$AWS_IP/api
+NEXT_PUBLIC_API_URL=https://aurum.dndpi.cl
 NODE_ENV=production
 EOF
 
