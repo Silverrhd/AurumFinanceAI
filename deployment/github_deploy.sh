@@ -51,7 +51,7 @@ sudo -u aurumapp cat > $APP_DIR/source/aurum_backend/.env << EOF
 DJANGO_ENVIRONMENT=production
 DEBUG=False
 SECRET_KEY=$($APP_DIR/venv/bin/python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
-ALLOWED_HOSTS=$AWS_IP,127.0.0.1,localhost
+ALLOWED_HOSTS=$AWS_IP,127.0.0.1,localhost,aurum.dndpi.cl
 
 # Database
 USE_POSTGRESQL=True
@@ -62,7 +62,7 @@ DB_HOST=localhost
 DB_PORT=5432
 
 # CORS for frontend
-CORS_ALLOWED_ORIGINS=http://$AWS_IP,http://127.0.0.1:3000,http://localhost:3000
+CORS_ALLOWED_ORIGINS=http://$AWS_IP,http://127.0.0.1:3000,http://localhost:3000,https://aurum.dndpi.cl
 
 # Security (disable HTTPS redirect for HTTP deployment)
 SECURE_SSL_REDIRECT=False
@@ -100,7 +100,7 @@ echo "🎨 Setting up Next.js frontend..."
 cd $APP_DIR/source/aurum_frontend
 
 sudo -u aurumapp cat > .env.local << EOF
-NEXT_PUBLIC_API_URL=http://$AWS_IP
+NEXT_PUBLIC_API_URL=https://aurum.dndpi.cl
 NODE_ENV=production
 EOF
 
