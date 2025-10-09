@@ -5,8 +5,8 @@
 
 set -e
 
-# Load secrets from server file
-SECRETS_FILE="/opt/aurumfinance/secrets.sh"
+# Load secrets from server file (persistent location)
+SECRETS_FILE="/var/lib/aurumfinance/secrets.sh"
 if [ -f "$SECRETS_FILE" ]; then
     source "$SECRETS_FILE"
     echo "✅ Secrets loaded from $SECRETS_FILE"
