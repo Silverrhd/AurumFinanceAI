@@ -106,7 +106,11 @@ class CorrectDashboardCacheService:
             bank_allocation_aggregated = {}
             bond_maturity_aggregated = {}
             client_count = 0
-            
+
+            # Initialize ModifiedDietzService once for all clients
+            from .modified_dietz_service import ModifiedDietzService
+            dietz_service = ModifiedDietzService()
+
             # Aggregate across all clients for this specific date
             for snapshot in snapshots:
                 metrics = snapshot.portfolio_metrics
@@ -117,9 +121,34 @@ class CorrectDashboardCacheService:
                 client_inception_percent = Decimal(str(metrics.get('inception_gain_loss_percent', 0)))
                 client_annual_income = Decimal(str(metrics.get('estimated_annual_income', 0)))
 
-                # Extract this period returns (already in metrics!)
-                client_period_dollar = Decimal(str(metrics.get('real_gain_loss_dollar', 0)))
-                client_period_percent = Decimal(str(metrics.get('real_gain_loss_percent', 0)))
+                # Calculate this period returns using ModifiedDietzService (like the report does)
+                # Don't trust stored metrics - they use simplified calculation that includes external flows
+
+                # Get previous snapshot for period calculation
+                previous_snapshots = PortfolioSnapshot.objects.filter(
+                    client=snapshot.client,
+                    snapshot_date__lt=date_obj
+                ).order_by('-snapshot_date')
+
+                if previous_snapshots.exists():
+                    previous_snapshot = previous_snapshots.first()
+                    try:
+                        # Use ModifiedDietzService for accurate period return (excludes external flows)
+                        detailed_result = dietz_service.calculate_portfolio_return_detailed(
+                            snapshot.client.code,
+                            previous_snapshot.snapshot_date,
+                            date_obj
+                        )
+                        client_period_dollar = Decimal(str(detailed_result.get('gain_loss', 0)))
+                        client_period_percent = Decimal(str(detailed_result.get('return_percentage', 0)))
+                    except Exception as e:
+                        logger.warning(f"Failed to calculate period return for {snapshot.client.code}: {e}")
+                        client_period_dollar = Decimal('0')
+                        client_period_percent = Decimal('0')
+                else:
+                    # First snapshot - no comparison possible
+                    client_period_dollar = Decimal('0')
+                    client_period_percent = Decimal('0')
 
                 # Aggregate totals
                 total_aum += client_total_value
